@@ -1,4 +1,9 @@
 # Cloud Native Breach and Attack Simulation (CNBAS) Tool 
+
+<p align="center">
+<img width="396" alt="cnbas" src="https://github.com/PaloAltoNetworks/cnbas-tool/assets/4271325/f618c9c8-4f3f-48ca-848b-c51b53e4e366">
+</p>
+
 TBD
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![support](https://img.shields.io/badge/Support%20Level-Community-yellowgreen)](./SUPPORT.md)
