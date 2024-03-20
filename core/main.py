@@ -22,7 +22,7 @@ def select_cloud_provider():
 
 def select_attack_scenario():
     print(colored("Select Attack Scenario:", color="yellow"))
-    print(colored("1. EC2 takeover with LFI", color="green"))
+    print(colored("1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning", color="green"))
     print(colored("2. Coming Soon", color="green"))
     while True:
         try:
