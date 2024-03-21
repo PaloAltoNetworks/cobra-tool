@@ -1,0 +1,47 @@
+ Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyz
+*.pyzw
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyz
+*.pyzw
+*.pytest_cache/
+
+# Virtual Environment
+venv/
+ENV/
+env/
+# If you're using Poetry for dependency management, add the following line
+# poetry.lock
+
+# AWS Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+*.tfstate
+
+# Ignore local AWS credentials or configuration
+.aws/credentials
+.aws/config
+
+# Ignore IDE specific files
+.vscode/
+*.idea/
+*.vscode/
+
+# Ignore compiled Python files or bytecode
+*.pyc
+
+# Ignore any local development files or sensitive data
+*.env
+*.log
