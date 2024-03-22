@@ -1,6 +1,25 @@
 import pulumi
 import pulumi_aws as aws
 
+key_pair = aws.ec2.KeyPair("my-key-pair", public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDNviNnByH5MaYiImlzXJ2LzGR+V4KY1SPAjQZQB/Uy6UFTtfeywltUcHWPJjMSuGKfPJe17Zw+/ny27iCzzIbVBrJlxFG54gTovYom7fZ/yvp7pCBOrSYEx0WLiMM35qatkkhrGwm51nz5oFaFhNMLcH4IVYYr7tVtD+SRtKjdtMyTjtJjvPwalPPquTCO56FP48WRbyp2UsMhoTcHg1zjyGei8xktQaYNLVuklEPOw8M28PQBg3OGFAKspRtR3SCaWZbyGugqDZKW/kU8rzB7CHwmJs5mlGEpPzXAaOkQO/R4/ihdlQUJGa4+kL1zAfs2nD/tNwWbH8A1h5f36QntRLr7540jm1xiDSyocgB8fL7hT93GYPGoB1M5mLnvejWVSMBKHtoiXzkl0FwPy79K5FpnRwm/JOYUecrA+jVtpYbkHU1U23K4HWSYzZ/2uKgUo90Z4XRoVzCAa1SJnuF1CXmG3bBQWhwjvR60Bk8cj6NfHfwdPDDdeJWCKUjtF10=")
+
+ubuntu_ami = aws.ec2.get_ami(
+    filters=[
+        aws.ec2.GetAmiFilterArgs(
+            name="name",
+            values=["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"],
+        ),
+        aws.ec2.GetAmiFilterArgs(
+            name="virtualization-type",
+            values=["hvm"],
+        ),
+    ],
+    owners=["099720109477"],  # Canonical's official owner ID for Ubuntu images
+    most_recent=True,
+    # Uncomment and replace YOUR_REGION with the AWS region
+    # opts=pulumi.InvokeOptions(region="YOUR_REGION")
+)
+
 # Create an IAM role for EC2 instance
 role = aws.iam.Role("ec2-role",
     assume_role_policy="""{
@@ -68,6 +87,12 @@ sg = aws.ec2.SecurityGroup("web-sg",
             "fromPort": 80,
             "toPort": 80,
             "cidrBlocks": ["0.0.0.0/0"]
+        },
+        {
+            "protocol": "tcp",
+            "fromPort": 22,
+            "toPort": 22,
+            "cidrBlocks": ["0.0.0.0/0"]
         }
     ],
     egress=[{
@@ -80,7 +105,12 @@ sg = aws.ec2.SecurityGroup("web-sg",
 
 # User data script to be executed when the instance starts
 user_data_script = """
-IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgZG9ja2VyLmlvIC15CnN1ZG8gYXB0IGluc3RhbGwgcHl0aG9uMy1waXAgLXkKc3VkbyBwaXAzIGluc3RhbGwgYXdzLWV4cG9ydC1jcmVkZW50aWFscwpzdWRvIHBpcDMgaW5zdGFsbCBhd3NjbGkKc3VkbyBzeXN0ZW1jdGwgc3RhcnQgZG9ja2VyCnN1ZG8gc3lzdGVtY3RsIGVuYWJsZSBkb2NrZXIKc3VkbyBhcHQgaW5zdGFsbCB1bnppcApzdWRvIHN5c3RlbWN0bCBzdGFydCBkb2NrZXIKc3VkbyBzeXN0ZW1jdGwgZW5hYmxlIGRvY2tlcgpzdWRvIHN5c3RlbWN0bCBzdG9wIHRvbWNhdDkuc2VydmljZQpzdWRvIGFwdCAgaW5zdGFsbCBkb2NrZXItY29tcG9zZSAteQp3Z2V0IGh0dHBzOi8vbGFiLWZpbGVzLTAwZmZhYWJjYy5zMy5hbWF6b25hd3MuY29tL3B1bHVtaS92dWxuX2FwcC0yMDI0MDMyMVQwNjUxMzNaLTAwMS56aXAgLVAgL2hvbWUvdWJ1bnR1LwpjZCAvaG9tZS91YnVudHUvICYmIHVuemlwIC9ob21lL3VidW50dS92dWxuX2FwcC0yMDI0MDMyMVQwNjUxMzNaLTAwMS56aXAKc3VkbyBkb2NrZXItY29tcG9zZSAtZiAvaG9tZS91YnVudHUvdnVsbl9hcHAvZG9ja2VyLWNvbXBvc2UueW1sIHVwIC0tYnVpbGQgLWQK
+IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgZG9ja2VyLmlvIC15CnN1ZG8gYXB0IGluc3RhbGwgcHl0aG9uMy1waXAgLXkKc3VkbyBwaXAzIGluc3RhbGwgYXdzLWV4cG9ydC1jcmVkZW50aWFscwpzdWRvIHBpcDMgaW5zdGFsbCBhd3NjbGkKc3VkbyBzeXN0ZW1jdGwgc3RhcnQgZG9ja2VyCnN1ZG8gc3lzdGVtY3RsIGVuYWJsZSBkb2NrZXIKc3VkbyBhcHQgaW5zdGFsbCB1bnppcApzdWRvIHN5c3RlbWN0bCBzdGFydCBkb2NrZXIKc3VkbyBzeXN0ZW1jdGwgZW5hYmxlIGRvY2tlcgpzdWRvIHN5c3RlbWN0bCBzdG9wIHRvbWNhdDkuc2VydmljZQpzdWRvIGFwdCAgaW5zdGFsbCBkb2NrZXItY29tcG9zZSAteQp3Z2V0IGh0dHBzOi8vbGFiLWZpbGVzLTAwZmZhYWJjYy5zMy5hbWF6b25hd3MuY29tL3B1bHVtaS9hcHAuemlwIC1QIC9ob21lL3VidW50dS8KY2QgL2hvbWUvdWJ1bnR1LyAmJiB1bnppcCAvaG9tZS91YnVudHUvYXBwLnppcApzdWRvIGRvY2tlci1jb21wb3NlIC1mIC9ob21lL3VidW50dS9hcHAvZG9ja2VyLWNvbXBvc2UueW1sIHVwIC0tYnVpbGQgLWQK
+"""
+
+#Attacker Machine User Script
+user_data_script_1 = """
+IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgcHl0aG9uMy1waXAgLXkKc3VkbyBwaXAzIGluc3RhbGwgYXdzY2xpIC15CnN1ZG8gYXB0IGluc3RhbGwgZ2l0IC15CnN1ZG8gcGlwMyBpbnN0YWxsIGJzNCAKc3VkbyBhcHQgaW5zdGFsbCBqcSAteQpzdWRvIHBpcDMgaW5zdGFsbCBwYWNrYWdpbmcKCndnZXQgaHR0cHM6Ly9jbG91ZGxhYnNkZW1vOTkuczMuYW1hem9uYXdzLmNvbS9leHBsb2l0LnB5IC1QIC9ob21lL3VidW50dQpjaG1vZCAreCAvaG9tZS91YnVudHUvZXhwbG9pdC5weQoKZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9TdXNtaXRoS3Jpc2huYW4vdG9yZ2hvc3QuZ2l0CgpjZCB+L3Rvcmdob3N0LwpzdWRvIHB5dGhvbjMgdG9yZ2hvc3QucHkgLXMKc2xlZXAgMzAKc3VkbyBweXRob24zIHRvcmdob3N0LnB5IC1zCg=="
 """
 
 instance_profile = aws.iam.InstanceProfile("my-instance-profile",
@@ -90,11 +120,19 @@ instance_profile = aws.iam.InstanceProfile("my-instance-profile",
 # Create an EC2 instance with user data
 instance = aws.ec2.Instance("web-server",
     instance_type="t2.micro",
-    ami="ami-06aa3f7caf3a30282",  # Replace with your desired AMI ID
+    ami=ubuntu_ami.id,  
     iam_instance_profile=instance_profile.name,
     security_groups=[sg.name],
     user_data=user_data_script
 )
+
+instance1 = aws.ec2.Instance("attacker-server",
+    instance_type="t2.micro",
+    ami=ubuntu_ami.id, 
+    security_groups=[sg.name],
+    user_data=user_data_script_1,
+    key_name=key_pair.key_name)
+
 
 # Export the public IP of the EC2 instance
 pulumi.export("public_ip", instance.public_ip)
