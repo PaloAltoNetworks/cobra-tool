@@ -1,5 +1,6 @@
 import pulumi
 import pulumi_aws as aws
+import os
 
 key_pair = aws.ec2.KeyPair("my-key-pair", public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDNviNnByH5MaYiImlzXJ2LzGR+V4KY1SPAjQZQB/Uy6UFTtfeywltUcHWPJjMSuGKfPJe17Zw+/ny27iCzzIbVBrJlxFG54gTovYom7fZ/yvp7pCBOrSYEx0WLiMM35qatkkhrGwm51nz5oFaFhNMLcH4IVYYr7tVtD+SRtKjdtMyTjtJjvPwalPPquTCO56FP48WRbyp2UsMhoTcHg1zjyGei8xktQaYNLVuklEPOw8M28PQBg3OGFAKspRtR3SCaWZbyGugqDZKW/kU8rzB7CHwmJs5mlGEpPzXAaOkQO/R4/ihdlQUJGa4+kL1zAfs2nD/tNwWbH8A1h5f36QntRLr7540jm1xiDSyocgB8fL7hT93GYPGoB1M5mLnvejWVSMBKHtoiXzkl0FwPy79K5FpnRwm/JOYUecrA+jVtpYbkHU1U23K4HWSYzZ/2uKgUo90Z4XRoVzCAa1SJnuF1CXmG3bBQWhwjvR60Bk8cj6NfHfwdPDDdeJWCKUjtF10=")
 
@@ -110,7 +111,7 @@ IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgZG9ja2VyLmlvIC15
 
 #Attacker Machine User Script
 user_data_script_1 = """
-IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgcHl0aG9uMy1waXAgLXkKc3VkbyBhcHQgIGluc3RhbGwgYXdzY2xpIC15CnN1ZG8gYXB0IGluc3RhbGwgZ2l0IC15CnN1ZG8gcGlwMyBpbnN0YWxsIGJzNCAKc3VkbyBhcHQgaW5zdGFsbCBqcSAteQpzdWRvIHBpcDMgaW5zdGFsbCBwYWNrYWdpbmcKCndnZXQgaHR0cHM6Ly9jbG91ZGxhYnNkZW1vOTkuczMuYW1hem9uYXdzLmNvbS9leHBsb2l0LnB5IC1QIC9ob21lL3VidW50dQpjaG1vZCAreCAvaG9tZS91YnVudHUvZXhwbG9pdC5weQoKZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9TdXNtaXRoS3Jpc2huYW4vdG9yZ2hvc3QuZ2l0CgpjZCB+L3Rvcmdob3N0LwpzdWRvIHB5dGhvbjMgdG9yZ2hvc3QucHkgLXMKc2xlZXAgMzAKc3VkbyBweXRob24zIHRvcmdob3N0LnB5IC1zCg==
+IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgcHl0aG9uMy1waXAgLXkKc3VkbyBhcHQgIGluc3RhbGwgYXdzY2xpIC15CnN1ZG8gYXB0IGluc3RhbGwgZ2l0IC15CnN1ZG8gcGlwMyBpbnN0YWxsIGJzNCAKc3VkbyBhcHQgaW5zdGFsbCBqcSAteQpzdWRvIHBpcDMgaW5zdGFsbCBwYWNrYWdpbmcKCndnZXQgaHR0cHM6Ly9sYWItZmlsZXMtMDBmZmFhYmNjLnMzLmFtYXpvbmF3cy5jb20vcHVsdW1pL2V4cGxvaXQucHkgLVAgL2hvbWUvdWJ1bnR1CmNobW9kICt4IC9ob21lL3VidW50dS9leHBsb2l0LnB5CmNob3duIHVidW50dTp1YnVudHUgL2hvbWUvdWJ1bnR1L2V4cGxvaXQucHkKCmNkIC9ob21lL3VidW50dS8KZ2l0IGNsb25lIGh0dHBzOi8vZ2l0aHViLmNvbS9TdXNtaXRoS3Jpc2huYW4vdG9yZ2hvc3QuZ2l0Cm1rZGlyIC9ob21lL3VidW50dS8uYXdzLwp0b3VjaCAvaG9tZS91YnVudHUvLmF3cy9jcmVkZW50aWFscwpjaG93biAtUiB1YnVudHU6dWJ1bnR1IC9ob21lL3VidW50dS8uYXdzLwoKCmNkIC9ob21lL3VidW50dS90b3JnaG9zdC8Kc3VkbyBweXRob24zIHRvcmdob3N0LnB5IC1zCnNsZWVwIDMwCnN1ZG8gcHl0aG9uMyB0b3JnaG9zdC5weSAtcwo=
 """
 
 instance_profile = aws.iam.InstanceProfile("my-instance-profile",
@@ -135,7 +136,11 @@ instance1 = aws.ec2.Instance("attacker-server",
 
 
 # Export the public IP of the EC2 instance
-pulumi.export("public_ip", instance.public_ip)
+print("Web Server Public IP")
+pulumi.export("Web Server Public IP", instance.public_ip)
+
+print("Attacker Server Public IP")
+pulumi.export("Attacker Server Public IP", instance1.public_ip)
 
 pulumi.export("role_name", role.name)
 
@@ -149,5 +154,10 @@ pulumi.export("security_group_name", sg.name)
 pulumi.export("instance_profile_name", instance_profile.name)
 
 # Export the instance ID
-pulumi.export("instance_id", instance.id)
+print("Web Server Instance ID")
+pulumi.export("Web Server Instance ID", instance.id)
+
+print("Attacker Server Instance ID")
+pulumi.export("Attacker Server Instance ID", instance1.id)
+
 
