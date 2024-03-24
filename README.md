@@ -46,11 +46,11 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
 ## Installation
 
 ```
-python3 -m venv ./venv
+python3 -m venv ./infra/venv
 ```
 
 ```
-source venv/bin/activate
+source ./infra/venv/bin/activate
 ```
 
 ```
