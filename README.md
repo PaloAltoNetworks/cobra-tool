@@ -1,4 +1,4 @@
-# Cloud Native Breach and Attack Simulation (CNBAS) Tool 
+<h1 align="center">🚀 Cloud Native Breach and Attack Simulation (CNBAS) Tool 👩‍💻</h1>
 
 <p align="center">
 <img width="396" alt="cnbas" src="https://github.com/PaloAltoNetworks/cnbas-tool/assets/4271325/f618c9c8-4f3f-48ca-848b-c51b53e4e366">
@@ -25,6 +25,14 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
 5. **Continuous Threat Simulation**:  CNBAS offers a modular and templatized approach for users to easily integrate additional modules, allowing for continuous threat simulation and adaptability, by providing a flexible framework for adding modules, CNBAS ensures that users can tailor their threat simulation capabilities according to evolving security needs, making it an ideal platform for continuous threat simulation.
 
 
+### Key Features
+
+- 🤖 Supports Multi-cloud AWS, Azure and GCP environment.
+- 🔍 Cloud Native Contextual based analysis.
+- 🌐 Seamless multi-cloud attack path simulation.
+- 💻 Cloud based tool evaluation based on controls analysis.
+- 📊 Generate report and provide check list to mitigate the risk
+
 ## Prerequisites
 
 - Python 3.8+
@@ -36,10 +44,77 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
 
 
 ## Installation
-TBD
+
+```
+python3 -m venv ./venv
+```
+
+```
+source venv/bin/activate
+```
+
+```
+pip install -r requirements.txt
+```
+
 
 ## Usage
-TBD
+
+```
+python cnbas.py -h
+```
+
+```
+usage: cnbas.py [-h] [--simulation] [--scenario {scenario-1,scenario-2}] {aws,azure,gcp} {launch,status,destroy}
+
+Terminal-based option tool
+
+positional arguments:
+  {aws,azure,gcp}       Cloud provider (aws, azure, gcp)
+  {launch,status,destroy}
+                        Action to perform (launch, status, destroy)
+
+options:
+  -h, --help            show this help message and exit
+  --simulation          Enable simulation mode
+  --scenario {scenario-1,scenario-2}
+                        Scenario selection
+```
+
+#### Simulate AWS Scenario 
+
+```
+python3 cnbas.py aws launch --simulation
+```
+
+
+```
+  ____   _   _   ____       _      ____
+ / ___| | \ | | | __ )     / \    / ___|
+| |     |  \| | |  _ \    / _ \   \___ \
+| |___  | |\  | | |_) |  / ___ \   ___) |
+ \____| |_| \_| |____/  /_/   \_\ |____/
+
+
+Select Attack Scenario of aws:
+1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
+2. Coming Soon
+Enter your choice:
+```
+
+#### Check Status 
+
+```
+python3 cnbas.py aws status
+```
+
+#### Destroy Simulation
+
+```
+python3 cnbas.py aws destroy
+```
+
+
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details

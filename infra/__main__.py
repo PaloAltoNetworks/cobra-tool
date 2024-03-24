@@ -1,8 +1,17 @@
 import pulumi
 import pulumi_aws as aws
 import os
+import sys
+import subprocess
 
-key_pair = aws.ec2.KeyPair("my-key-pair", public_key="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDNviNnByH5MaYiImlzXJ2LzGR+V4KY1SPAjQZQB/Uy6UFTtfeywltUcHWPJjMSuGKfPJe17Zw+/ny27iCzzIbVBrJlxFG54gTovYom7fZ/yvp7pCBOrSYEx0WLiMM35qatkkhrGwm51nz5oFaFhNMLcH4IVYYr7tVtD+SRtKjdtMyTjtJjvPwalPPquTCO56FP48WRbyp2UsMhoTcHg1zjyGei8xktQaYNLVuklEPOw8M28PQBg3OGFAKspRtR3SCaWZbyGugqDZKW/kU8rzB7CHwmJs5mlGEpPzXAaOkQO/R4/ihdlQUJGa4+kL1zAfs2nD/tNwWbH8A1h5f36QntRLr7540jm1xiDSyocgB8fL7hT93GYPGoB1M5mLnvejWVSMBKHtoiXzkl0FwPy79K5FpnRwm/JOYUecrA+jVtpYbkHU1U23K4HWSYzZ/2uKgUo90Z4XRoVzCAa1SJnuF1CXmG3bBQWhwjvR60Bk8cj6NfHfwdPDDdeJWCKUjtF10=")
+def read_public_key(pub_key_path):
+    # Read the public key from the file
+    with open(pub_key_path, "r") as f:
+        public_key = f.read().strip()
+
+    return public_key
+
+key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("./../id_rsa.pub"))
 
 ubuntu_ami = aws.ec2.get_ami(
     filters=[

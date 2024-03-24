@@ -45,3 +45,12 @@ terraform.tfstate.backup
 # Ignore any local development files or sensitive data
 *.env
 *.log
+
+# ssh keys ignore 
+
+*id_rsa
+*id_rsa.pub
+
+*.DS_Store
+
+*aws-scenario-1-output.json
