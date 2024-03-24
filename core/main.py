@@ -6,6 +6,7 @@ import json
 from tqdm import tqdm
 from time import sleep
 from termcolor import colored
+from .report import gen_report
 
 def loading_animation():
     chars = "/—\\|"
@@ -78,6 +79,8 @@ def scenario_execute():
 
     ATTACKER_SERVER_PUBLIC_IP = data["Attacker Server Public IP"]
     WEB_SERVER_PUBLIC_IP = data["Web Server Public IP"]
+    ATTACKER_SERVER_INSTANCE_ID = data["Attacker Server Instance ID"]
+    WEB_SERVER_INSTANCE_ID = data["Web Server Instance ID"]
 
     print("Web Server Public IP: ", WEB_SERVER_PUBLIC_IP)
 
@@ -98,6 +101,8 @@ def scenario_execute():
     print(colored("Role Details", color="red"))
     loading_animation()
     subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" 'aws sts get-caller-identity'", shell=True)
+
+    gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID)
 
 
 def print_ascii_art(text):
