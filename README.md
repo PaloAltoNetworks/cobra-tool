@@ -61,7 +61,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```
-python cnbas.py -h
+python3 cnbas.py -h
 ```
 
 ```
