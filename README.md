@@ -1,4 +1,4 @@
-<h3 align="center">🚀 Cloud Native Breach and Attack Simulation (CNBAS) Tool 👩‍💻</h3>
+<h2 align="center">🚀 Cloud Native Breach and Attack Simulation (CNBAS) Tool 👩‍💻</h2>
 
 <p align="center">
 <img width="396" alt="cnbas" src="https://github.com/PaloAltoNetworks/cnbas-tool/assets/4271325/f618c9c8-4f3f-48ca-848b-c51b53e4e366">
