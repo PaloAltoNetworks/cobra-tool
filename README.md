@@ -37,7 +37,7 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
 
 - Python 3.8+
 - pip3
-- Pulumi
+- Pulumi Account
 - AWS CLI
 - Azure CLI
 - Google Cloud SDK
@@ -114,7 +114,6 @@ python3 cnbas.py aws status
 python3 cnbas.py aws destroy
 ```
 
-
-
 ## License
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details
+
+This project is licensed under the Apache Version 2.0, - see the [LICENSE](./LICENSE) file for details
