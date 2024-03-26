@@ -99,6 +99,15 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
                 <p>Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning.</p>
             </section>
 
+            <section>
+                <h2 style="color: #34A853;">Attack Scenario Breakdown</h2>
+                <p>1. A Web Server EC2 with a vulnerable application container is launched.</p>
+                <p>2. Attacker Machine is launched, operates behind Tor.</p>
+                <p>3. Attacker exploits the Application, gets shell access of the EC2.</p>
+                <p>4. Attacker retrieves and exfiltrates the Role credentials attached to the EC2.</p>
+                <p>5. Attacker loads these credentials on his machine.</p>
+                <p>6. Attacker launches some infra as a post exploit step.</p>
+            </section>    
 
             <section>
                 <h2 style="color: #34A853;">Attack Path Graph</h2>
@@ -171,6 +180,6 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
 
 
 
-gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID, WEB_SERVER_PUBLIC_IP)
+#gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID, WEB_SERVER_PUBLIC_IP)
 
     
