@@ -37,13 +37,29 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
 
 - Python 3.8+
 - pip3
-- Pulumi Account
+- Pulumi Account 
 - AWS CLI
 - Azure CLI
 - Google Cloud SDK
 
 
 ## Installation
+
+### AWS Credentials
+
+1. Install the AWS CLI by following the
+   instructions [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html).
+
+2. Configure your AWS credentials by running:
+
+    ```bash
+    aws configure
+    ```
+
+   You'll be prompted to enter your Access Key ID, Secret Access Key, and default region name.
+
+
+### Install CNBAS Tool
 
 ```
 python3 -m venv ./infra/venv
