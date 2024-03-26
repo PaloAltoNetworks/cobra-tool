@@ -7,7 +7,7 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE) [![support](https://img.shields.io/badge/Support%20Level-Community-yellowgreen)](./SUPPORT.md)
 
 ## Description
-CNBAS is not just another cloud security tool — it's a comprehensive simulation platform, built on the foundation of real-world threat scenarios, CNBAS offers organizations a unique opportunity to proactively strengthen their cloud defenses through simulated simulations tailored to their specific needs. 
+Cloud Native Breach and Attack Simulation (CNBAS) is an open-source tool designed to empower users to simulate attacks within multi-cloud environments, offering a comprehensive evaluation of security controls. By automating the testing of various threat vectors including external and insider threats, lateral movement, and data exfiltration, CNBAS enables organizations to gain insights into their security posture vulnerabilities. CNBAS is designed to conduct simulated attacks to assess an organization's ability to detect and respond to security threats effectively.
 
 It facilitates Proof of Concept (POC) evaluations, assesses security controls, measures maturity levels, and generates comprehensive reports, enabling organizations to enhance their cloud security resilience through lifelike threat scenarios. 
 
