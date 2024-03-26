@@ -169,4 +169,9 @@ pulumi.export("Web Server Instance ID", instance.id)
 print("Attacker Server Instance ID")
 pulumi.export("Attacker Server Instance ID", instance1.id)
 
+pulumi.export("AMI ID", ubuntu_ami.id)
+
+pulumi.export("Subnet ID", instance.subnet_id)
+
+pulumi.export("Key Pair Name", key_pair.key_name)
 

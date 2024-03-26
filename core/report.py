@@ -98,6 +98,8 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
                 <h2 style="color: #EA4335;">Description of Attack Path Scenario</h2>
                 <p>Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning.</p>
             </section>
+
+
             <section>
                 <h2 style="color: #34A853;">Attack Path Graph</h2>
                 <img src="core/scenarios/cnbas-as-1.png" alt="Attack Path Graph">
@@ -165,9 +167,10 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
         
 
     print("HTML report generated successfully.")
+    webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cnbas-as1-report.html')
 
 
 
-#gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID, WEB_SERVER_PUBLIC_IP)
-webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cnbas-as1-report.html')
+gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID, WEB_SERVER_PUBLIC_IP)
+
     
