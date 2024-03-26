@@ -1,16 +1,5 @@
 import webbrowser
-import json
-
 from pathlib import Path
-
-
-# with open("./core/aws-scenario-1-output.json", "r") as file:
-#     data = json.load(file)
-
-# ATTACKER_SERVER_PUBLIC_IP = data["Attacker Server Public IP"]
-# WEB_SERVER_PUBLIC_IP = data["Web Server Public IP"]
-# ATTACKER_SERVER_INSTANCE_ID = data["Attacker Server Instance ID"]
-# WEB_SERVER_INSTANCE_ID = data["Web Server Instance ID"]
 
 def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
     html_template = '''
@@ -95,8 +84,8 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
                 <h1 style="color: #4285F4;">CNBAS Attack Path Report</h1>
             </header>
             <section class="attack-description">
-                <h2 style="color: #EA4335;">Description of Attack Path Scenario</h2>
-                <p>Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning.</p>
+                <h2 style="color: #EA4335;">Attack Path Scenario Explained</h2>
+                <p>The scenario simulates a real-world chained attack, beginning with the exploitation of a vulnerable application. Subsequently, this initial breach facilitates a chain of events, including the takeover of EC2 instances, exfiltration of credentials, and the anomalous provisioning of compute resources..</p>
             </section>
 
             <section>
