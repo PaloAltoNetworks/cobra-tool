@@ -32,7 +32,7 @@ def generate_ssh_key():
     return key_path, key_path + ".pub"
 
     
-def scenario_execute():
+def scenario_1_execute():
     print("-"*30)
     print(colored("Executing Scenraio 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
     generate_ssh_key()
@@ -115,6 +115,19 @@ def scenario_execute():
     loading_animation()
     gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID)
 
+def scenario_2_execute():
+    print("-"*30)
+    print(colored("Executing Scenraio 2 : Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence ", color="red"))
+
+    print(colored("Rolling out Infra", color="red"))
+    loading_animation()
+    print("-"*30)
+
+    subprocess.call("cd ./infra/scenario-2/ && pulumi up -s aws-scenario-2 -y", shell=True)
+    subprocess.call("cd ./infra/scenario-2/ && pulumi stack -s aws-scenario-2 output --json >> ./../../core/aws-scenario-2-output.json", shell=True)
+
+
+
 
 def print_ascii_art(text):
     ascii_art = pyfiglet.figlet_format(text)
@@ -137,7 +150,7 @@ def select_cloud_provider():
 def select_attack_scenario(cloud_provider):
     print(colored("Select Attack Scenario of %s:", color="yellow") % cloud_provider)
     print(colored("1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning", color="green"))
-    print(colored("2. Coming Soon", color="green"))
+    print(colored("2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence", color="green"))
     while True:
         try:
             choice = int(input(colored("Enter your choice: ", color="yellow")))
@@ -160,10 +173,15 @@ def get_credentials():
         except ValueError as e:
             print(e)
 
-def execute_scenario():
+def execute_scenario(x):
     try:
         # Call the scenario function from the imported module
-        scenario_execute()
+        if x == 1:
+            scenario_1_execute()
+        elif x == 2:
+            scenario_2_execute()
+        else: 
+            print("Invalid Scenario Selected")
         print(colored("Scenario executed successfully!", color="green"))
     except Exception as e:
         print(colored("Error executing scenario:", color="red"), str(e))
@@ -177,9 +195,10 @@ def main(cloud_provider, action, simulation, scenario):
                 scenario_choice = select_attack_scenario(cloud_provider)
                 if scenario_choice == 1:
                     # Pass the selected scenario module to execute
-                    execute_scenario()
+                    execute_scenario(1)
                 elif scenario_choice == 2:
-                    print(colored("Scenario coming soon!", color="yellow"))
+                    execute_scenario(2)
+                    #print(colored("Scenario coming soon!", color="yellow"))
         elif action == 'status':
             subprocess.call("cd ./infra && pulumi stack ls", shell=True)
         elif action == 'destroy':
