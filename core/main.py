@@ -123,9 +123,28 @@ def scenario_2_execute():
     loading_animation()
     print("-"*30)
 
+    file_path = "./core/aws-scenario-2-output.json"
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print("File '{}' found and deleted.".format(file_path))
+    else:
+        print("File '{}' not found.".format(file_path))
+
     subprocess.call("cd ./infra/scenario-2/ && pulumi up -s aws-scenario-2 -y", shell=True)
     subprocess.call("cd ./infra/scenario-2/ && pulumi stack -s aws-scenario-2 output --json >> ./../../core/aws-scenario-2-output.json", shell=True)
 
+    with open("./core/aws-scenario-2-output.json", "r") as file:
+        data = json.load(file)
+
+    API_GW_URL = data["apigateway-rest-endpoint"]
+
+    print(colored("Exploiting the Application on API GW", color="red"))
+    loading_animation()
+    print("-"*30)   
+
+    print(colored("Detected OS Injection through API GW, lambda backend, attempting credential exfil", color="red"))
+    loading_animation()
+    print("-"*30)   
 
 
 
