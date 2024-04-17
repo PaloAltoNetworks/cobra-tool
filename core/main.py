@@ -173,6 +173,8 @@ def scenario_2_execute():
 
     gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME)
 
+    subprocess.call("rm token.txt", shell=True)
+
 
 def print_ascii_art(text):
     ascii_art = pyfiglet.figlet_format(text)
@@ -233,6 +235,7 @@ def execute_scenario(x):
 
 def main(cloud_provider, action, simulation, scenario):
     tool_name = "C N B A S"
+    print(scenario)
     print_ascii_art(tool_name)
     if cloud_provider == 'aws':
         if action == 'launch':
@@ -246,10 +249,10 @@ def main(cloud_provider, action, simulation, scenario):
                     #print(colored("Scenario coming soon!", color="yellow"))
         elif action == 'status':
             subprocess.call("cd ./infra && pulumi stack ls", shell=True)
-        elif action == 'destroy' and scenario == "1":
+        elif action == 'destroy' and scenario == "scenario-1":
             subprocess.call("cd ./infra && pulumi destroy", shell=True)
-        elif action == 'destroy' and scenario == "2":
-            subprocess.call("cd ./infra/scenario-2 && pulumi destroy", shell=True)
+        elif action == 'destroy' and scenario == "scenario-2":
+            subprocess.call("cd ./infra/scenario-2/ && pulumi destroy", shell=True)    
         else:
             print('No options provided. --help to know more')
 
