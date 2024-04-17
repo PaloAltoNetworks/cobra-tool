@@ -127,7 +127,7 @@ python3 cnbas.py aws status
 #### Destroy Simulation
 
 ```
-python3 cnbas.py aws destroy
+python3 cnbas.py aws destroy --scenario <scenario-1/scenario-2>
 ```
 
 ## License
