@@ -54,3 +54,7 @@ terraform.tfstate.backup
 *.DS_Store
 
 *aws-scenario-1-output.json
+*aws-scenario-2-output.json
+*token.txt
+*cnbas-as1-report.html
+*cnbas-as2-report.html

