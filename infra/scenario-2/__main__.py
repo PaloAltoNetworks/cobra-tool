@@ -54,5 +54,7 @@ rest_invoke_permission = aws.lambda_.Permission("api-rest-lambda-permission",
     source_arn=deployment.execution_arn.apply(lambda arn: arn + "*/*"),
 )
 
+pulumi.export("api-gateway-id", rest_api.id)
 pulumi.export("apigateway-rest-endpoint", deployment.invoke_url.apply(lambda url: url + custom_stage_name))
 pulumi.export("lambda-role-name", iam.lambda_role.name)
+pulumi.export("lambda-func-name", lambda_func.arn)

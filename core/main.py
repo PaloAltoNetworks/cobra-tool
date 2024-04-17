@@ -7,6 +7,7 @@ from tqdm import tqdm
 from time import sleep
 from termcolor import colored
 from .report import gen_report
+from .report import gen_report_2
 
 def loading_animation():
     chars = "/—\\|"
@@ -138,6 +139,8 @@ def scenario_2_execute():
 
     API_GW_URL = data["apigateway-rest-endpoint"]
     LAMBDA_ROLE_NAME = data["lambda-role-name"]
+    API_GW_ID = data["api-gateway-id"]
+    LAMBDA_FUNC_ARN = data["lambda-func-name"]
 
     print(colored("Exploiting the Application on API GW", color="red"))
     loading_animation()
@@ -168,6 +171,7 @@ def scenario_2_execute():
     subprocess.call(""+creds+" && aws iam create-role --role-name monitoring-metrics --assume-role-policy-document file://infra/scenario-2/assume-role-trust-policy.json", shell=True)
     subprocess.call(""+creds+" && aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --role-name monitoring-metrics", shell=True)
 
+    gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME)
 
 
 def print_ascii_art(text):
@@ -176,7 +180,7 @@ def print_ascii_art(text):
 
 def select_cloud_provider():
     print(colored("Select Cloud Provider:", color="yellow"))
-    print(colored("1. AWS", color="green"))
+    print(colored("1. AWS", color="green")) 
     print(colored("2. Azure", color="green"))
     print(colored("3. GCP", color="green"))
     while True:
@@ -242,13 +246,12 @@ def main(cloud_provider, action, simulation, scenario):
                     #print(colored("Scenario coming soon!", color="yellow"))
         elif action == 'status':
             subprocess.call("cd ./infra && pulumi stack ls", shell=True)
-        elif action == 'destroy':
+        elif action == 'destroy' and scenario == "1":
             subprocess.call("cd ./infra && pulumi destroy", shell=True)
+        elif action == 'destroy' and scenario == "2":
+            subprocess.call("cd ./infra/scenario-2 && pulumi destroy", shell=True)
         else:
             print('No options provided. --help to know more')
 
 if __name__ == "__main__":
     main()
-
-
-
