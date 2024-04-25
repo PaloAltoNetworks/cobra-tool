@@ -105,17 +105,18 @@ python3 cnbas.py aws launch --simulation
 
 
 ```
-  ____   _   _   ____      _      ____
- / ___| | \ | | | __ )    / \    / ___|
-| |     |  \| | |  _ \   / _ \   \___ \
-| |___  | |\  | | |_) | / ___ \   ___) |
- \____| |_| \_| |____/ /_/   \_\ |____/
+  ____   _   _   ____       _      ____
+ / ___| | \ | | | __ )     / \    / ___|
+| |     |  \| | |  _ \    / _ \   \___ \
+| |___  | |\  | | |_) |  / ___ \   ___) |
+ \____| |_| \_| |____/  /_/   \_\ |____/
 
 
 Select Attack Scenario of aws:
 1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
-2. Coming Soon
+2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence
 Enter your choice:
+
 ```
 
 #### Check Status 
