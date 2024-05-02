@@ -131,6 +131,18 @@ python3 cnbas.py aws status
 python3 cnbas.py aws destroy --scenario <scenario-1/scenario-2>
 ```
 
+### Current Scenarios 
+
+1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
+2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence
+
+### To Do / In Roadmap
+
+3. Compromising a GKE Pod and accessing cluster secrets, taking over the cluster & escalating privileges at the Project level, possible project takeover. 
+4. Azure App exploit on a function, data exfiltration from Blob storage & abusing function misconfigs to escalate privileges & leaving a backdoor IAM entity. 
+5. Exploiting an App on VM, exfiltration of data from Cosmos DB & possible takeover of a resource group. 
+6. More scenarios loading...
+
 ## License
 
 This project is licensed under the Apache Version 2.0, - see the [LICENSE](./LICENSE) file for details
