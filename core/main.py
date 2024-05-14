@@ -48,13 +48,13 @@ def scenario_1_execute():
         print("File '{}' found and deleted.".format(file_path))
     else:
         print("File '{}' not found.".format(file_path))
-    subprocess.call("cd ./infra && pulumi up -s aws-scenario-1 -y", shell=True)
-    subprocess.call("cd ./infra && pulumi stack -s aws-scenario-1 output --json >> ./../core/aws-scenario-1-output.json", shell=True)
+    subprocess.call("cd ./infra/scenario-1/ && pulumi up -s aws-scenario-1 -y", shell=True)
+    subprocess.call("cd ./infra/scenario-1/ && pulumi stack -s aws-scenario-1 output --json >> ../../core/aws-scenario-1-output.json", shell=True)
     
     print("-"*30)
     print(colored("Bringing up the Vulnerable Application", color="red"))
     loading_animation()
-    # subprocess.call("sleep 300", shell=True)
+
     # Use tqdm as a context manager to create the progress bar
     sleep_duration = 300
     with tqdm(total=sleep_duration, desc="Loading") as pbar:
@@ -255,10 +255,12 @@ def main(cloud_provider, action, simulation, scenario):
                 elif scenario_choice == 2:
                     execute_scenario(2)
                     #print(colored("Scenario coming soon!", color="yellow"))
-        elif action == 'status':
-            subprocess.call("cd ./infra && pulumi stack ls", shell=True)
+        elif action == 'status' and scenario == "scenario-1":
+            subprocess.call("cd ./infra/scenario-1/ && pulumi stack ls", shell=True)
+        elif action == 'status' and scenario == "scenario-2":
+            subprocess.call("cd ./infra/scenario-2/ && pulumi stack ls", shell=True)
         elif action == 'destroy' and scenario == "scenario-1":
-            subprocess.call("cd ./infra && pulumi destroy", shell=True)
+            subprocess.call("cd ./infra/scenario-1/ && pulumi destroy", shell=True)
         elif action == 'destroy' and scenario == "scenario-2":
             subprocess.call("cd ./infra/scenario-2/ && pulumi destroy", shell=True)    
         else:

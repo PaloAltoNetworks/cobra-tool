@@ -11,7 +11,7 @@ def read_public_key(pub_key_path):
 
     return public_key
 
-key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("./../id_rsa.pub"))
+key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("../../id_rsa.pub"))
 
 ubuntu_ami = aws.ec2.get_ami(
     filters=[
