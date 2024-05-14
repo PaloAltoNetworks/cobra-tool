@@ -62,11 +62,11 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
 ### Install CNBAS Tool
 
 ```
-python3 -m venv ./infra/<scenario-1/2/*>/venv
+python3 -m venv ./venv
 ```
 
 ```
-source ./infra/<scenario-1/2/*>/venv/bin/activate
+source ./venv/bin/activate
 ```
 
 ```
