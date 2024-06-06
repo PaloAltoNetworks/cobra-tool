@@ -11,7 +11,7 @@ def read_public_key(pub_key_path):
 
     return public_key
 
-key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("../../id_rsa.pub"))
+key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("../../../id_rsa.pub"))
 
 ubuntu_ami = aws.ec2.get_ami(
     filters=[
@@ -24,10 +24,9 @@ ubuntu_ami = aws.ec2.get_ami(
             values=["hvm"],
         ),
     ],
-    owners=["099720109477"],  # Canonical's official owner ID for Ubuntu images
+    owners=["099720109477"],  
     most_recent=True,
-    # Uncomment and replace YOUR_REGION with the AWS region
-    # opts=pulumi.InvokeOptions(region="YOUR_REGION")
+
 )
 
 # Create an IAM role for EC2 instance
@@ -83,7 +82,6 @@ policy = aws.iam.RolePolicy("ec2-role-policy",
     }"""
 )
 
-# Create a security group allowing inbound traffic on port 8080
 sg = aws.ec2.SecurityGroup("web-sg",
     ingress=[
         {

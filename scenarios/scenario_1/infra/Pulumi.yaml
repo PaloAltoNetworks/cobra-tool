@@ -2,7 +2,7 @@ name: infra
 runtime:
   name: python
   options:
-    virtualenv: ../../venv
+    virtualenv: ../../../venv
 description: A minimal AWS Python Pulumi program
 config:
   pulumi:tags:

@@ -8,6 +8,8 @@ from time import sleep
 from termcolor import colored
 from .report import gen_report
 from .report import gen_report_2
+from scenarios.scenario_1.scenario_1 import scenario_1_execute
+from scenarios.scenario_2.scenario_2 import scenario_2_execute
 
 def loading_animation():
     chars = "/—\\|"
@@ -16,24 +18,10 @@ def loading_animation():
             print(f"\rLoading {char}", end="", flush=True)
             time.sleep(0.1)
 
-def generate_ssh_key():
-    # Define the path to save the keys
-    key_path = os.path.expanduser("./id_rsa")
 
-    # Check if SSH key already exists
-    if os.path.exists(key_path):
-        print("SSH key already exists. Deleting the existing key...")
-        os.remove(key_path)
-
-    # Generate the SSH key pair
-    with open(os.devnull, 'w') as devnull:
-        subprocess.run(["ssh-keygen", "-t", "rsa", "-b", "4096", "-N", "", "-f", key_path], stdout=devnull, stderr=devnull)
-    print("SSH Key Pair generated successfully!")
-
-    return key_path, key_path + ".pub"
 
     
-def scenario_1_execute():
+#def scenario_1_execute():
     print("-"*30)
     print(colored("Executing Scenraio 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
     generate_ssh_key()
@@ -42,6 +30,7 @@ def scenario_1_execute():
     print(colored("Rolling out Infra", color="red"))
     loading_animation()
     print("-"*30)
+    subprocess.call("pwd", shell=True)
     file_path = "./core/aws-scenario-1-output.json"
     if os.path.exists(file_path):
         os.remove(file_path)
@@ -116,7 +105,7 @@ def scenario_1_execute():
     loading_animation()
     gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID)
 
-def scenario_2_execute():
+#def scenario_2_execute():
     print("-"*30)
     print(colored("Executing Scenraio 2 : Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence ", color="red"))
 
@@ -256,13 +245,13 @@ def main(cloud_provider, action, simulation, scenario):
                     execute_scenario(2)
                     #print(colored("Scenario coming soon!", color="yellow"))
         elif action == 'status' and scenario == "scenario-1":
-            subprocess.call("cd ./infra/scenario-1/ && pulumi stack ls", shell=True)
+            subprocess.call("cd ./scenarios/scenario-1/infra/ && pulumi stack ls", shell=True)
         elif action == 'status' and scenario == "scenario-2":
-            subprocess.call("cd ./infra/scenario-2/ && pulumi stack ls", shell=True)
+            subprocess.call("cd ./scenarios/scenario-2/infra/ && pulumi stack ls", shell=True)
         elif action == 'destroy' and scenario == "scenario-1":
-            subprocess.call("cd ./infra/scenario-1/ && pulumi destroy", shell=True)
+            subprocess.call("cd ./scenarios/scenario-1/infra && pulumi destroy", shell=True)
         elif action == 'destroy' and scenario == "scenario-2":
-            subprocess.call("cd ./infra/scenario-2/ && pulumi destroy", shell=True)    
+            subprocess.call("cd ./scenarios/scenario-2/infra && pulumi destroy", shell=True)    
         else:
             print('No options provided. --help to know more')
 
