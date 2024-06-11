@@ -8,6 +8,7 @@ from time import sleep
 from termcolor import colored
 from core.helpers import generate_ssh_key
 from core.helpers import loading_animation
+from core.report import gen_report
 
 def generate_ssh_key():
     # Define the path to save the keys
@@ -78,6 +79,7 @@ def scenario_1_execute():
     SUBNET_ID = data["Subnet ID"]
     AMI_ID = data["AMI ID"]
     KEY_PAIR_NAME = data["Key Pair Name"]
+    REGION = data["Region"]
 
     print("Web Server Public IP: ", WEB_SERVER_PUBLIC_IP)
 
@@ -102,7 +104,7 @@ def scenario_1_execute():
     print("-"*30)
     print(colored("Anomalous Infra Rollout", color="red"))
     loading_animation()
-    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" ""aws ec2 run-instances --image-id "+AMI_ID+" --instance-type t2.micro --key-name "+KEY_PAIR_NAME+"  --subnet-id "+SUBNET_ID+" --region ap-south-1 | jq '.Instances[].InstanceId'""", shell=True)
+    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" ""aws ec2 run-instances --image-id "+AMI_ID+" --instance-type t2.micro --key-name "+KEY_PAIR_NAME+"  --subnet-id "+SUBNET_ID+" --region "+REGION+" | jq '.Instances[].InstanceId'""", shell=True)
 
     print("-"*30)
     print(colored("Generating Report", color="red"))

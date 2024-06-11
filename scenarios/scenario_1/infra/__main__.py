@@ -11,6 +11,8 @@ def read_public_key(pub_key_path):
 
     return public_key
 
+current = aws.get_region()
+
 key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("../../../id_rsa.pub"))
 
 ubuntu_ami = aws.ec2.get_ami(
@@ -172,4 +174,6 @@ pulumi.export("AMI ID", ubuntu_ami.id)
 pulumi.export("Subnet ID", instance.subnet_id)
 
 pulumi.export("Key Pair Name", key_pair.key_name)
+
+pulumi.export("Region", current.name)
 
