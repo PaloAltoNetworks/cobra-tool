@@ -10,6 +10,25 @@ from core.helpers import generate_ssh_key
 from core.helpers import loading_animation
 from .report.report import gen_report_2
 
+def scenario_2_destroy():
+    with open("./core/aws-scenario-2-output.json", "r") as file:
+        data = json.load(file)
+    
+    LAMBDA_ROLE_NAME = data["lambda-role-name"]
+
+    print(colored("Deleting Manually Created resources - resources which are not tracked by Pulumi's State", color="red"))
+    loading_animation()
+    print("-"*30)
+    
+    subprocess.call("aws iam detach-user-policy --user-name devops --policy-arn arn:aws:iam::aws:policy/AdministratorAccess", shell=True)
+    subprocess.call("aws iam list-access-keys --user-name devops | jq -r '.AccessKeyMetadata[0].AccessKeyId' | xargs -I {} aws iam delete-access-key --user-name devops --access-key-id {}", shell=True)
+    subprocess.call("aws iam delete-user --user-name devops", shell=True)
+
+    subprocess.call("aws iam list-role-policies --role-name "+LAMBDA_ROLE_NAME+" | jq -r '.PolicyNames[]' | xargs -I {} aws iam delete-role-policy --role-name "+LAMBDA_ROLE_NAME+" --policy-name {}", shell=True)
+    subprocess.call("aws iam detach-role-policy --role-name "+LAMBDA_ROLE_NAME+" --policy-arn arn:aws:iam::aws:policy/AdministratorAccess", shell=True)
+
+    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi destroy", shell=True)
+
 
 def scenario_2_execute():
     print("-"*30)

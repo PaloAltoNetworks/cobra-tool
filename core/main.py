@@ -10,6 +10,7 @@ from .report import gen_report
 from .report import gen_report_2
 from scenarios.scenario_1.scenario_1 import scenario_1_execute
 from scenarios.scenario_2.scenario_2 import scenario_2_execute
+from scenarios.scenario_2.scenario_2 import scenario_2_destroy
 
 def loading_animation():
     chars = "/—\\|"
@@ -136,7 +137,7 @@ def main(cloud_provider, action, simulation, scenario):
         elif action == 'destroy' and scenario == "scenario-1":
             subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy", shell=True)
         elif action == 'destroy' and scenario == "scenario-2":
-            subprocess.call("cd ./scenarios/scenario_2/infra && pulumi destroy", shell=True)    
+            scenario_2_destroy()    
         else:
             print('No options provided. --help to know more')
 
