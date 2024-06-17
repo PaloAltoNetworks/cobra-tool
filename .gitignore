@@ -56,5 +56,7 @@ terraform.tfstate.backup
 *aws-scenario-1-output.json
 *aws-scenario-2-output.json
 *token.txt
+*cobra-as1-report.html
+*cobra-as2-report.html
 *cnbas-as1-report.html
 *cnbas-as2-report.html
