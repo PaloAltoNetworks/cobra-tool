@@ -8,7 +8,7 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CNBAS Attack Path Report</title>
+        <title>COBRA Attack Path Report</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -80,8 +80,8 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
     <body>
         <div class="container">
             <header>
-                <img src="core/scenarios/cnbas-logo.png" alt="CNBAS Logo">
-                <h1 style="color: #4285F4;">CNBAS Attack Path Report</h1>
+                <img src="core/scenarios/cnbas-logo.png" alt="COBRA Logo">
+                <h1 style="color: #4285F4;">COBRA Attack Path Report</h1>
             </header>
             <section class="attack-description">
                 <h2 style="color: #EA4335;">Attack Path Scenario Explained</h2>
@@ -160,12 +160,12 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
     </html>
     '''
 
-    with open("cnbas-as1-report.html", "w+") as file:
+    with open("cobra-as1-report.html", "w+") as file:
         file.write(html_template)
         
 
     print("HTML report generated successfully.")
-    webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cnbas-as1-report.html')
+    webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cobra-as1-report.html')
 
 def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
     html_template = '''
@@ -174,7 +174,7 @@ def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CNBAS Attack Path Report</title>
+        <title>COBRA Attack Path Report</title>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -247,7 +247,7 @@ def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
         <div class="container">
             <header>
                 <img src="core/cnbas-logo.png" alt="CNBAS Logo">
-                <h1 style="color: #4285F4;">CNBAS Attack Path Report</h1>
+                <h1 style="color: #4285F4;">COBRA Attack Path Report</h1>
             </header>
             <section class="attack-description">
                 <h2 style="color: #EA4335;">Attack Path Scenario Explained</h2>
@@ -326,12 +326,12 @@ def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
     </html>
     '''
 
-    with open("cnbas-as2-report.html", "w+") as file:
+    with open("cobra-as2-report.html", "w+") as file:
         file.write(html_template)
         
 
     print("HTML report generated successfully.")
-    webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cnbas-as2-report.html')
+    webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cobra-as2-report.html')
 
 #gen_report(ATTACKER_SERVER_INSTANCE_ID, ATTACKER_SERVER_PUBLIC_IP, WEB_SERVER_INSTANCE_ID, WEB_SERVER_PUBLIC_IP)
 
