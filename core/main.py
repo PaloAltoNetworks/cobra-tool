@@ -11,6 +11,7 @@ from .report import gen_report_2
 from scenarios.scenario_1.scenario_1 import scenario_1_execute
 from scenarios.scenario_2.scenario_2 import scenario_2_execute
 from scenarios.scenario_2.scenario_2 import scenario_2_destroy
+from scenarios.scenario_3.scenario_3 import scenario_3_execute
 
 def loading_animation():
     chars = "/—\\|"
@@ -18,45 +19,6 @@ def loading_animation():
         for char in chars:
             print(f"\rLoading {char}", end="", flush=True)
             time.sleep(0.1)
-
-
-
-    
-
-    print("-"*30)
-    print(colored("Executing Scenraio 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
-    generate_ssh_key()
-    loading_animation()
-    print("-"*30)
-    print(colored("Rolling out Infra", color="red"))
-    loading_animation()
-    print("-"*30)
-    subprocess.call("pwd", shell=True)
-    file_path = "./core/aws-scenario-1-output.json"
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print("File '{}' found and deleted.".format(file_path))
-    else:
-        print("File '{}' not found.".format(file_path))
-    subprocess.call("cd ./infra/scenario-1/ && pulumi up -s aws-scenario-1 -y", shell=True)
-    subprocess.call("cd ./infra/scenario-1/ && pulumi stack -s aws-scenario-1 output --json >> ../../core/aws-scenario-1-output.json", shell=True)
-    
-    print("-"*30)
-    print(colored("Bringing up the Vulnerable Application", color="red"))
-    loading_animation()
-
-    # Use tqdm as a context manager to create the progress bar
-    sleep_duration = 300
-    with tqdm(total=sleep_duration, desc="Loading") as pbar:
-        # Loop until sleep_duration is reached
-        while sleep_duration > 0:
-            # Sleep for a shorter interval to update the progress bar
-            sleep_interval = min(1, sleep_duration)
-            sleep(sleep_interval)
-            
-            # Update the progress bar with the elapsed time
-            pbar.update(sleep_interval)
-            sleep_duration -= sleep_interval
 
 
 def print_ascii_art(text):
@@ -81,10 +43,11 @@ def select_attack_scenario(cloud_provider):
     print(colored("Select Attack Scenario of %s:", color="yellow") % cloud_provider)
     print(colored("1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning", color="green"))
     print(colored("2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence", color="green"))
+    print(colored("3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster", color="green"))
     while True:
         try:
             choice = int(input(colored("Enter your choice: ", color="yellow")))
-            if choice not in [1, 2]:
+            if choice not in [1, 2, 3]:
                 raise ValueError(colored("Invalid choice. Please enter 1 or 2.", color="red"))
             return choice
         except ValueError as e:
@@ -110,6 +73,8 @@ def execute_scenario(x):
             scenario_1_execute()
         elif x == 2:
             scenario_2_execute()
+        elif x == 3:
+            scenario_3_execute()
         else: 
             print("Invalid Scenario Selected")
         print(colored("Scenario executed successfully!", color="green"))
@@ -129,6 +94,8 @@ def main(cloud_provider, action, simulation, scenario):
                     execute_scenario(1)
                 elif scenario_choice == 2:
                     execute_scenario(2)
+                elif scenario_choice == 3:
+                    execute_scenario(3)
                     #print(colored("Scenario coming soon!", color="yellow"))
         elif action == 'status' and scenario == "scenario-1":
             subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack ls", shell=True)

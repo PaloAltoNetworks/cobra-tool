@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+
+
+###
+### Deployment Metadata
+###
+metadata:
+  name: spring4shell-web
+
+
+###
+### Specs
+###
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: spring4shell-web
+      tier: frontend
+
+  template:
+
+    # Template Metadata to be used by service for discovery
+    metadata:
+      labels:
+        app: spring4shell-web
+        tier: frontend
+
+    # Container/Volume definition
+    spec:
+      containers:
+        - name: spring4shell-web
+          image: ***REMOVED***
+          ports:
+            - containerPort: 8080
