@@ -19,45 +19,6 @@ def loading_animation():
             print(f"\rLoading {char}", end="", flush=True)
             time.sleep(0.1)
 
-
-
-    
-
-    print("-"*30)
-    print(colored("Executing Scenraio 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
-    generate_ssh_key()
-    loading_animation()
-    print("-"*30)
-    print(colored("Rolling out Infra", color="red"))
-    loading_animation()
-    print("-"*30)
-    subprocess.call("pwd", shell=True)
-    file_path = "./core/aws-scenario-1-output.json"
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print("File '{}' found and deleted.".format(file_path))
-    else:
-        print("File '{}' not found.".format(file_path))
-    subprocess.call("cd ./infra/scenario-1/ && pulumi up -s aws-scenario-1 -y", shell=True)
-    subprocess.call("cd ./infra/scenario-1/ && pulumi stack -s aws-scenario-1 output --json >> ../../core/aws-scenario-1-output.json", shell=True)
-    
-    print("-"*30)
-    print(colored("Bringing up the Vulnerable Application", color="red"))
-    loading_animation()
-
-    # Use tqdm as a context manager to create the progress bar
-    sleep_duration = 300
-    with tqdm(total=sleep_duration, desc="Loading") as pbar:
-        # Loop until sleep_duration is reached
-        while sleep_duration > 0:
-            # Sleep for a shorter interval to update the progress bar
-            sleep_interval = min(1, sleep_duration)
-            sleep(sleep_interval)
-            
-            # Update the progress bar with the elapsed time
-            pbar.update(sleep_interval)
-            sleep_duration -= sleep_interval
-
 def select_cloud_provider():
     print(colored("Select Cloud Provider:", color="yellow"))
     print(colored("1. AWS", color="green")) 
