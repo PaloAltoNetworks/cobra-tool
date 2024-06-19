@@ -45,4 +45,5 @@ gke_nodepool = gcp.container.NodePool("nodepool-1",
 )
 
 pulumi.export("cluster-name", gke_cluster.name)
+pulumi.export("cluster-endpoint", gke_cluster.endpoint)
 

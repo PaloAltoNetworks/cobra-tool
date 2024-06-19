@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: bind-manage-cluster-roles
+  name: example-clusterrole-binding
 subjects:
 - kind: ServiceAccount
-  name: default  # Replace with your service account name
-  namespace: default        # Replace with the namespace of your service account
+  name: default
+  namespace: default
 roleRef:
   kind: ClusterRole
-  name: manage-cluster-roles
+  name: example-clusterrole
   apiGroup: rbac.authorization.k8s.io
 
