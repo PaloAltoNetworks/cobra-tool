@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: example-clusterrole
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["clusterroles", "rolebindings"]
+  verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+
