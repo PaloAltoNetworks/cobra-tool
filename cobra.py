@@ -1,5 +1,11 @@
 import argparse
 from core import main
+import pyfiglet
+from termcolor import colored
+
+def display_banner():
+    ascii_art = pyfiglet.figlet_format("COBRA")
+    print(colored(ascii_art, color="cyan"))
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Terminal-based option tool")
@@ -14,6 +20,7 @@ def main_function(cloud_provider, action, simulation, scenario):
     main.main(cloud_provider, action, simulation, scenario)
 
 if __name__ == "__main__":
+    display_banner()
     args = parse_arguments()
     
     # Convert argparse Namespace to dictionary
