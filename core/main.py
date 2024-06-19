@@ -82,9 +82,6 @@ def execute_scenario(x):
         print(colored("Error executing scenario:", color="red"), str(e))
 
 def main(cloud_provider, action, simulation, scenario):
-    tool_name = "C N B A S"
-    print(scenario)
-    print_ascii_art(tool_name)
     if cloud_provider == 'aws':
         if action == 'launch':
             if simulation is True:

@@ -81,6 +81,13 @@ python3 cobra.py -h
 ```
 
 ```
+ ____ ___  ____  ____      _
+ / ___/ _ \| __ )|  _ \    / \
+| |  | | | |  _ \| |_) |  / _ \
+| |__| |_| | |_) |  _ <  / ___ \
+ \____\___/|____/|_| \_\/_/   \_\
+
+
 usage: cobra.py [-h] [--simulation] [--scenario {scenario-1,scenario-2}] {aws,azure,gcp} {launch,status,destroy}
 
 Terminal-based option tool
@@ -105,11 +112,11 @@ python3 cobra.py aws launch --simulation
 
 
 ```
-  ____   _   _   ____       _      ____
- / ___| | \ | | | __ )     / \    / ___|
-| |     |  \| | |  _ \    / _ \   \___ \
-| |___  | |\  | | |_) |  / ___ \   ___) |
- \____| |_| \_| |____/  /_/   \_\ |____/
+  ____ ___  ____  ____      _
+ / ___/ _ \| __ )|  _ \    / \
+| |  | | | |  _ \| |_) |  / _ \
+| |__| |_| | |_) |  _ <  / ___ \
+ \____\___/|____/|_| \_\/_/   \_\
 
 
 Select Attack Scenario of aws:
