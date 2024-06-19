@@ -12,3 +12,4 @@ semver==2.13.0
 six==1.16.0
 termcolor==2.4.0
 tqdm==4.66.2
+pulumi-gcp>=7.0.0,<8.0.0
