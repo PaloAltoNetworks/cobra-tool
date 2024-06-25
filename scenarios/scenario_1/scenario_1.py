@@ -10,32 +10,17 @@ from core.helpers import generate_ssh_key
 from core.helpers import loading_animation
 from core.report import gen_report
 
-def generate_ssh_key():
-    # Define the path to save the keys
-    key_path = os.path.expanduser("./id_rsa")
-
-    # Check if SSH key already exists
-    if os.path.exists(key_path):
-        print("SSH key already exists. Deleting the existing key...")
-        os.remove(key_path)
-
-    # Generate the SSH key pair
-    with open(os.devnull, 'w') as devnull:
-        subprocess.run(["ssh-keygen", "-t", "rsa", "-b", "4096", "-N", "", "-f", key_path], stdout=devnull, stderr=devnull)
-    print("SSH Key Pair generated successfully!")
-
-    return key_path, key_path + ".pub"
 
 def scenario_1_execute():
     print("-"*30)
-    print(colored("Executing Scenraio 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
+    print(colored("Executing Scenario 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
     generate_ssh_key()
     loading_animation()
     print("-"*30)
     print(colored("Rolling out Infra", color="red"))
     loading_animation()
     print("-"*30)
-    subprocess.call("pwd", shell=True)
+    
     file_path = "./core/aws-scenario-1-output.json"
     if os.path.exists(file_path):
         os.remove(file_path)
