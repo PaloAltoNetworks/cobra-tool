@@ -86,7 +86,7 @@ def execute_scenario(x):
         print(colored("Error executing scenario:", color="red"), str(e))
 
 def main(cloud_provider, action, simulation, scenario):
-    tool_name = "C N B A S"
+    tool_name = "C O B R A"
     print(scenario)
     print_ascii_art(tool_name)
     if cloud_provider == 'aws':
@@ -112,7 +112,7 @@ def main(cloud_provider, action, simulation, scenario):
         elif action == 'destroy' and scenario == "scenario-2":
             scenario_2_destroy()    
         elif action == 'destroy' and scenario == "scenario-3":
-            subprocess.call("cd ./scenarios/scenario_3/infra && pulumi destroy -s gcp-scenario-1", shell=True)
+            subprocess.call("cd ./scenarios/scenario_3/infra && pulumi destroy -s ", shell=True)
         elif action == 'destroy' and scenario == "scenario-4":
             subprocess.call("cd ./scenarios/scenario_4/infra && pulumi destroy -s aws-scenario-3", shell=True)
 
