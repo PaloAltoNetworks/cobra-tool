@@ -86,7 +86,7 @@ def scenario_2_execute():
             pbar.update(sleep_interval)
             sleep_duration -= sleep_interval
 
-    subprocess.call("curl '"+API_GW_URL+"?query=ping'", shell=True)
+    #subprocess.call("curl '"+API_GW_URL+"?query=ping'", shell=True)
 
     #Backdoor IAM User
     print(colored("Creating a Backdoor User which can be used by the attacker", color="red"))
