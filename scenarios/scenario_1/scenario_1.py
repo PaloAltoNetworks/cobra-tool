@@ -49,16 +49,12 @@ def scenario_1_execute():
     print(colored("Bringing up the Vulnerable Application", color="red"))
     loading_animation()
 
-    # Use tqdm as a context manager to create the progress bar
     sleep_duration = 300
     with tqdm(total=sleep_duration, desc="Loading") as pbar:
-        # Loop until sleep_duration is reached
         while sleep_duration > 0:
-            # Sleep for a shorter interval to update the progress bar
             sleep_interval = min(1, sleep_duration)
             sleep(sleep_interval)
             
-            # Update the progress bar with the elapsed time
             pbar.update(sleep_interval)
             sleep_duration -= sleep_interval
 
