@@ -100,8 +100,8 @@ sg = aws.ec2.SecurityGroup("web-sg",
     ingress=[
         {
             "protocol": "tcp",
-            "fromPort": 8080,
-            "toPort": 8080,
+            "fromPort": 8000,
+            "toPort": 8000,
             "cidrBlocks": ["0.0.0.0/0"]
         },
         {
@@ -121,7 +121,7 @@ sg = aws.ec2.SecurityGroup("web-sg",
 
 # User data script to be executed when the instance starts
 user_data_script = """
-IyEvYmluL2Jhc2gKc3VkbyBhcHQgaW5zdGFsbCBhd3NjbGkgLXkKd2dldCAtUCAvaG9tZS91YnVudHUvIGh0dHBzOi8vbGFiLWZpbGVzLTAwZmZhYWJjYy5zMy5hbWF6b25hd3MuY29tL3VlYmEtbGFiL3NlcnZlci5weQpzdWRvIGNob3duIHVidW50dTp1YnVudHUgL2hvbWUvdWJ1bnR1L3NlcnZlci5weQp3Z2V0IC1QIC9ob21lL3VidW50dS8gaHR0cHM6Ly9sYWItZmlsZXMtMDBmZmFhYmNjLnMzLmFtYXpvbmF3cy5jb20vdWViYS1sYWIvdXNlcmRhdGEudHh0Cg==
+IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlCnN1ZG8gYXB0IGluc3RhbGwgYXdzY2xpIC15CndnZXQgLVAgL2hvbWUvdWJ1bnR1LyBodHRwczovL2xhYi1maWxlcy0wMGZmYWFiY2MuczMuYW1hem9uYXdzLmNvbS91ZWJhLWxhYi9zZXJ2ZXIucHkKc3VkbyBjaG93biB1YnVudHU6dWJ1bnR1IC9ob21lL3VidW50dS9zZXJ2ZXIucHkKd2dldCAtUCAvaG9tZS91YnVudHUvIGh0dHBzOi8vY29icmEtdG9vbC1maWxlcy5zMy5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb20vc2NlbmFyaW8tNC91c2VyZGF0YS50eHQK
 """
 
 instance_profile = aws.iam.InstanceProfile("my-instance-profile",
@@ -139,7 +139,8 @@ instance = aws.ec2.Instance("attacker",
     iam_instance_profile=instance_profile.name,
     security_groups=[sg.name],
     user_data=user_data_script,
-    key_name=key_pair.key_name 
+    key_name=key_pair.key_name
+ 
 )
 
 instance1 = aws.ec2.Instance("imds-machine",
@@ -157,7 +158,11 @@ pulumi.export("Attacker Server Public IP", instance.public_ip)
 print("Victim Server Public IP")
 pulumi.export("Victim Server Public IP", instance1.public_ip)
 
+print("Attacker Server Role Name")
 pulumi.export("role_name", role.name)
+
+print("Victim Server Role Name")
+pulumi.export("victim_role_name", role_2.name)
 
 # Export the policy name
 pulumi.export("policy_name", policy.name)
