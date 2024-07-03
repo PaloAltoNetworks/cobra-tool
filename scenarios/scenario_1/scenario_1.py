@@ -21,7 +21,7 @@ def scenario_1_execute():
     loading_animation()
     print("-"*30)
     
-    file_path = "./core/aws-scenario-1-output.json"
+    file_path = "/Users/aschnitzer/dev/cobra-tool/core/aws-scenario-1-output.json"
     if os.path.exists(file_path):
         os.remove(file_path)
         print("File '{}' found and deleted.".format(file_path))
