@@ -48,7 +48,6 @@ role = aws.iam.Role("ec2-role",
 )
 
 # Attach a policy to the role allowing necessary permissions
-pdb.set_trace()
 policy = aws.iam.RolePolicy("ec2-role-policy",
     role=role.name,
     policy="""{
