@@ -22,10 +22,8 @@ def scenario_1_execute():
     print("-"*30)
     
     base_directory = os.path.abspath('.')
-    print(f"Current directory absolute path: {base_directory}")
     sub_directory = "core"
     file_name = "aws-scenario-1-output.json"
-    input("Press any key to continue...")
     file_path = os.path.join(base_directory, sub_directory, file_name)
     if os.path.exists(file_path):
         os.remove(file_path)
