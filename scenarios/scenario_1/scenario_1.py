@@ -64,7 +64,7 @@ def scenario_1_execute():
     AMI_ID = data["AMI ID"]
     KEY_PAIR_NAME = data["Key Pair Name"]
     REGION = data["Region"]
-
+    INSTANCE_NAME='Cobra-Anomalous'
     print("Web Server Public IP: ", WEB_SERVER_PUBLIC_IP)
 
     print("-"*30)
@@ -88,8 +88,7 @@ def scenario_1_execute():
     print("-"*30)
     print(colored("Anomalous Infra Rollout", color="red"))
     loading_animation()
-    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" ""aws ec2 run-instances --image-id "+AMI_ID+" --instance-type t2.micro --key-name "+KEY_PAIR_NAME+"  --subnet-id "+SUBNET_ID+" --region "+REGION+" --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value='Cobra-Anomalous'}]" | jq '.Instances[].InstanceId'""", shell=True)
-
+    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@" + ATTACKER_SERVER_PUBLIC_IP + " \"aws ec2 run-instances --image-id " + AMI_ID + " --instance-type t2.micro --key-name " + KEY_PAIR_NAME + " --subnet-id " + SUBNET_ID + " --region " + REGION + " --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=" + INSTANCE_NAME + "}]'\" | jq '.Instances[].InstanceId'", shell=True)  
     print("-"*30)
     print(colored("Generating Report", color="red"))
     loading_animation()
