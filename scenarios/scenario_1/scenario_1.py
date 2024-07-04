@@ -21,6 +21,9 @@ def scenario_1_execute():
     loading_animation()
     print("-"*30)
     
+    current_directory = os.path.abspath('.')
+    print(f"Current directory absolute path: {current_directory}")
+    input("Press any key to continue...")
     file_path = "/Users/aschnitzer/dev/cobra-tool/core/aws-scenario-1-output.json"
     if os.path.exists(file_path):
         os.remove(file_path)
