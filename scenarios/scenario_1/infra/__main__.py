@@ -33,7 +33,6 @@ ubuntu_ami = aws.ec2.get_ami(
 )
 
 # Create an IAM role for EC2 instance
-pdb.set_trace()
 role = aws.iam.Role("ec2-role",
     assume_role_policy="""{
         "Version": "2012-10-17",
