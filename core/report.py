@@ -100,7 +100,7 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
 
             <section>
                 <h2 style="color: #34A853;">Attack Path Graph</h2>
-                <img src="../scenarios/scenario_1/report/cnbas-as-1.png" alt="Attack Path Graph">
+                <img src="/scenarios/scenario_1/report/cnbas-as-1.png" alt="Attack Path Graph">
             </section>
             <section>
                 <h2 style="color: #FBBC05;">Resource Meta Data</h2>
