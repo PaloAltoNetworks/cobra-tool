@@ -134,6 +134,9 @@ instance = aws.ec2.Instance("web-server",
     iam_instance_profile=instance_profile.name,
     security_groups=[sg.name],
     user_data=user_data_script
+    tags={
+        "Name": "Cobra-Web-Server)"
+    }
 )
 
 instance1 = aws.ec2.Instance("attacker-server",
@@ -141,9 +144,11 @@ instance1 = aws.ec2.Instance("attacker-server",
     ami=ubuntu_ami.id, 
     security_groups=[sg.name],
     user_data=user_data_script_1,
-    key_name=key_pair.key_name)
-
-
+    key_name=key_pair.key_name,
+    tags={
+        "Name": "Cobra-Attacker)"
+    }
+)
 # Export the public IP of the EC2 instance
 print("Web Server Public IP")
 pulumi.export("Web Server Public IP", instance.public_ip)
