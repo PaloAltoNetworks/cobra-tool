@@ -133,7 +133,7 @@ instance = aws.ec2.Instance("web-server",
     ami=ubuntu_ami.id,  
     iam_instance_profile=instance_profile.name,
     security_groups=[sg.name],
-    user_data=user_data_script
+    user_data=user_data_script,
     tags={
         "Name": "Cobra-Web-Server)"
     }
