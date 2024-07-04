@@ -30,7 +30,6 @@ def scenario_1_execute():
         print("File '{}' found and deleted.".format(file_path))
     else:
         print("File '{}' not found.".format(file_path))
-        input("Press any key to continue...")
     subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi up -s aws-scenario-1 -y", shell=True)
     subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack -s aws-scenario-1 output --json >> ../../../core/aws-scenario-1-output.json", shell=True)
     
