@@ -3,6 +3,7 @@ import pulumi_aws as aws
 import os
 import sys
 import subprocess
+import pdb
 
 def read_public_key(pub_key_path):
     # Read the public key from the file
@@ -32,6 +33,7 @@ ubuntu_ami = aws.ec2.get_ami(
 )
 
 # Create an IAM role for EC2 instance
+pdb.set_trace()
 role = aws.iam.Role("ec2-role",
     assume_role_policy="""{
         "Version": "2012-10-17",
@@ -46,6 +48,7 @@ role = aws.iam.Role("ec2-role",
 )
 
 # Attach a policy to the role allowing necessary permissions
+pdb.set_trace()
 policy = aws.iam.RolePolicy("ec2-role-policy",
     role=role.name,
     policy="""{
@@ -135,7 +138,7 @@ instance = aws.ec2.Instance("web-server",
     security_groups=[sg.name],
     user_data=user_data_script,
     tags={
-        "Name": "Cobra-Web-Server)"
+        "Name": "Cobra-Webserver)"
     }
 )
 
