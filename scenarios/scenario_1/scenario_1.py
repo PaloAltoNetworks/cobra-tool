@@ -93,7 +93,7 @@ def scenario_1_execute():
     aws_command = (
     f"aws ec2 run-instances --image-id {AMI_ID} --instance-type t2.micro "
     f"--key-name {KEY_PAIR_NAME} --subnet-id {SUBNET_ID} --region {REGION} "
-    f"--tag-specifications 'ResourceType=instance,Tags=[{{Key=Name,Value={INSTANCE_NAME}}}]]'"
+    f"--tag-specifications 'ResourceType=instance,Tags=[{{Key=Name,Value={INSTANCE_NAME}}}]'"
     )
 
     # Construct the full SSH command with jq and xargs
