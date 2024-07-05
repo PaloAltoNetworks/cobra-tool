@@ -99,12 +99,12 @@ def scenario_1_execute():
     # Construct the full SSH command with jq and xargs
     ssh_command = (
     f"ssh -o StrictHostKeyChecking=accept-new -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} "
-    f"\'{aws_command} | "  # Escape the inner single quote here
-    "jq -r '.Instances[].InstanceId' | xargs -I {{}} sh -c " 
-    f"'cd ./scenarios/scenario_1/infra/ && pulumi import aws:ec2/instance:Instance \\\"Cobra-Anomalous\\\" {{}}'\"", 
+    f"\"{aws_command} | jq -r '.Instances[].InstanceId' | xargs -I {{}} sh -c "
+    f"'cd ./scenarios/scenario_1/infra/ && pulumi import aws:ec2/instance:Instance Cobra-Anomalous {{}}'"
+    "\"" # Close the double quote for the entire command string
     )
 
-    # Execute the combined command
+    # Execute the command
     try:
         subprocess.call(ssh_command, shell=True)
     except subprocess.CalledProcessError as e:
