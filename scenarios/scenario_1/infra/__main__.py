@@ -137,7 +137,7 @@ instance = aws.ec2.Instance("web-server",
     security_groups=[sg.name],
     user_data=user_data_script,
     tags={
-        "Name": "Cobra-Webserver)"
+        "Name": "Cobra-Webserver"
     }
 )
 
@@ -148,7 +148,7 @@ instance1 = aws.ec2.Instance("attacker-server",
     user_data=user_data_script_1,
     key_name=key_pair.key_name,
     tags={
-        "Name": "Cobra-Attacker)"
+        "Name": "Cobra-Attacker"
     }
 )
 # Export the public IP of the EC2 instance
