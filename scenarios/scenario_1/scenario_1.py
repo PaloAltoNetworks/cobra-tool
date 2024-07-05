@@ -100,7 +100,7 @@ def scenario_1_execute():
     ssh_command = (
     f"ssh -o StrictHostKeyChecking=accept-new -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} "
     f"\"{aws_command} | jq -r '.Instances[].InstanceId' | xargs -I {{}} sh -c "
-    f"'cd ./scenarios/scenario_1/infra/ && pulumi import aws:ec2/instance:Instance Cobra-Anomalous {{}}'"
+    f"'ls && pwd && cd ./scenarios/scenario_1/infra/ && pulumi import aws:ec2/instance:Instance Cobra-Anomalous {{}}'"
     "\"" # Close the double quote for the entire command string
     )
 
