@@ -88,7 +88,14 @@ def scenario_1_execute():
     print("-"*30)
     print(colored("Anomalous Infra Rollout", color="red"))
     loading_animation()
-    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@" + ATTACKER_SERVER_PUBLIC_IP + " \"aws ec2 run-instances --image-id " + AMI_ID + " --instance-type t2.micro --key-name " + KEY_PAIR_NAME + " --subnet-id " + SUBNET_ID + " --region " + REGION + " --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=" + INSTANCE_NAME + "}]'\" | jq '.Instances[].InstanceId'", shell=True)  
+    # subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@" + ATTACKER_SERVER_PUBLIC_IP + " \"aws ec2 run-instances --image-id " + AMI_ID + " --instance-type t2.micro --key-name " + KEY_PAIR_NAME + " --subnet-id " + SUBNET_ID + " --region " + REGION + " --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=" + INSTANCE_NAME + "}]'\" | jq '.Instances[].InstanceId'", shell=True)  
+    subprocess.call(
+    f"ssh -o StrictHostKeyChecking=accept-new -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} "
+    f"\"aws ec2 run-instances --image-id {AMI_ID} --instance-type t2.micro --key-name {KEY_PAIR_NAME} "
+    f"--subnet-id {SUBNET_ID} --region {REGION} "
+    f"--tag-specifications 'ResourceType=instance,Tags=[{{Key=Name,Value={INSTANCE_NAME}}}]]' | "
+    "jq -r '.Instances[].InstanceId' | xargs -I {} pulumi import aws:ec2/instance:Instance 'your-pulumi-resource-name' {}\"",
+    shell=True)
     print("-"*30)
     print(colored("Generating Report", color="red"))
     loading_animation()
