@@ -21,7 +21,10 @@ def scenario_1_execute():
     loading_animation()
     print("-"*30)
     
-    file_path = "./core/aws-scenario-1-output.json"
+    base_directory = os.path.abspath('.')
+    sub_directory = "core"
+    file_name = "aws-scenario-1-output.json"
+    file_path = os.path.join(base_directory, sub_directory, file_name)
     if os.path.exists(file_path):
         os.remove(file_path)
         print("File '{}' found and deleted.".format(file_path))
@@ -61,7 +64,7 @@ def scenario_1_execute():
     AMI_ID = data["AMI ID"]
     KEY_PAIR_NAME = data["Key Pair Name"]
     REGION = data["Region"]
-
+    INSTANCE_NAME='Cobra-Anomalous'
     print("Web Server Public IP: ", WEB_SERVER_PUBLIC_IP)
 
     print("-"*30)
@@ -85,8 +88,27 @@ def scenario_1_execute():
     print("-"*30)
     print(colored("Anomalous Infra Rollout", color="red"))
     loading_animation()
-    subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+ATTACKER_SERVER_PUBLIC_IP+" ""aws ec2 run-instances --image-id "+AMI_ID+" --instance-type t2.micro --key-name "+KEY_PAIR_NAME+"  --subnet-id "+SUBNET_ID+" --region "+REGION+" | jq '.Instances[].InstanceId'""", shell=True)
+    # subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@" + ATTACKER_SERVER_PUBLIC_IP + " \"aws ec2 run-instances --image-id " + AMI_ID + " --instance-type t2.micro --key-name " + KEY_PAIR_NAME + " --subnet-id " + SUBNET_ID + " --region " + REGION + " --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=" + INSTANCE_NAME + "}]'\" | jq '.Instances[].InstanceId'", shell=True)  
+    # Construct the AWS CLI command
+    aws_command = (
+    f"aws ec2 run-instances --image-id {AMI_ID} --instance-type t2.micro "
+    f"--key-name {KEY_PAIR_NAME} --subnet-id {SUBNET_ID} --region {REGION} "
+    f"--tag-specifications 'ResourceType=instance,Tags=[{{Key=Name,Value={INSTANCE_NAME}}}]'"
+    )
 
+    # Construct the full SSH command with jq and xargs
+    ssh_command = (
+    f"ssh -o StrictHostKeyChecking=accept-new -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} "
+    f"\"{aws_command} | jq -r '.Instances[].InstanceId' | xargs -I {{}} sh -c "
+    f"'ls && pwd && cd ./scenarios/scenario_1/infra/ && pulumi import aws:ec2/instance:Instance Cobra-Anomalous {{}}'"
+    "\"" # Close the double quote for the entire command string
+    )
+
+    # Execute the command
+    try:
+        subprocess.call(ssh_command, shell=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Command failed with error: {e}")
     print("-"*30)
     print(colored("Generating Report", color="red"))
     loading_animation()

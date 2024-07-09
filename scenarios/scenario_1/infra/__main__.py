@@ -3,6 +3,7 @@ import pulumi_aws as aws
 import os
 import sys
 import subprocess
+import pdb
 
 def read_public_key(pub_key_path):
     # Read the public key from the file
@@ -71,6 +72,7 @@ policy = aws.iam.RolePolicy("ec2-role-policy",
                     "ec2:CreateKeyPair",
                     "ec2:RunInstances",
                     "ec2:TerminateInstances",
+                    "ec2:CreateTags",
                     "iam:ListRoles",
                     "iam:ListInstanceProfiles",
                     "iam:ListAttachedRolePolicies",
@@ -133,7 +135,10 @@ instance = aws.ec2.Instance("web-server",
     ami=ubuntu_ami.id,  
     iam_instance_profile=instance_profile.name,
     security_groups=[sg.name],
-    user_data=user_data_script
+    user_data=user_data_script,
+    tags={
+        "Name": "Cobra-Webserver"
+    }
 )
 
 instance1 = aws.ec2.Instance("attacker-server",
@@ -141,9 +146,11 @@ instance1 = aws.ec2.Instance("attacker-server",
     ami=ubuntu_ami.id, 
     security_groups=[sg.name],
     user_data=user_data_script_1,
-    key_name=key_pair.key_name)
-
-
+    key_name=key_pair.key_name,
+    tags={
+        "Name": "Cobra-Attacker"
+    }
+)
 # Export the public IP of the EC2 instance
 print("Web Server Public IP")
 pulumi.export("Web Server Public IP", instance.public_ip)
