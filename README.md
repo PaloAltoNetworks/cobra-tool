@@ -37,8 +37,13 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
 
 - Python 3.8+
 - pip3
-- Pulumi Account 
-- AWS CLI
+- Pulumi CLI [Docs](https://www.pulumi.com/docs/install/)
+- Pulumi Account [here](https://www.pulumi.com/)
+  - Create Pulumi Personal Access Token [Docs](https://www.pulumi.com/docs/pulumi-cloud/access-management/access-tokens/#creating-personal-access-tokens)
+  - Use shell to login to Pulumi `$pulumi login` (Paste access token) [Docs](https://www.pulumi.com/docs/cli/commands/pulumi_login/)
+- AWS CLI installed
+  - Will use the default profile credentials unless defined with the environment variables `AWS_PROFILE` and `AWS_REGION`
+  - Must have the region defined. 
 - Azure CLI
 - Google Cloud SDK
 
