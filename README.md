@@ -1,8 +1,8 @@
 <h2 align="center">🚀 Cloud Offensive Breach and Risk Assessment (COBRA) Tool 👩‍💻</h2>
 
-<!-- <p align="center">
-<img width="396" alt="cobra" src="https://github.com/PaloAltoNetworks/cobra-tool/assets/4271325/f618c9c8-4f3f-48ca-848b-c51b53e4e366">
-</p> -->
+<p align="center">
+<img width="160" alt="cobra" src="https://raw.githubusercontent.com/PaloAltoNetworks/cobra-tool/main/core/cobra-logo.png">
+</p>
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
