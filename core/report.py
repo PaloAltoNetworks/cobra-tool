@@ -80,7 +80,7 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
     <body>
         <div class="container">
             <header>
-                <img src="core/cnbas-logo.png" alt="COBRA Logo">
+                <img src="core/cobra-logo.png" alt="COBRA Logo">
                 <h1 style="color: #4285F4;">COBRA Attack Path Report</h1>
             </header>
             <section class="attack-description">
@@ -246,7 +246,7 @@ def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
     <body>
         <div class="container">
             <header>
-                <img src="core/cnbas-logo.png" alt="CNBAS Logo">
+                <img src="core/cobra-logo.png" alt="CNBAS Logo">
                 <h1 style="color: #4285F4;">COBRA Attack Path Report</h1>
             </header>
             <section class="attack-description">
