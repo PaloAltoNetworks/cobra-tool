@@ -108,13 +108,13 @@ def main(cloud_provider, action, simulation, scenario):
         elif action == 'status' and scenario == "scenario-2":
             subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi stack ls", shell=True)
         elif action == 'destroy' and scenario == "scenario-1":
-            subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy", shell=True)
+            subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy --yes ", shell=True)
         elif action == 'destroy' and scenario == "scenario-2":
             scenario_2_destroy()    
         elif action == 'destroy' and scenario == "scenario-3":
-            subprocess.call("cd ./scenarios/scenario_3/infra && pulumi destroy -s ", shell=True)
+            subprocess.call("cd ./scenarios/scenario_3/infra && pulumi destroy -s --yes", shell=True)
         elif action == 'destroy' and scenario == "scenario-4":
-            subprocess.call("cd ./scenarios/scenario_4/infra && pulumi destroy -s aws-scenario-3", shell=True)
+            subprocess.call("cd ./scenarios/scenario_4/infra && pulumi destroy -s --yes aws-scenario-3", shell=True)
 
         else:
             print('No options provided. --help to know more')
