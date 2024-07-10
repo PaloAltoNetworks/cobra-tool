@@ -165,4 +165,4 @@ def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
         
 
     print("HTML report generated successfully.")
-    webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cnbas-as2-report.html')
+    webbrowser.open_new_tab('file://'+ str(Path.cwd())+'/cobra-as2-report.html')
