@@ -105,7 +105,7 @@ def scenario_1_execute():
         print(f"Command failed with error: {e}")
 
 
-    subprocess.run(f"pulumi -C scenarios/scenario_1/infra/ import aws:ec2/instance:Instance {INSTANCE_NAME.strip()} {instance_id.strip()} --protect=false --yes --stack=aws-scenario-1 --suppress-outputs --suppress-progress", shell=True)
+    subprocess.run(f"pulumi -C scenarios/scenario_1/infra/ import aws:ec2/instance:Instance {INSTANCE_NAME.strip()} {instance_id.strip()} --protect=false --yes --stack=aws-scenario-1 --suppress-outputs --suppress-progress > /dev/null 2>&1", shell=True)
 
 
     print("-"*30)
