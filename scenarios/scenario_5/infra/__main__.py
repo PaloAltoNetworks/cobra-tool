@@ -3,6 +3,7 @@ import pulumi_aws as aws
 import os
 import sys
 import subprocess
+from pulumi_random import RandomPet
 
 def read_public_key(pub_key_path):
     with open(pub_key_path, "r") as f:
@@ -107,13 +108,12 @@ instance = aws.ec2.Instance("attacker",
     key_name=key_pair.key_name
  
 )
-
+bucket_suffix = RandomPet("bucketSuffix", length=2)
 s3_bucket = aws.s3.Bucket("bucket",
-    bucket="my-tf-test-bucket",
+    bucket=bucket_suffix.id.apply(lambda suffix: f"my-unique-bucket-{suffix}"),
     acl=aws.s3.CannedAcl.PRIVATE,
     tags={
-        "Name": "My bucket",
-        "Environment": "Dev",
+        "Environment": "Dev"
 })
 
 # Export the public IP of the EC2 instance
@@ -147,5 +147,5 @@ pulumi.export("Key Pair Name", key_pair.key_name)
 
 pulumi.export("Region", current.name)
 
-pulumi.export("Bucket Name", s3_bucket.name)
+pulumi.export("Bucket Name", bucket.bucket)
 
