@@ -4,6 +4,8 @@ import os
 import sys
 import subprocess
 from pulumi_random import RandomPet
+import pulumi_synced_folder
+from pulumi_aws import s3
 
 def read_public_key(pub_key_path):
     with open(pub_key_path, "r") as f:
@@ -116,6 +118,14 @@ s3_bucket = aws.s3.Bucket("bucket",
         "Environment": "Dev"
 })
 
+folder = pulumi_synced_folder.S3BucketFolder(
+    "synced-folder",
+    path="./s3_files",
+    bucket_name=s3_bucket.bucket,
+    acl=s3.CannedAcl.PRIVATE,
+)
+
+
 # Export the public IP of the EC2 instance
 print("Attacker Server Public IP")
 pulumi.export("Attacker Server Public IP", instance.public_ip)
@@ -147,5 +157,5 @@ pulumi.export("Key Pair Name", key_pair.key_name)
 
 pulumi.export("Region", current.name)
 
-pulumi.export("Bucket Name", bucket.bucket)
+pulumi.export("Bucket Name", s3_bucket.bucket)
 

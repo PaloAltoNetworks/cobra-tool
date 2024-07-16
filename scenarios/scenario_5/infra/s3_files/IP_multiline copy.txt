@@ -1,0 +1,42 @@
+Configure the best practice Antivirus profile by cloning the predefined profile and changing the imap, pop3, and smtp decoder values to reset-both in the Action and WildFire Action columns.
+Configure the best practice Anti-Spyware profile by cloning the predefined strict profile. On the Rules tab, enable single packet capture on medium, high, and critical severity threats for traffic you log. (For traffic you don’t log, apply a separate profile without packet capture enabled.) April_05_01
+On the DNS Signatures tab, change the Action on DNS Queries to sinkhole if the firewall can’t see the originator of the DNS query (typically when the firewall is north of the local DNS server) so that you can identify infected hosts.
+    "AWS-AAKI": {
+      "positive": {
+        "aaki1": "AKIAYPDIK3OCOFEZAOQQ AWS Access Key",
+        "aaki2": "Access Key ID 022QF06E7MXBSH9DHM02",
+        "aaki3": "022QF06E7MXBSH9DHM02 Key ID",
+        "aaki4": "Amazon Web Services 022QF06E7MXBSH9DHM02"
+      }.  
+}
+DNS sinkhole identifies and tracks potentially compromised hosts that attempt to access suspicious domains and prevents them from accessing those domains. Enable extended packet capture on the sinkholed traffic. April_05_01
+Configure the best practice Vulnerability Protection profile by cloning the predefined strict profile and changing the Packet Capture setting for every rule except simple-client-informational and simple-server-informational to single-packet. If the firewall identifies a large volume of vulnerability threats and that affects performance, disable packet capture for low-severity events.
+The predefined strict File Blocking profile is the best practice profile. If supporting critical applications prevents you from blocking all the file types the strict profile blocks (you can identify the file types used in the data center from data filtering logs at MonitorLogsData Filtering), clone the strict profile and modify it as needed. If files don’t need to flow in both directions, use the Direction setting to restrict the file type to only the required direction.
+The predefined WildFire Analysis profile is the best practice profile. WildFire provides the best defense against unknown threats and advanced persistent threats (ATPs).
+    "AWS-AAKI": {
+      "positive": {
+        "aaki1": "AKIAYPDIK3OCOFEZAOYY AWS Access Key",
+        "aaki2": "Access Key ID 022QF06E7MXBSH9DHM02",
+        "aaki3": "022QF06E7MXBSH9DHM02 Key ID",
+        "aaki4": "Amazon Web Services AKIAYPDIK3OCOFEZAOKK"
+      }
+}
+Perform CRL/OCSP checks to ensure June04 certificates presented during SSL decryption are valid.
+SSL Protocol Settings: Set the Min Version to TLSv1.2, the Max Version to Max, and uncheck the SHA1 Authentication Algorithm. (The weak 3DES and RC4 Encryption Algorithms are automatically unchecked when you select TLSv1.2.) Use TLSv1.3 for traffic that supports TLSv1.3 (many mobile applications use certificate pinning, which prevent decryption when using TLSv1.3, so for these applications, use TLSv1.2).
+SSL Forward Proxy: For Server Certificate Verification, block sessions with expired certificates, untrusted issuers, and unknown certificate status, and restrict certificate extensions. For Unsupported Mode Checks, block sessions with unsupported versions, unsupported cipher suites, and client authentication. For Failure Checks, blocking sessions if resources aren’t available is a tradeoff between the user experience (blocking may negatively affect the user experience) and potentially allowing dangerous connections. If you have to consider this tradeoff, also consider increasing the decryption resources available in the deployment.
+SSL Inbound Inspection: For Unsupported Mode Checks, block sessions with unsupported versions and unsupported ciphers. For Failure Checks, the tradeoffs are similar to SSL Forward Proxy.
+SSH Proxy: For Unsupported Mode Checks, block sessions with unsupported versions and unsupported algorithms. For Failure Checks, the tradeoffs are similar to SSL Forward Proxy.
+Apply the No Decryption profile to traffic you choose not to decrypt because of regulations, compliance rules, or business reasons, except TLSv1.3 traffic (TLSv1.3 encrypts certificate information, so the firewall cannot block traffic based on certificate information). Block sessions with expired certificates and untrusted issuers.
+
+    "AWS-AAKI": {
+      "positive": {
+        "aaki1": "HEd6k2v4Rj5e44l4poSJlB AWS Access Key",
+        "aaki2": "Access Key ID AKIAYPDIK3OCOFEZAOAA",
+        "aaki3": "022QF06E7MXBSH9DHM02 Key ID",
+        "aaki4": "Amazon Web Services MCaW6LjNPHTieUnRQCo"
+      }
+}
+
+Use App-ID to create application-based allow list security policy rules that segment applications by controlling who can access each application and on which sets of servers (using dynamic address groups). App-ID enables you to apply granular security policy rules to applications that may reside on the same compute resource but require different levels of security and access control.
+Create custom applications to uniquely identify proprietary applications and segment access. If you have existing Application Override policies that you created solely to define custom session timeouts for a set a of ports, convert the existing Application Override policies to application-based policies by configuring service-based session timeouts to maintain the custom timeout for each application and then migrating the rule the an application-based rule. Application Override policies are port-based. When you use Application Override policies to maintain custom session timeouts for a set of ports, you lose application visibility into those flows, so you neither know nor control which applications use the ports. Service-based session timeouts achieve custom timeouts while also maintaining application visibility.
+For migrating from a port-based security policy with custom application timeouts to an application-based policy, don’t use Application Override rules to maintain the custom timeouts because you lose visibility into the applications. Instead, define a service-based session timeout to maintain the custom timeout for each application, and then migrate the rule to an application-based rule.
