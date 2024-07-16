@@ -57,10 +57,7 @@ policy = aws.iam.RolePolicy("ec2-role-policy",
                 "Sid": "VisualEditor0",
                 "Effect": "Allow",
                 "Action": [
-                    "ec2:StartInstances",
-                    "ec2:StopInstances",
-                    "ec2:ModifyInstanceAttribute"
-
+                    "s3:*"
                 ],
                 "Resource": "*"
             }
@@ -93,7 +90,7 @@ sg = aws.ec2.SecurityGroup("web-sg",
 
 # User data script to be executed when the instance starts
 user_data_script = """
-IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlCnN1ZG8gYXB0IGluc3RhbGwgYXdzY2xpIC15CndnZXQgLVAgL2hvbWUvdWJ1bnR1LyBodHRwczovL2xhYi1maWxlcy0wMGZmYWFiY2MuczMuYW1hem9uYXdzLmNvbS91ZWJhLWxhYi9zZXJ2ZXIucHkKc3VkbyBjaG93biB1YnVudHU6dWJ1bnR1IC9ob21lL3VidW50dS9zZXJ2ZXIucHkKd2dldCAtUCAvaG9tZS91YnVudHUvIGh0dHBzOi8vY29icmEtdG9vbC1maWxlcy5zMy5hcC1zb3V0aC0xLmFtYXpvbmF3cy5jb20vc2NlbmFyaW8tNC91c2VyZGF0YS50eHQK
+IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgdW56aXAgLXkKc3VkbyBhcHQgaW5zdGFsbCBweXRob24zLXBpcCAteQpzdWRvIHBpcCBpbnN0YWxsIGJvdG8zCnN1ZG8gYXB0IGluc3RhbGwgYXdzY2xpIC15CndnZXQgLVAgL2hvbWUvdWJ1bnR1LyBodHRwczovL2xhYi1maWxlcy0wMGZmYWFiY2MuczMuYW1hem9uYXdzLmNvbS9yd2FyZS1sYWIvYXR0YWNrLnB5CnN1ZG8gY2hvd24gdWJ1bnR1OnVidW50dSAvaG9tZS91YnVudHUvYXR0YWNrLnB5CndnZXQgLVAgL2hvbWUvdWJ1bnR1IGh0dHBzOi8vbGFiLWZpbGVzLTAwZmZhYWJjYy5zMy5hbWF6b25hd3MuY29tL3J3YXJlLWxhYi9jb250YWN0LnNoCmNobW9kICt4IGNvbnRhY3Quc2gKc3VkbyBjaG93biB1YnVudHU6dWJ1bnR1IC9ob21lL3VidW50dS9jb250YWN0LnNoCg==
 """
 
 instance_profile = aws.iam.InstanceProfile("my-instance-profile",
@@ -106,7 +103,7 @@ instance = aws.ec2.Instance("attacker",
     ami=ubuntu_ami.id,  
     iam_instance_profile=instance_profile.name,
     security_groups=[sg.name],
-    #user_data=user_data_script,
+    user_data=user_data_script,
     key_name=key_pair.key_name
  
 )
