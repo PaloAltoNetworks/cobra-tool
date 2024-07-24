@@ -1,0 +1,2 @@
+title: Rest API exploit
+description: Command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation and persistence.

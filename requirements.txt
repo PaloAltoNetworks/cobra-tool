@@ -4,12 +4,13 @@ dill==0.3.8
 grpcio==1.60.1
 parver==0.5
 protobuf==4.25.3
-pulumi>=3.0.0,<4.0.0
 pulumi-aws>=6.0.2,<7.0.0
+pulumi-gcp>=7.0.0,<8.0.0
+pulumi>=3.0.0,<4.0.0
 pyfiglet==1.0.2
 PyYAML==6.0.1
+requests==2.32.3
 semver==2.13.0
 six==1.16.0
 termcolor==2.4.0
 tqdm==4.66.2
-pulumi-gcp>=7.0.0,<8.0.0
