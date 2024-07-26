@@ -83,3 +83,15 @@ def get_scenarios_config():
 def print_ascii_art(text):
     ascii_art = pyfiglet.figlet_format(text)
     print(colored(ascii_art, color="cyan"))
+
+
+def pbar_sleep(duration, label='Loading'):
+    with tqdm(total=duration, desc=label) as pbar:
+        # Loop until sleep_duration is reached
+        while duration > 0:
+            # Sleep for a shorter interval to update the progress bar
+            sleep_interval = min(1, duration)
+            sleep(sleep_interval)
+            # Update the progress bar with the elapsed time
+            pbar.update(sleep_interval)
+            duration -= sleep_interval

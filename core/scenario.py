@@ -12,7 +12,7 @@ from termcolor import colored
 import yaml
 from pulumi import automation as auto
 
-from core.helpers import loading_animation, slugify
+from core.helpers import loading_animation, slugify, pbar_sleep
 
 
 class Scenario(object):
@@ -37,6 +37,11 @@ class Scenario(object):
 
     def attack(self):
         """Run the attack scenario on the deployed infra/resources."""
+        # TODO: logging instead of print here and elsewhere
+        print(colored("Executing attack...", color="red"))
+        # TODO: sleep to ensure deployed resources are available?
+        #   Need more reliable way to do this?  (e.g. Pulumi API callback?)
+        pbar_sleep(10)
         # TODO: Exception handling if no data
         with open(self.output_path, 'r') as f:
             data = json.load(f)
