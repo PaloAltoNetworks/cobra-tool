@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Module providing a class for encapsulating COBRA scenarios."""
+"""This module provides a base class for COBRA scenarios."""
 import importlib
 import json
 import os
@@ -42,6 +42,7 @@ class Scenario(object):
             data = json.load(f)
         result = self.attack_mod.attack(data)
         if (result):
+            # TODO: logging instead of print
             print(colored('Attack succeeded', color='red'))
         else:
             print(colored('Attack failed', color='red'))
@@ -53,7 +54,7 @@ class Scenario(object):
 
     def generate_report(self):
         """Generate report."""
-        print('Reporting not yet implemented.')
+        print('Not yet implemented.')
         # TODO
         # html_template = ''
         # with open('cobra-report-{}.html'.format(self.slug), 'w+') as file:
@@ -70,7 +71,7 @@ class Scenario(object):
             program=self.infra_mod.pulumi_program
         )
         stack.workspace.install_plugin('aws', 'v4.0.0')
-        # stack.set_config('aws:region', auto.ConfigValue(value='us-east-2'))
+        stack.set_config('aws:region', auto.ConfigValue(value='us-east-2'))
         # TODO: make region configurable
         stack.refresh(on_output=print)
         return stack
