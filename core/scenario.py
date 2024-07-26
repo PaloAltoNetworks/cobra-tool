@@ -51,7 +51,6 @@ class Scenario(object):
             data = json.load(f)
         result = self.attack_mod.attack(data)
         if (result):
-            # TODO: logging instead of print
             print(colored('Attack succeeded', color='red'))
         else:
             print(colored('Attack failed', color='red'))
