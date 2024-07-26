@@ -1,18 +1,15 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-"""This module provides a base class for COBRA scenarios."""
+"""Module providing a class for encapsulating COBRA scenarios."""
 import importlib
 import json
 import os
-import subprocess
-import webbrowser
-from pathlib import Path
 from termcolor import colored
 
 import yaml
 from pulumi import automation as auto
 
-from core.helpers import loading_animation, slugify, pbar_sleep
+from core.helpers import slugify, pbar_sleep
 
 
 class Scenario(object):
@@ -59,7 +56,7 @@ class Scenario(object):
 
     def generate_report(self):
         """Generate report."""
-        print('Not yet implemented.')
+        print('Reporting not yet implemented.')
         # TODO
         # html_template = ''
         # with open('cobra-report-{}.html'.format(self.slug), 'w+') as file:
@@ -76,8 +73,7 @@ class Scenario(object):
             program=self.infra_mod.pulumi_program
         )
         stack.workspace.install_plugin('aws', 'v4.0.0')
-        stack.set_config('aws:region', auto.ConfigValue(value='us-east-2'))
-        # TODO: make region configurable
+        # stack.set_config('aws:region', auto.ConfigValue(value='us-east-2'))
         stack.refresh(on_output=print)
         return stack
 
@@ -92,7 +88,6 @@ class Scenario(object):
             outputs_dict[key] = outputs[key].value
         with open(self.output_path, 'w') as file_:
             file_.write(json.dumps(outputs_dict))
-        print(f'update summary: \n{json.dumps(up_res.summary.resource_changes, indent=4)}')
 
     def _destroy_infra(self):
         """Destroy the IaC stack."""
