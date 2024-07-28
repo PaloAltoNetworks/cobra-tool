@@ -63,4 +63,8 @@ terraform.tfstate.backup
 *cnbas-as1-report.html
 *cnbas-as2-report.html
 
-files/var/
+
+files/var/logs/*
+files/var/output/*
+files/var/reports/*
+!.gitkeep

@@ -80,43 +80,23 @@
         </header>
         <section class="attack-description">
             <h2 style="color: #EA4335;">Attack Path Scenario Explained</h2>
-            <p>The scenario simulates a real-world chained attack, beginning with the exploitation of a vulnerable application which is on Lambda, with an API GW. Subsequently, this initial breach facilitates a chain of events, including the credential dsicovery, exfiltration, escalation of credentials, and the anomalous provisioning of Backdoor IAM Role..</p>
+            <p>$attack_explanation</p>
         </section>
 
         <section>
             <h2 style="color: #34A853;">Attack Scenario Breakdown</h2>
-            <p>1. Application is exploited through API GW, lambda backend</p>
-            <p>2. Lambda Role credential is discovered and exfiltrated.</p>
-            <p>3. Discovery of Privilege Escalation possibility with the exfiltrated credential.</p>
-            <p>4. Attach Privileged Policy to the Role.</p>
-            <p>5. Provision a Backdoor IAM Role to maintain persistence.</p>
-            <p>6. Whitelist Attacker account id in the trust policy of the backdoor role.</p>
+            $attack_steps
         </section>    
 
         <section>
             <h2 style="color: #34A853;">Attack Path Graph</h2>
-            <img src="scenarios/scenario_2/report/cnbas-as-2.png" alt="Attack Path Graph">
+            <img src="$path/report.png" alt="Attack Path Graph">
         </section>
         <section>
-            <h2 style="color: #FBBC05;">Resource Meta Data</h2>
+            <h2 style="color: #FBBC05;">Resource Metadata</h2>
             <table class="vertical-table">
                 <tbody>
-                    <tr>
-                        <td class="resource-type">API GW ID:</td>
-                        <td>'''+API_GW_ID+'''</td>
-                    </tr>
-                    <tr>
-                        <td class="resource-type">Lambda Function ARN :</td>
-                        <td>'''+LAMBDA_FUNC_ARN+'''</td>
-                    </tr>
-                    <tr>
-                        <td class="resource-type">API GW URL:</td>
-                        <td>'''+API_GW_URL+'''</td>
-                    </tr>
-                    <tr>
-                        <td class="resource-type">Lambda Role Name:</td>
-                        <td>'''+LAMBDA_ROLE_NAME+'''</td>
-                    </tr>
+                    $resources
                 </tbody>
             </table>
         </section>
@@ -129,24 +109,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Check if API Gatway has Authentication & Autorization for APIs.</td>
-                    </tr>
-                    <tr>
-                        <td>Check if API Gateway has WAF integrated which can stop L7 attacks.</td>
-                    </tr>
-                    <tr>
-                        <td>Check if any Lambda has any defender layer which could prevent injection & credential exfil.</td>
-                    </tr>
-                    <tr>
-                        <td>Check if Role Exfil and usage is being monitoried by eventbridge rules or cloudtrail monitoring.</td>
-                    </tr>
-                    <tr>
-                        <td>Check if there are any SCPs which could prevent attaching privileged policies. </td>
-                    </tr>
-                    <tr>
-                        <td>Check if new user/role/group creation is monitored.</td>
-                    </tr>
+                    $controls
                 </tbody>
             </table>
         </section>

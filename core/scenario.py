@@ -4,6 +4,7 @@
 import importlib
 import json
 import os
+import webbrowser
 from pathlib import Path
 from termcolor import colored
 
@@ -11,6 +12,7 @@ import yaml
 from pulumi import automation as auto
 
 from core.helpers import slugify, pbar_sleep
+from core.report_ng import get_report
 
 
 class Scenario(object):
@@ -25,9 +27,9 @@ class Scenario(object):
             self.infra_mod = None
         self.attack_mod = importlib.import_module(
             '.{}.attack'.format(self.scenario_label), 'scenarios_ng')
-        config = self._get_config()
-        self.title = config['title']
-        self.description = config['description']
+        self.config = self._get_config()
+        self.title = self.config['title']
+        self.description = self.config['description']
         self.slug = slugify(self.title)  # e.g. title-of-scenario
         self.output_path = self._get_output_path()
 
@@ -64,14 +66,13 @@ class Scenario(object):
 
     def generate_report(self):
         """Generate report."""
-        print('Reporting not yet implemented.')
-        # TODO
-        # html_template = ''
-        # with open('cobra-report-{}.html'.format(self.slug), 'w+') as file:
-        #     file.write(html_template)
-        # webbrowser.open_new_tab(
-        #     'file://{}/cobra-report-{}.html'.format(str(Path.cwd()), self.slug)
-        # )
+        with open(self.output_path, 'r') as f:
+            output_data = json.load(f)
+        report = get_report(self.scenario_label, self.config, output_data)
+        report_path = Path(__file__).parent.parent / 'files' / 'var' / 'reports' / '{}_report.html'.format(self.scenario_label)
+        with open(report_path, 'w+') as file:
+            file.write(report)
+        webbrowser.open_new_tab('file://{}'.format(report_path))
 
     def _get_stack(self):
         stack_dir = Path(__file__).parent.parent / 'scenarios_ng' / self.scenario_label / 'infra' / 'stack'
