@@ -4,6 +4,7 @@
 import importlib
 import json
 import os
+from pathlib import Path
 from termcolor import colored
 
 import yaml
@@ -17,8 +18,11 @@ class Scenario(object):
     def __init__(self, scenario_id):
         self.scenario_id = scenario_id
         self.scenario_label = 'scenario_{}'.format(scenario_id)
-        self.infra_mod = importlib.import_module(
-            '.{}.infra.main'.format(self.scenario_label), 'scenarios_ng')
+        try:
+            self.infra_mod = importlib.import_module(
+                '.{}.infra.extra'.format(self.scenario_label), 'scenarios_ng')
+        except ModuleNotFoundError:
+            self.infra_mod = None
         self.attack_mod = importlib.import_module(
             '.{}.attack'.format(self.scenario_label), 'scenarios_ng')
         config = self._get_config()
@@ -30,7 +34,8 @@ class Scenario(object):
     def setup(self):
         """Deploy resources needed for the scenario."""
         self._deploy_infra()
-        # TODO: execute extra resources module if exists
+        if self.infra_mod:
+            self.infra_mod.deploy_additional_resources()
 
     def attack(self):
         """Run the attack scenario on the deployed infra/resources."""
@@ -52,7 +57,10 @@ class Scenario(object):
     def destroy(self):
         """Destroy scenario resources and clean up."""
         self._destroy_infra()
-        # TODO: logic to destroy additional resources not managed by Pulumi
+        if self.infra_mod:
+            with open(self.output_path, 'r') as f:
+                data = json.load(f)
+            self.infra_mod.destroy_additional_resources(data)
 
     def generate_report(self):
         """Generate report."""
@@ -66,12 +74,16 @@ class Scenario(object):
         # )
 
     def _get_stack(self):
-        project_name = 'cobra'
+        stack_dir = Path(__file__).parent.parent / 'scenarios_ng' / self.scenario_label / 'infra' / 'stack'
         stack = auto.create_or_select_stack(
+            # TODO: support for Pulumi programs defined as a function
+            # see https://www.pulumi.com/docs/reference/pkg/python/pulumi/#module-pulumi.automation
+            # project_name='cobra',
+            # program=self.infra_mod.pulumi_program
             stack_name=self.scenario_label,
-            project_name=project_name,
-            program=self.infra_mod.pulumi_program
+            work_dir=stack_dir
         )
+
         stack.workspace.install_plugin('aws', 'v4.0.0')
         # stack.set_config('aws:region', auto.ConfigValue(value='us-east-2'))
         stack.refresh(on_output=print)

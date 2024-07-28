@@ -36,7 +36,9 @@ def main(cloud_provider, action, simulation, scenario):
             # TODO: what to do with cloud provider?
             scenario.setup()
             scenario.attack()
-            scenario.destroy()
+            # scenario.destroy()
+            # TODO: ^^^ do we really want to destroy the infra immediately?
+            #   there's a separate command for destroy
             scenario.generate_report()  # TODO: not implemented
     elif action == 'status':
         # TODO
