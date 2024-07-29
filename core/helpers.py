@@ -1,16 +1,18 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 import os
-from pathlib import Path, PurePath
 import pyfiglet
-import time
-import subprocess
-import json
 import re
-from time import sleep
-from termcolor import colored
+import subprocess
+import time
 
+from pathlib import Path, PurePath
+from termcolor import colored
+from time import sleep
+
+from tqdm import tqdm
 import requests
 import yaml
-from tqdm import tqdm
 
 
 def loading_animation():
@@ -19,6 +21,24 @@ def loading_animation():
         for char in chars:
             print(f"\rLoading {char}", end="", flush=True)
             time.sleep(0.1)
+
+
+def print_ascii_art(text):
+    ascii_art = pyfiglet.figlet_format(text)
+    print(colored(ascii_art, color="cyan"))
+
+
+def pbar_sleep(duration, label='Loading'):
+    """"Show a progress bar while sleeping for given duration."""
+    with tqdm(total=duration, desc=label) as pbar:
+        # Loop until sleep_duration is reached
+        while duration > 0:
+            # Sleep for a shorter interval to update the progress bar
+            sleep_interval = min(1, duration)
+            sleep(sleep_interval)
+            # Update the progress bar with the elapsed time
+            pbar.update(sleep_interval)
+            duration -= sleep_interval
 
 
 def generate_ssh_key():
@@ -39,6 +59,7 @@ def generate_ssh_key():
 
 
 def slugify(s):
+    """Return a slug of a string, e.g. My Example becomes my-example"""
     s = s.lower().strip()
     s = re.sub(r'[^\w\s-]', '', s)
     s = re.sub(r'[\s_-]+', '-', s)
@@ -46,14 +67,14 @@ def slugify(s):
     return s
 
 
-def http_request(url, method='GET', headers={}):
-    resp = requests.request(method, url)
+def http_request(url, method='GET', data={}, headers={}):
+    """Convenience method for HTTP requests"""
+    resp = requests.request(method, url, data=data, headers=headers)
     return resp
 
 
 def get_scenario_list():
-    """Get a list of scenarios for selection from command line.
-    """
+    """Get a list of scenarios for selection from command line."""
     scenarios_path = Path(__file__).parent.parent / 'scenarios_ng'
     scenarios_list = []
     for path in Path(scenarios_path).glob('*'):
@@ -65,8 +86,7 @@ def get_scenario_list():
 
 def get_scenarios_config():
     """Create dict containing scenario config data from every entry in
-    scenarios directory (title, description, etc.)
-    """
+    scenarios directory (title, description, etc.)"""
     scenarios_path = Path(__file__).parent.parent / 'scenarios_ng'
     scenarios_config = {}
     for path in Path(scenarios_path).glob('*'):
@@ -78,20 +98,3 @@ def get_scenarios_config():
                 config = yaml.load(file_, Loader=yaml.SafeLoader)
             scenarios_config[scenario_name] = config
     return scenarios_config
-
-
-def print_ascii_art(text):
-    ascii_art = pyfiglet.figlet_format(text)
-    print(colored(ascii_art, color="cyan"))
-
-
-def pbar_sleep(duration, label='Loading'):
-    with tqdm(total=duration, desc=label) as pbar:
-        # Loop until sleep_duration is reached
-        while duration > 0:
-            # Sleep for a shorter interval to update the progress bar
-            sleep_interval = min(1, duration)
-            sleep(sleep_interval)
-            # Update the progress bar with the elapsed time
-            pbar.update(sleep_interval)
-            duration -= sleep_interval

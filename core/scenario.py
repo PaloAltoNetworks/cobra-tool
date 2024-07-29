@@ -3,7 +3,6 @@
 """Module providing a class for encapsulating COBRA scenarios."""
 import importlib
 import json
-import os
 import webbrowser
 from pathlib import Path
 from termcolor import colored
@@ -12,7 +11,7 @@ import yaml
 from pulumi import automation as auto
 
 from core.helpers import slugify, pbar_sleep
-from core.report_ng import get_report
+from core.report import get_report
 
 
 class Scenario(object):
@@ -35,13 +34,14 @@ class Scenario(object):
 
     def setup(self):
         """Deploy resources needed for the scenario."""
+        # TODO: logging instead of print here and elsewhere
+        print(colored('Deploying scenario infrastructure', color='red'))
         self._deploy_infra()
         if self.infra_mod:
             self.infra_mod.deploy_additional_resources()
 
     def attack(self):
         """Run the attack scenario on the deployed infra/resources."""
-        # TODO: logging instead of print here and elsewhere
         print(colored("Executing attack...", color="red"))
         # TODO: sleep to ensure deployed resources are available?
         #   Need more reliable way to do this?  (e.g. Pulumi API callback?)
@@ -58,6 +58,7 @@ class Scenario(object):
 
     def destroy(self):
         """Destroy scenario resources and clean up."""
+        print(colored('Destroying scenario infrastructure', color='red'))
         self._destroy_infra()
         if self.infra_mod:
             with open(self.output_path, 'r') as f:
@@ -69,7 +70,9 @@ class Scenario(object):
         with open(self.output_path, 'r') as f:
             output_data = json.load(f)
         report = get_report(self.scenario_label, self.config, output_data)
-        report_path = Path(__file__).parent.parent / 'files' / 'var' / 'reports' / '{}_report.html'.format(self.scenario_label)
+        report_path = Path(__file__).parent.parent \
+            / 'files' / 'var' / 'reports' / '{}_report.html'.format(
+                self.scenario_label)
         with open(report_path, 'w+') as file:
             file.write(report)
         webbrowser.open_new_tab('file://{}'.format(report_path))
@@ -84,7 +87,6 @@ class Scenario(object):
             stack_name=self.scenario_label,
             work_dir=stack_dir
         )
-
         stack.workspace.install_plugin('aws', 'v4.0.0')
         # stack.set_config('aws:region', auto.ConfigValue(value='us-east-2'))
         stack.refresh(on_output=print)
@@ -93,8 +95,7 @@ class Scenario(object):
     def _deploy_infra(self):
         """Deploy required IaC infrastructure."""
         stack = self._get_stack()
-        up_res = stack.up(on_output=print)
-        # TODO: is this the right way to handle Pulumi outputs?
+        stack.up(on_output=print)
         outputs = stack.outputs()
         outputs_dict = {}
         for key in outputs.keys():
@@ -108,17 +109,14 @@ class Scenario(object):
         stack.destroy(on_output=print)
 
     def _get_config(self):
-        config_path = os.path.join(  # FIXME: use pathlib instead
-            os.path.dirname(__file__),
-            '..', 'scenarios_ng', self.scenario_label, '_files', 'config.yaml')
+        config_path = Path(__file__).parent.parent \
+            / 'scenarios_ng' / self.scenario_label / '_files' / 'config.yaml'
         with open(config_path, 'r') as file_:
             config = yaml.load(file_, Loader=yaml.SafeLoader)
         return config
 
     def _get_output_path(self):
-        output_path = os.path.join(
-            os.path.dirname(__file__),
-            '..', 'files', 'var', 'output',
-            '{}.json'.format(self.scenario_label),
-        )
+        output_path = Path(__file__).parent.parent \
+            / 'files' / 'var' / 'output' / '{}.json'.format(
+                self.scenario_label)
         return output_path

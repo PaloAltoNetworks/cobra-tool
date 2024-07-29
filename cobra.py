@@ -1,6 +1,6 @@
 import argparse
 
-from core import main_ng as main
+from core import main
 from core.helpers import get_scenario_list
 
 
