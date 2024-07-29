@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COBRA Attack Path Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        header img {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .controls {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .controls li {
+            margin-bottom: 10px;
+        }
+        .vertical-table {
+            display: flex;
+            flex-direction: row;
+        }
+        .vertical-table td {
+            padding: 5px 10px;
+        }
+        .vertical-table .resource-type {
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="core/cnbas-logo.png" alt="COBRA Logo">
+            <h1 style="color: #4285F4;">COBRA Attack Path Report</h1>
+        </header>
+        <section class="attack-description">
+            <h2 style="color: #EA4335;">Attack Path Scenario Explained</h2>
+            <p>$attack_explanation</p>
+        </section>
+
+        <section>
+            <h2 style="color: #34A853;">Attack Scenario Breakdown</h2>
+            $attack_steps
+        </section>    
+
+        <section>
+            <h2 style="color: #34A853;">Attack Path Graph</h2>
+            <img src="$path/report.png" alt="Attack Path Graph">
+        </section>
+        <section>
+            <h2 style="color: #FBBC05;">Resource Metadata</h2>
+            <table class="vertical-table">
+                <tbody>
+                    $resources
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h2 style="color: #4285F4;">List of Controls to Evaluate Post-Attack</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Controls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    $controls
+                </tbody>
+            </table>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+title: Example scenario
+description: An example scenario that deploys a public S3 bucket and file containing sensitive data, and executes an HTTP request to retrieve the file.
+cloud_provider: aws
+attack_explanation: TODO
+attack_steps:
+- 1. Step 1 (TODO)
+- 2. Step 2 (TODO)
+post_attack_controls_eval_steps:
+- 1. Step 1 (TODO)
+- 2. Step 2 (TODO)

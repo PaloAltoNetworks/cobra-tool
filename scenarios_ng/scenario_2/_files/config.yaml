@@ -1,0 +1,18 @@
+title: Rest API exploit
+description: Command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation and persistence.
+cloud_provider: aws
+attack_explanation: The scenario simulates a real-world chained attack, beginning with the exploitation of a vulnerable application which is on Lambda, with an API GW. Subsequently, this initial breach facilitates a chain of events, including the credential dsicovery, exfiltration, escalation of credentials, and the anomalous provisioning of Backdoor IAM Role.
+attack_steps:
+- 1. Application is exploited through API GW, lambda backend
+- 2. Lambda Role credential is discovered and exfiltrated.
+- 3. Discovery of Privilege Escalation possibility with the exfiltrated credential.
+- 4. Attach Privileged Policy to the Role.
+- 5. Provision a Backdoor IAM Role to maintain persistence.
+- 6. Whitelist Attacker account id in the trust policy of the backdoor role.
+post_attack_controls_eval_steps:
+- 1. Check if API Gatway has Authentication & Autorization for APIs.
+- 2. Check if API Gateway has WAF integrated which can stop L7 attacks.
+- 3. Check if any Lambda has any defender layer which could prevent injection & credential exfil.
+- 4. Check if Role Exfil and usage is being monitoried by eventbridge rules or cloudtrail monitoring.
+- 5. Check if there are any SCPs which could prevent attaching privileged policies.
+- 6. Check if new user/role/group creation is monitored.
