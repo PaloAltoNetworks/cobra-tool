@@ -6,6 +6,7 @@ import subprocess
 from pulumi_random import RandomPet
 import pulumi_synced_folder
 from pulumi_aws import s3
+import json
 
 def read_public_key(pub_key_path):
     with open(pub_key_path, "r") as f:
@@ -13,7 +14,7 @@ def read_public_key(pub_key_path):
 
     return public_key
 
-current = aws.get_region()
+region = aws.get_region()
 
 key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("../../../id_rsa.pub"))
 
@@ -122,6 +123,64 @@ folder = pulumi_synced_folder.S3BucketFolder(
     acl=s3.CannedAcl.PRIVATE,
 )
 
+current = aws.get_caller_identity()
+kmskey = aws.kms.Key("example",
+    description="An example symmetric encryption KMS key",
+    enable_key_rotation=True,
+    deletion_window_in_days=20,
+    policy=json.dumps({
+        "Version": "2012-10-17",
+        "Id": "key-default-1",
+        "Statement": [
+            {
+                "Sid": "Enable IAM User Permissions",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": f"arn:aws:iam::{current.account_id}:root",
+                },
+                "Action": "kms:*",
+                "Resource": "*",
+            },
+            {
+                "Sid": "Allow administration of the key",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": f"arn:aws:iam::{current.account_id}:role/aws-service-role/sso.amazonaws.com/AWSServiceRoleForSSO",
+                },
+                "Action": [
+                    "kms:ReplicateKey",
+                    "kms:Create*",
+                    "kms:Describe*",
+                    "kms:Enable*",
+                    "kms:List*",
+                    "kms:Put*",
+                    "kms:Update*",
+                    "kms:Revoke*",
+                    "kms:Disable*",
+                    "kms:Get*",
+                    "kms:Delete*",
+                    "kms:ScheduleKeyDeletion",
+                    "kms:CancelKeyDeletion",
+                ],
+                "Resource": "*",
+            },
+            {
+                "Sid": "Allow use of the key",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "*",
+                },
+                "Action": [
+                    "kms:DescribeKey",
+                    "kms:Encrypt",
+                    "kms:ReEncrypt*",
+                    "kms:GenerateDataKey"
+                ],
+                "Resource": "*",
+            },
+        ],
+    }))
+
 
 # Export the public IP of the EC2 instance
 print("Attacker Server Public IP")
@@ -152,7 +211,9 @@ pulumi.export("Subnet ID", instance.subnet_id)
 
 pulumi.export("Key Pair Name", key_pair.key_name)
 
-pulumi.export("Region", current.name)
+pulumi.export("Region", region.name)
 
 pulumi.export("Bucket Name", s3_bucket.bucket)
+
+pulumi.export("KMS Key", kmskey.arn)
 
