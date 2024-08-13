@@ -109,6 +109,8 @@ options:
                         Scenario selection
 ```
 
+>>Note* ONLY RUN INTO SANDBOX ENVIRONMENT
+
 #### Simulate AWS Scenario 
 
 ```
@@ -117,16 +119,19 @@ python3 cobra.py aws launch --simulation
 
 
 ```
-  ____ ___  ____  ____      _
- / ___/ _ \| __ )|  _ \    / \
-| |  | | | |  _ \| |_) |  / _ \
-| |__| |_| | |_) |  _ <  / ___ \
- \____\___/|____/|_| \_\/_/   \_\
+  ____    ___    ____    ____       _
+ / ___|  / _ \  | __ )  |  _ \     / \
+| |     | | | | |  _ \  | |_) |   / _ \
+| |___  | |_| | | |_) | |  _ <   / ___ \
+ \____|  \___/  |____/  |_| \_\ /_/   \_\
 
 
 Select Attack Scenario of aws:
 1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
 2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence
+3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster
+4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access
+5. Instance takeover, abuse s3 access & perform ransomware using external KMS key
 Enter your choice:
 
 ```
@@ -147,13 +152,16 @@ python3 cobra.py aws destroy --scenario <scenario-1/scenario-2>
 
 1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
 2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence
+3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster
+4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access
+5. Instance takeover, abuse s3 access & perform ransomware using external KMS key
 
 ### To Do / In Roadmap
 
-3. Compromising a GKE Pod and accessing cluster secrets, taking over the cluster & escalating privileges at the Project level, possible project takeover. 
-4. Azure App exploit on a function, data exfiltration from Blob storage & abusing function misconfigs to escalate privileges & leaving a backdoor IAM entity. 
-5. Exploiting an App on VM, exfiltration of data from Cosmos DB & possible takeover of a resource group. 
-6. More scenarios loading...
+
+- Azure App exploit on a function, data exfiltration from Blob storage & abusing function misconfigs to escalate privileges & leaving a backdoor IAM entity. 
+- Exploiting an App on VM, exfiltration of data from Cosmos DB & possible takeover of a resource group. 
+- More scenarios loading...
 
 ## License
 
