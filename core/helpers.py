@@ -43,8 +43,8 @@ def pbar_sleep(duration, label='Loading'):
 
 def generate_ssh_key():
     # Define the path to save the keys
-    key_path = os.path.expanduser("./id_rsa")
-
+    key_path = Path(__file__).parent.parent \
+        / 'files' / 'var' / 'ssh' / 'id_rsa'
     # Check if SSH key already exists
     if os.path.exists(key_path):
         print("SSH key already exists. Deleting the existing key...")
@@ -54,7 +54,6 @@ def generate_ssh_key():
     with open(os.devnull, 'w') as devnull:
         subprocess.run(["ssh-keygen", "-t", "rsa", "-b", "4096", "-N", "", "-f", key_path], stdout=devnull, stderr=devnull)
     print("SSH Key Pair generated successfully!")
-
     return key_path, key_path + ".pub"
 
 
@@ -98,3 +97,13 @@ def get_scenarios_config():
                 config = yaml.load(file_, Loader=yaml.SafeLoader)
             scenarios_config[scenario_name] = config
     return scenarios_config
+
+
+def get_project_root():
+    return Path(__file__).parent.parent
+
+
+def notify(msg):
+    print("-"*30)
+    print(colored(msg, color="red"))
+    loading_animation()

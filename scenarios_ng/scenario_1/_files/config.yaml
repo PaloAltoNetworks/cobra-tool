@@ -1,0 +1,18 @@
+title: Exploit Vulnerable Application
+description: EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
+cloud_provider: aws
+attack_explanation: TODO
+attack_steps:
+- 1. A Web Server EC2 with a vulnerable application container is launched.
+- 2. Attacker Machine is launched, operates behind Tor.
+- 3. Attacker exploits the Application, gets shell access of the EC2.
+- 4. Attacker retrieves and exfiltrates the Role credentials attached to the EC2.
+- 5. Attacker loads these credentials on his machine.
+- 6. Attacker launches some infra as a post exploit step.
+post_attack_controls_eval_steps:
+- 1. Check if controls can identify Vulnerabilities in EC2 instances
+- 2. Check if controls can identify IAM high-privileged run-instance and pass-role permissions
+- 3. Check if controls can identify anomaly activity through their threat detection
+- 4. Check if controls can prevent the attack by blocking RCE payloads
+- 5. Check if controls can able to identify metadata queries from audit logs
+- 6. Check if controls logged the activity

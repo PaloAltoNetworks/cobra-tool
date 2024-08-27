@@ -1,8 +1,5 @@
 import subprocess
 
-from core.helpers import loading_animation
-from termcolor import colored
-
 
 def deploy_additional_resources():
     pass
@@ -10,10 +7,6 @@ def deploy_additional_resources():
 
 def destroy_additional_resources(data):    
     LAMBDA_ROLE_NAME = data["lambda-role-name"]
-
-    print(colored("Deleting Manually Created resources - resources which are not tracked by Pulumi's State", color="red"))
-    loading_animation()
-    print("-"*30)
     
     # TODO: consider doing programatically via boto3 vs. subprocess
     subprocess.call("aws iam detach-user-policy --user-name devops --policy-arn arn:aws:iam::aws:policy/AdministratorAccess", shell=True)

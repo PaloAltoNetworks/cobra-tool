@@ -63,6 +63,7 @@ class Scenario(object):
         if self.infra_mod:
             with open(self.output_path, 'r') as f:
                 data = json.load(f)
+            print(colored("Deleting manually created resources not tracked by Pulumi's state", color="red"))
             self.infra_mod.destroy_additional_resources(data)
 
     def generate_report(self):
