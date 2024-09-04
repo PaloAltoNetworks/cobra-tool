@@ -1,3 +1,6 @@
+# NOTE: This file is not actually used, it's left here as an example of using
+#   a `pulumi_program` function instead of a `__main__.py` module for
+#   deploying cloud resources via Pulumi
 import json
 import os
 

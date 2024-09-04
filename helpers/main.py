@@ -1,26 +1,30 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-import pyfiglet
 import re
 import subprocess
 import time
+import logging
 
 from pathlib import Path, PurePath
 from termcolor import colored
 from time import sleep
 
 from tqdm import tqdm
+import pyfiglet
 import requests
 import yaml
 
+logging.basicConfig(level=logging.INFO)
 
-def loading_animation():
+
+def loading_animation(num_dec_secs=10):
     chars = "/—\\|"
-    for _ in range(10):
+    for _ in range(num_dec_secs):
         for char in chars:
             print(f"\rLoading {char}", end="", flush=True)
             time.sleep(0.1)
+    print('\r')
 
 
 def print_ascii_art(text):
@@ -53,8 +57,9 @@ def generate_ssh_key():
     # Generate the SSH key pair
     with open(os.devnull, 'w') as devnull:
         subprocess.run(["ssh-keygen", "-t", "rsa", "-b", "4096", "-N", "", "-f", key_path], stdout=devnull, stderr=devnull)
+    # TODO: use Python library to generate SSH key
     print("SSH Key Pair generated successfully!")
-    return key_path, key_path + ".pub"
+    # return key_path, key_path + ".pub"
 
 
 def slugify(s):
@@ -103,7 +108,10 @@ def get_project_root():
     return Path(__file__).parent.parent
 
 
-def notify(msg):
-    print("-"*30)
-    print(colored(msg, color="red"))
-    loading_animation()
+def notify(msg, animate=True):
+    # TODO: log to file as well as console, add formatter(s)
+    logging.info(msg)
+    # print("-"*30)
+    # print(colored(msg, color="red"))
+    if animate:
+        loading_animation()

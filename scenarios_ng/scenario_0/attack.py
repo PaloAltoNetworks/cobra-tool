@@ -1,11 +1,11 @@
-from core.helpers import http_request
+from helpers.main import http_request, notify
 
 
 def attack(output):
     """Exfiltrate an S3 object from a public bucket."""
     url = 'https://{}.s3.amazonaws.com/{}'.format(
         output['s3-bucket-id'], output['s3-object-id'])
-    print('Running attack scenario on {}'.format(url))
+    notify('Running attack scenario on {}'.format(url))
     # TODO: replace print with logging
     resp = http_request(url)
     if resp.status_code == 200:

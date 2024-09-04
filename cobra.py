@@ -1,7 +1,7 @@
 import argparse
 
 from core import main
-from core.helpers import get_scenario_list
+from helpers.main import get_scenario_list
 
 
 def parse_arguments():

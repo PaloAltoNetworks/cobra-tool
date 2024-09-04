@@ -10,8 +10,8 @@ from termcolor import colored
 import yaml
 from pulumi import automation as auto
 
-from core.helpers import slugify, pbar_sleep
 from core.report import get_report
+from helpers.main import slugify, pbar_sleep
 
 
 class Scenario(object):
@@ -36,9 +36,9 @@ class Scenario(object):
         """Deploy resources needed for the scenario."""
         # TODO: logging instead of print here and elsewhere
         print(colored('Deploying scenario infrastructure', color='red'))
+        self._extra_action('extra_setup')
         self._deploy_infra()
-        if self.infra_mod:
-            self.infra_mod.deploy_additional_resources()
+        self._extra_action('deploy_additional_resources')
 
     def attack(self):
         """Run the attack scenario on the deployed infra/resources."""
@@ -62,8 +62,9 @@ class Scenario(object):
         if self.infra_mod:
             with open(self.output_path, 'r') as f:
                 data = json.load(f)
-            print(colored("Deleting manually created resources not tracked by Pulumi's state", color="red"))
-            self.infra_mod.destroy_additional_resources(data)
+                print(colored("Deleting manually created resources not tracked by Pulumi's state", color="red"))
+                self._extra_action('destroy_additional_resources', data)
+            self._extra_action('extra_teardown')
 
     def generate_report(self):
         """Generate report."""
@@ -107,6 +108,15 @@ class Scenario(object):
         """Destroy the IaC stack."""
         stack = self._get_stack()
         stack.destroy(on_output=print)
+
+    def _extra_action(self, action, args=None):
+        if hasattr(self.infra_mod, action):
+            func = getattr(self.infra_mod, action)
+            if args:
+                func(args)
+            else:
+                func()
+            # TODO: log warning if func doesn't exist?
 
     def _get_config(self):
         config_path = Path(__file__).parent.parent \

@@ -1,5 +1,15 @@
 import boto3
 
+from helpers.main import generate_ssh_key
+
+
+def extra_setup():
+    generate_ssh_key()
+
+
+def extra_teardown():
+    pass
+
 
 def deploy_additional_resources():
     pass

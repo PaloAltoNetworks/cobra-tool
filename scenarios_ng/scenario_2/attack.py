@@ -1,7 +1,7 @@
 import subprocess
 from termcolor import colored
 
-from core.helpers import loading_animation, pbar_sleep
+from helpers.main import loading_animation, pbar_sleep
 
 
 def attack(data):

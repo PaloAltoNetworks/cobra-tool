@@ -3,8 +3,8 @@
 """Module providing a class for encapsulating COBRA scenarios."""
 from termcolor import colored
 
-from core.helpers import print_ascii_art, get_scenarios_config
 from core.scenario import Scenario
+from helpers.main import print_ascii_art, get_scenarios_config
 
 
 def select_attack_scenario(cloud_provider):
@@ -39,7 +39,7 @@ def main(cloud_provider, action, simulation, scenario):
     if action == 'launch':
         if simulation:
             # TODO: what to do with cloud provider?
-            scenario.setup()
+            # scenario.setup()
             scenario.attack()
             # scenario.destroy()
             # TODO: ^^^ do we really want to destroy the infra immediately?
