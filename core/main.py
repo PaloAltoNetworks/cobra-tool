@@ -114,7 +114,7 @@ def main(cloud_provider, action, simulation, scenario):
         elif action == 'status' and scenario == "scenario-2":
             subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi stack ls", shell=True)
         elif action == 'destroy' and scenario == "scenario-1":
-            subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy -s --yes aws-scenario-1 ", shell=True)
+            subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy -s aws-scenario-1 --yes ", shell=True)
         elif action == 'destroy' and scenario == "scenario-2":
             scenario_2_destroy()    
         elif action == 'destroy' and scenario == "scenario-3":

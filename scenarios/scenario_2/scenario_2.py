@@ -27,7 +27,7 @@ def scenario_2_destroy():
     subprocess.call("aws iam list-role-policies --role-name "+LAMBDA_ROLE_NAME+" | jq -r '.PolicyNames[]' | xargs -I {} aws iam delete-role-policy --role-name "+LAMBDA_ROLE_NAME+" --policy-name {}", shell=True)
     subprocess.call("aws iam detach-role-policy --role-name "+LAMBDA_ROLE_NAME+" --policy-arn arn:aws:iam::aws:policy/AdministratorAccess", shell=True)
 
-    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi destroy", shell=True)
+    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi destroy -s aws-scenario-2 --yes", shell=True)
 
 
 def scenario_2_execute():
