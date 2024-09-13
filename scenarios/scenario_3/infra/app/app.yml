@@ -33,6 +33,6 @@ spec:
     spec:
       containers:
         - name: spring4shell-web
-          image: ***REMOVED***
+          image: ananddockerhub/spring4shell:latest
           ports:
             - containerPort: 8080
