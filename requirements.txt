@@ -14,3 +14,5 @@ termcolor==2.4.0
 tqdm==4.66.2
 pulumi-gcp>=7.0.0,<8.0.0
 pulumi-random==4.16.3
+pulumi_synced_folder==0.11.1
+setuptools==74.1.2

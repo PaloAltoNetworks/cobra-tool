@@ -100,7 +100,7 @@ def gen_report(attacker_vm_id, attacker_vm_ip, infected_vm_id, infected_vm_ip ):
 
             <section>
                 <h2 style="color: #34A853;">Attack Path Graph</h2>
-                <img src="../infra/scenario-1/cnbas-as-1.png" alt="Attack Path Graph">
+                <img src="scenarios/scenario_1/report/cobra-scenario-arch-1.png" alt="Attack Path Graph">
             </section>
             <section>
                 <h2 style="color: #FBBC05;">Resource Meta Data</h2>
@@ -246,7 +246,7 @@ def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
     <body>
         <div class="container">
             <header>
-                <img src="core/cnbas-logo.png" alt="CNBAS Logo">
+                <img src="core/cobra-logo.png" alt="COBRA Logo">
                 <h1 style="color: #4285F4;">COBRA Attack Path Report</h1>
             </header>
             <section class="attack-description">
@@ -266,7 +266,7 @@ def gen_report_2(API_GW_ID, LAMBDA_FUNC_ARN, API_GW_URL, LAMBDA_ROLE_NAME):
 
             <section>
                 <h2 style="color: #34A853;">Attack Path Graph</h2>
-                <img src="scenarios/scenario_2/report/cnbas-as-2.png" alt="Attack Path Graph">
+                <img src="scenarios/scenario_2/report/cobra-scenario-arch-2.png" alt="Attack Path Graph">
             </section>
             <section>
                 <h2 style="color: #FBBC05;">Resource Meta Data</h2>
