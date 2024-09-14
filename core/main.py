@@ -48,11 +48,12 @@ def select_attack_scenario():
     print(colored("3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster", color="green"))
     print(colored("4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access", color="green"))
     print(colored("5. Instance takeover, abuse s3 access & perform ransomware using external KMS key", color="green"))
+    print(colored("6. Exit", color="green"))
     while True:
         try:
             choice = int(input(colored("Enter your choice: ", color="yellow")))
-            if choice not in [1, 2, 3, 4, 5]:
-                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4 or 5.", color="red"))
+            if choice not in [1, 2, 3, 4, 5, 6]:
+                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 6 or 5.", color="red"))
             return choice
         except ValueError as e:
             print(e)
@@ -83,6 +84,8 @@ def execute_scenario(x):
             scenario_4_execute()
         elif x == 5:
             scenario_5_execute()
+        elif x == 6:
+            exit
         else: 
             print("Invalid Scenario Selected")
         print(colored("Scenario executed successfully!", color="green"))
