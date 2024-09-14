@@ -20,7 +20,7 @@ def scenario_5_execute():
     loading_animation()
     print("-"*30)
     
-    file_path = "./core/aws-scenario-5-output.json"
+    file_path = "./core/cobra-scenario-5-output.json"
     if os.path.exists(file_path):
         os.remove(file_path)
         print("File '{}' found and deleted.".format(file_path))
@@ -29,10 +29,10 @@ def scenario_5_execute():
 
     generate_ssh_key()
 
-    subprocess.call("cd ./scenarios/scenario_5/infra/ && pulumi up -s aws-scenario-5 -y", shell=True)
-    subprocess.call("cd ./scenarios/scenario_5/infra/ && pulumi stack -s aws-scenario-5 output --json >> ../../../core/aws-scenario-5-output.json", shell=True)
+    subprocess.call("cd ./scenarios/scenario_5/infra/ && pulumi up -s cobra-scenario-5 -y", shell=True)
+    subprocess.call("cd ./scenarios/scenario_5/infra/ && pulumi stack -s cobra-scenario-5 output --json >> ../../../core/cobra-scenario-5-output.json", shell=True)
 
-    with open("./core/aws-scenario-5-output.json", "r") as file:
+    with open("./core/cobra-scenario-5-output.json", "r") as file:
         data = json.load(file)
 
     ATTACKER_SERVER_PUBLIC_IP = data["Attacker Server Public IP"] 

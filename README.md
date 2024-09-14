@@ -93,7 +93,7 @@ python3 cobra.py -h
  \____\___/|____/|_| \_\/_/   \_\
 
 
-usage: cobra.py [-h] [--simulation] [--scenario {scenario-1,scenario-2}] {aws,azure,gcp} {launch,status,destroy}
+usage: cobra.py [-h] [--simulation] [--scenario {cobra-scenario-1,scenario-2}] {aws,azure,gcp} {launch,status,destroy}
 
 Terminal-based option tool
 
@@ -105,16 +105,16 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --simulation          Enable simulation mode
-  --scenario {scenario-1,scenario-2}
+  --scenario {cobra-scenario-1,scenario-2}
                         Scenario selection
 ```
 
 >>Note* ONLY RUN INTO SANDBOX ENVIRONMENT
 
-#### Simulate AWS Scenario 
+#### Simulate Cloud Attacks 
 
 ```
-python3 cobra.py aws launch --simulation
+python3 cobra.py launch --simulation
 ```
 
 
@@ -136,16 +136,32 @@ Enter your choice:
 
 ```
 
-#### Check Status 
+#### Print Infra Status 
 
 ```
-python3 cobra.py aws status
+python3 cobra.py status
 ```
+
+
+```
+  ____    ___    ____    ____       _    
+ / ___|  / _ \  | __ )  |  _ \     / \   
+| |     | | | | |  _ \  | |_) |   / _ \  
+| |___  | |_| | | |_) | |  _ <   / ___ \ 
+ \____|  \___/  |____/  |_| \_\ /_/   \_\
+                                         
+
+NAME            LAST UPDATE    RESOURCE COUNT  URL
+cobra-scenario-1  in progress    14              https://app.pulumi.com/xxxxxx/infra/cobra-scenario-1
+fdev            2 months ago   0               https://app.pulumi.com/xxxxxxxx/infra/fdev
+cobra-scenario-3  5 minutes ago  4               https://app.pulumi.com/xxxxxxxx/infra/cobra-scenario-3
+```
+
 
 #### Destroy Simulation
 
 ```
-python3 cobra.py aws destroy --scenario <scenario-1/scenario-2> 
+python3 cobra.py destroy --scenario <cobra-scenario-1/cobra-scenario-2> 
 ```
 
 ### Current Scenarios 

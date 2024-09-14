@@ -11,7 +11,7 @@ from core.helpers import loading_animation
 from .report.report import gen_report_2
 
 def scenario_2_destroy():
-    with open("./core/aws-scenario-2-output.json", "r") as file:
+    with open("./core/cobra-scenario-2-output.json", "r") as file:
         data = json.load(file)
     
     LAMBDA_ROLE_NAME = data["lambda-role-name"]
@@ -27,7 +27,7 @@ def scenario_2_destroy():
     subprocess.call("aws iam list-role-policies --role-name "+LAMBDA_ROLE_NAME+" | jq -r '.PolicyNames[]' | xargs -I {} aws iam delete-role-policy --role-name "+LAMBDA_ROLE_NAME+" --policy-name {}", shell=True)
     subprocess.call("aws iam detach-role-policy --role-name "+LAMBDA_ROLE_NAME+" --policy-arn arn:aws:iam::aws:policy/AdministratorAccess", shell=True)
 
-    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi destroy -s aws-scenario-2 --yes", shell=True)
+    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi destroy -s cobra-scenario-2 --yes", shell=True)
 
 
 def scenario_2_execute():
@@ -38,17 +38,17 @@ def scenario_2_execute():
     loading_animation()
     print("-"*30)
 
-    file_path = "./core/aws-scenario-2-output.json"
+    file_path = "./core/cobra-scenario-2-output.json"
     if os.path.exists(file_path):
         os.remove(file_path)
         print("File '{}' found and deleted.".format(file_path))
     else:
         print("File '{}' not found.".format(file_path))
 
-    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi up -s aws-scenario-2 -y", shell=True)
-    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi stack -s aws-scenario-2 output --json >> ../../../core/aws-scenario-2-output.json", shell=True)
+    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi up -s cobra-scenario-2 -y", shell=True)
+    subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi stack -s cobra-scenario-2 output --json >> ../../../core/cobra-scenario-2-output.json", shell=True)
 
-    with open("./core/aws-scenario-2-output.json", "r") as file:
+    with open("./core/cobra-scenario-2-output.json", "r") as file:
         data = json.load(file)
 
     API_GW_URL = data["apigateway-rest-endpoint"]

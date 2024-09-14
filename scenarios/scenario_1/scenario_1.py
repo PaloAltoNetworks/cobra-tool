@@ -23,15 +23,15 @@ def scenario_1_execute():
     
     base_directory = os.path.abspath('.')
     sub_directory = "core"
-    file_name = "aws-scenario-1-output.json"
+    file_name = "cobra-scenario-1-output.json"
     file_path = os.path.join(base_directory, sub_directory, file_name)
     if os.path.exists(file_path):
         os.remove(file_path)
         print("File '{}' found and deleted.".format(file_path))
     else:
         print("File '{}' not found.".format(file_path))
-    subprocess.call("pulumi -C scenarios/scenario_1/infra/ up -s aws-scenario-1 --yes", shell=True)
-    subprocess.call("pulumi -C scenarios/scenario_1/infra/ stack -s aws-scenario-1 output --json >> core/aws-scenario-1-output.json", shell=True)
+    subprocess.call("pulumi -C scenarios/scenario_1/infra/ up -s cobra-scenario-1 --yes", shell=True)
+    subprocess.call("pulumi -C scenarios/scenario_1/infra/ stack -s cobra-scenario-1 output --json >> core/cobra-scenario-1-output.json", shell=True)
     
     print("-"*30)
     print(colored("Bringing up the Vulnerable Application", color="red"))
@@ -53,7 +53,7 @@ def scenario_1_execute():
     print(colored("Get into the attacker machine - Tor Node", color="red"))
     loading_animation()
 
-    with open("./core/aws-scenario-1-output.json", "r") as file:
+    with open("./core/cobra-scenario-1-output.json", "r") as file:
         data = json.load(file)
 
     ATTACKER_SERVER_PUBLIC_IP = data["Attacker Server Public IP"]
@@ -105,7 +105,7 @@ def scenario_1_execute():
         print(f"Command failed with error: {e}")
 
 
-    subprocess.run(f"pulumi -C scenarios/scenario_1/infra/ import aws:ec2/instance:Instance {INSTANCE_NAME.strip()} {instance_id.strip()} --protect=false --yes --stack=aws-scenario-1 --suppress-outputs --suppress-progress > /dev/null 2>&1", shell=True)
+    subprocess.run(f"pulumi -C scenarios/scenario_1/infra/ import aws:ec2/instance:Instance {INSTANCE_NAME.strip()} {instance_id.strip()} --protect=false --yes --stack=cobra-scenario-1 --suppress-outputs --suppress-progress > /dev/null 2>&1", shell=True)
 
 
     print("-"*30)
