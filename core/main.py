@@ -8,7 +8,7 @@ from time import sleep
 from termcolor import colored
 from .report import gen_report
 from .report import gen_report_2
-from scenarios.scenario_1.scenario_1 import scenario_1_execute
+from scenarios.scenario_1 import scenario_1
 from scenarios.scenario_2.scenario_2 import scenario_2_execute
 from scenarios.scenario_2.scenario_2 import scenario_2_destroy
 from scenarios.scenario_3.scenario_3 import scenario_3_execute
@@ -42,9 +42,9 @@ def select_cloud_provider():
             print(e)
 
 def select_attack_scenario():
-    print(colored("Select Attack Scenario of %s:", color="yellow"))
+    print(colored("Select Attack Scenario of:", color="yellow"))
     print(colored("1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning", color="green"))
-    print(colored("2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence", color="green"))
+    print(colored("2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilege escalation, rogue identity creation & persistence", color="green"))
     print(colored("3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster", color="green"))
     print(colored("4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access", color="green"))
     print(colored("5. Instance takeover, abuse s3 access & perform ransomware using external KMS key", color="green"))
@@ -75,7 +75,7 @@ def execute_scenario(x):
     try:
         # Call the scenario function from the imported module
         if x == 1:
-            scenario_1_execute()
+            scenario_1.ScenarioExecution().execute()
         elif x == 2:
             scenario_2_execute()
         elif x == 3:
@@ -89,6 +89,17 @@ def execute_scenario(x):
         else: 
             print("Invalid Scenario Selected")
         print(colored("Scenario executed successfully!", color="green"))
+    except Exception as e:
+        print(colored("Error executing scenario:", color="red"), str(e))
+
+def post_execute_scenario(x):
+    try:
+        # Call the scenario function from the imported module
+        if x == 1:
+            scenario_1.ScenarioExecution().post_execution()
+        else: 
+            print("Invalid Scenario Selected")
+        print(colored("Thank you for using COBRA!", color="green"))
     except Exception as e:
         print(colored("Error executing scenario:", color="red"), str(e))
 
@@ -110,6 +121,12 @@ def main(action, simulation, scenario):
             elif scenario_choice == 5:
                 execute_scenario(5)
                 #print(colored("Scenario coming soon!", color="yellow"))
+    elif action == 'post-launch':
+        if simulation is True:
+            scenario_choice = select_attack_scenario()
+            if scenario_choice == 1:
+                # Pass the selected scenario module to execute
+                post_execute_scenario(1)
     elif action == 'status' and scenario == "cobra-scenario-1":
         subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack ls", shell=True)
     elif action == 'status' and scenario == "cobra-scenario-2":

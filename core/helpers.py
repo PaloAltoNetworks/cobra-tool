@@ -32,3 +32,15 @@ def generate_ssh_key():
     print("SSH Key Pair generated successfully!")
 
     return key_path, key_path + ".pub"
+
+def upload_file_to_server(source_file, server_username, server_ip, server_directory):
+    try:
+        # Construct the scp command
+        scp_command = f'scp -i id_rsa -r {source_file} {server_username}@{server_ip}:{server_directory}'
+        
+        # Execute the scp command
+        subprocess.check_call(scp_command, shell=True)
+        
+        print(f"File '{source_file}' successfully uploaded to server '{server_ip}' in directory '{server_directory}'.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error uploading file: {e}")
