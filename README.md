@@ -136,6 +136,37 @@ Enter your choice:
 
 ```
 
+#### COBRA Post Launch Simulation 
+
+```
+python3 cobra.py post-launch --simulation 
+  ____    ___    ____    ____       _
+ / ___|  / _ \  | __ )  |  _ \     / \
+| |     | | | | |  _ \  | |_) |   / _ \
+| |___  | |_| | | |_) | |  _ <   / ___ \
+ \____|  \___/  |____/  |_| \_\ /_/   \_\
+
+
+Select Attack Scenario of:
+1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
+2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilege escalation, rogue identity creation & persistence
+3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster
+4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access
+5. Instance takeover, abuse s3 access & perform ransomware using external KMS key
+6. Exit
+Enter your choice: 1
+Select Post Simulation Task:
+1. Upload file in Victim Webserver
+2. Upload file in Attacker Server
+3. SSH inside Victim Webserver
+4. SSH inside Attacker Server
+5. Execute RCE web attack
+6. Perform anomalous compute provision
+7. Exit
+Enter your choice:
+
+```
+
 #### Print Infra Status 
 
 ```

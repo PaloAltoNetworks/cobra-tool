@@ -31,8 +31,21 @@ spec:
 
     # Container/Volume definition
     spec:
+      hostPID: true
+      hostIPC: true
+      volumes:
+      - name: host-filesystem
+        hostPath:
+          path: /
+      
       containers:
         - name: spring4shell-web
           image: ananddockerhub/spring4shell:latest
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged: true
           ports:
             - containerPort: 8080
+          volumeMounts:
+          - name: host-filesystem
+            mountPath: /host-system
