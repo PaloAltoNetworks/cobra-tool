@@ -9,8 +9,7 @@ from termcolor import colored
 from .report import gen_report
 from .report import gen_report_2
 from scenarios.scenario_1 import scenario_1
-from scenarios.scenario_2.scenario_2 import scenario_2_execute
-from scenarios.scenario_2.scenario_2 import scenario_2_destroy
+from scenarios.scenario_2 import scenario_2
 from scenarios.scenario_3.scenario_3 import scenario_3_execute
 from scenarios.scenario_4.scenario_4 import scenario_4_execute
 from scenarios.scenario_5.scenario_5 import scenario_5_execute
@@ -77,7 +76,7 @@ def execute_scenario(x):
         if x == 1:
             scenario_1.ScenarioExecution().execute()
         elif x == 2:
-            scenario_2_execute()
+            scenario_2.ScenarioExecution().scenario_2_execute()
         elif x == 3:
             scenario_3_execute()
         elif x == 4:
@@ -97,6 +96,8 @@ def post_execute_scenario(x):
         # Call the scenario function from the imported module
         if x == 1:
             scenario_1.ScenarioExecution().post_execution()
+        elif x == 2:
+            scenario_2.ScenarioExecution.post_execution("None")
         else: 
             print("Invalid Scenario Selected")
         print(colored("Thank you for using COBRA!", color="green"))
@@ -127,6 +128,8 @@ def main(action, simulation, scenario):
             if scenario_choice == 1:
                 # Pass the selected scenario module to execute
                 post_execute_scenario(1)
+            elif scenario_choice == 2:
+                post_execute_scenario(2)
     elif action == 'status' and scenario == "cobra-scenario-1":
         subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack ls", shell=True)
     elif action == 'status' and scenario == "cobra-scenario-2":
@@ -134,7 +137,7 @@ def main(action, simulation, scenario):
     elif action == 'destroy' and scenario == "cobra-scenario-1":
         subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy -s cobra-scenario-1 --yes ", shell=True)
     elif action == 'destroy' and scenario == "cobra-scenario-2":
-        scenario_2_destroy()    
+        scenario_2.ScenarioExecution.scenario_2_destroy("none")
     elif action == 'destroy' and scenario == "cobra-scenario-3":
         subprocess.call("cd ./scenarios/scenario_3/infra && pulumi destroy -s cobra-scenario-3 --yes", shell=True)
     elif action == 'destroy' and scenario == "cobra-scenario-4":

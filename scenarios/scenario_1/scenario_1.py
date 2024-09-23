@@ -77,6 +77,7 @@ class ScenarioExecution:
         subprocess.call("pulumi -C scenarios/scenario_1/infra/ stack -s cobra-scenario-1 output --json >> core/cobra-scenario-1-output.json", shell=True)
 
     def get_data(self):
+        
         with open("./core/cobra-scenario-1-output.json", "r") as file:
             data = json.load(file)
 
