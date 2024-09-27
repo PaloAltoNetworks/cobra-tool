@@ -70,11 +70,11 @@ def get_credentials():
         except ValueError as e:
             print(e)
 
-def execute_scenario(x):
+def execute_scenario(x, manual):
     try:
         # Call the scenario function from the imported module
         if x == 1:
-            scenario_1.ScenarioExecution().execute()
+            scenario_1.ScenarioExecution().execute(manual)
         elif x == 2:
             scenario_2.ScenarioExecution().scenario_2_execute()
         elif x == 3:
@@ -104,7 +104,7 @@ def post_execute_scenario(x):
     except Exception as e:
         print(colored("Error executing scenario:", color="red"), str(e))
 
-def main(action, simulation, scenario):
+def main(action, simulation, scenario, manual):
     tool_name = "C O B R A"
     print_ascii_art(tool_name)
     if action == 'launch':
@@ -112,7 +112,7 @@ def main(action, simulation, scenario):
             scenario_choice = select_attack_scenario()
             if scenario_choice == 1:
                 # Pass the selected scenario module to execute
-                execute_scenario(1)
+                execute_scenario(1, manual)
             elif scenario_choice == 2:
                 execute_scenario(2)
             elif scenario_choice == 3:

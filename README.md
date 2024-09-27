@@ -210,6 +210,11 @@ python3 cobra.py destroy --scenario <cobra-scenario-1/cobra-scenario-2>
 - Exploiting an App on VM, exfiltration of data from Cosmos DB & possible takeover of a resource group. 
 - More scenarios loading...
 
+### Tools used
+1. Torghost - [https://github.com/SusmithKrishnan/torghost](https://github.com/SusmithKrishnan/torghost)
+2. Cloud Enumeration Tool - [https://github.com/NotSoSecure/cloud-service-enum](https://github.com/NotSoSecure/cloud-service-enum)
+
+
 ## License
 
 This project is licensed under the Apache Version 2.0, - see the [LICENSE](./LICENSE) file for details

