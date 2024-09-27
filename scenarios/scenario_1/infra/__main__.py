@@ -143,7 +143,7 @@ instance_profile = aws.iam.InstanceProfile("my-instance-profile",
 
 # Create an EC2 instance with user data
 instance = aws.ec2.Instance("web-server",
-    instance_type="t2.micro",
+    instance_type="t2.medium",
     ami=ubuntu_ami.id,  
     iam_instance_profile=instance_profile.name,
     security_groups=[sg.name],
