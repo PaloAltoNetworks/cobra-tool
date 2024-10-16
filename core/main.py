@@ -114,13 +114,13 @@ def main(action, simulation, scenario, manual):
                 # Pass the selected scenario module to execute
                 execute_scenario(1, manual)
             elif scenario_choice == 2:
-                execute_scenario(2)
+                execute_scenario(2, manual)
             elif scenario_choice == 3:
-                execute_scenario(3)
+                execute_scenario(3, manual)
             elif scenario_choice == 4:
-                execute_scenario(4)
+                execute_scenario(4, manual)
             elif scenario_choice == 5:
-                execute_scenario(5)
+                execute_scenario(5, manual)
                 #print(colored("Scenario coming soon!", color="yellow"))
     elif action == 'post-launch':
         if simulation is True:
