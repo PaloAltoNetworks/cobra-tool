@@ -2,8 +2,7 @@ import iam
 import pulumi
 import pulumi_aws as aws
 
-current = aws.get_region()
-region = current.name
+region = aws.config.region
 
 custom_stage_name = 'example'
 
