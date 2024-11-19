@@ -13,7 +13,6 @@ from scenarios.scenario_2 import scenario_2
 from scenarios.scenario_3.scenario_3 import scenario_3_execute
 from scenarios.scenario_4.scenario_4 import scenario_4_execute
 from scenarios.scenario_5.scenario_5 import scenario_5_execute
-from scenarios.scenario_7.scenario_7 import scenario_7_execute
 
 def loading_animation():
     chars = "/—\\|"
@@ -48,13 +47,12 @@ def select_attack_scenario():
     print(colored("3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster", color="green"))
     print(colored("4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access", color="green"))
     print(colored("5. Instance takeover, abuse s3 access & perform ransomware using external KMS key", color="green"))
-    print(colored("7. Container Escape & Cluster Takeover in EKS", color="green"))
     print(colored("6. Exit", color="green"))
     while True:
         try:
             choice = int(input(colored("Enter your choice: ", color="yellow")))
-            if choice not in [1, 2, 3, 4, 5, 6, 7]:
-                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 5, 6 or 7.", color="red"))
+            if choice not in [1, 2, 3, 4, 5, 6]:
+                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 6 or 5.", color="red"))
             return choice
         except ValueError as e:
             print(e)
@@ -85,8 +83,6 @@ def execute_scenario(x, manual):
             scenario_4_execute()
         elif x == 5:
             scenario_5_execute()
-        elif x == 7:
-            scenario_7_execute()            
         elif x == 6:
             exit
         else: 
@@ -125,8 +121,6 @@ def main(action, simulation, scenario, manual):
                 execute_scenario(4, manual)
             elif scenario_choice == 5:
                 execute_scenario(5, manual)
-            elif scenario_choice == 7:
-                execute_scenario(7, manual)                
                 #print(colored("Scenario coming soon!", color="yellow"))
     elif action == 'post-launch':
         if simulation is True:
@@ -150,8 +144,6 @@ def main(action, simulation, scenario, manual):
         subprocess.call("cd ./scenarios/scenario_4/infra && pulumi destroy -s cobra-scenario-4 --yes", shell=True)
     elif action == 'destroy' and scenario == "cobra-scenario-5":
         subprocess.call("cd ./scenarios/scenario_5/infra && pulumi destroy -s cobra-scenario-5 --yes", shell=True)
-    elif action == 'destroy' and scenario == "cobra-scenario-7":
-        subprocess.call("cd ./scenarios/scenario_7/infra && pulumi destroy -s cobra-scenario-7 --yes", shell=True)
 
     else:
         print('No options provided. --help to know more')
