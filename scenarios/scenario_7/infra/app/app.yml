@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+
+
+###
+### Deployment Metadata
+###
+metadata:
+  name: spring4shell-web
+
+
+###
+### Specs
+###
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: spring4shell-web
+      tier: frontend
+
+  template:
+
+    # Template Metadata to be used by service for discovery
+    metadata:
+      labels:
+        app: spring4shell-web
+        tier: frontend
+
+    # Container/Volume definition
+    spec:
+      hostPID: true
+      hostIPC: true
+      volumes:
+      - name: host-filesystem
+        hostPath:
+          path: /
+      
+      containers:
+        - name: spring4shell-web
+          image: ananddockerhub/spring4shell:latest
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged: true
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+          - name: host-filesystem
+            mountPath: /host-system
