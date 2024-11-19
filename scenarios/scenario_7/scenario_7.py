@@ -44,7 +44,7 @@ def scenario_7_execute():
 
     print(colored("Deploying Web App and service", color="red"))
     loading_animation()
-    sleep_duration = 300
+    sleep_duration = 60
     with tqdm(total=sleep_duration, desc="Loading") as pbar:
         while sleep_duration > 0:
             sleep_interval = min(1, sleep_duration)
