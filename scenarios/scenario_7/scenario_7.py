@@ -15,7 +15,7 @@ class ScenarioExecution:
     def __init__(self):
         pass
 
-    def scenario_7_execute():
+    def scenario_7_execute(self):
         print("-"*30)
         print(colored("Executing Scenraio 7 : Container Escape & Cluster Takeover in EKS", color="red"))
         loading_animation()

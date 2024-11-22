@@ -88,7 +88,7 @@ def execute_scenario(x, manual):
         elif x == 6:
             exit
         elif x == 7:
-            scenario_7_execute()               
+            scenario_7.ScenarioExecution().scenario_7_execute()           
         elif x == 8:
             exit
         else: 
