@@ -10,10 +10,10 @@ from .report import gen_report
 from .report import gen_report_2
 from scenarios.scenario_1 import scenario_1
 from scenarios.scenario_2 import scenario_2
+from scenarios.scenario_7 import scenario_7
 from scenarios.scenario_3.scenario_3 import scenario_3_execute
 from scenarios.scenario_4.scenario_4 import scenario_4_execute
 from scenarios.scenario_5.scenario_5 import scenario_5_execute
-from scenarios.scenario_7.scenario_7 import scenario_7_execute
 
 def loading_animation():
     chars = "/—\\|"
@@ -49,12 +49,12 @@ def select_attack_scenario():
     print(colored("4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access", color="green"))
     print(colored("5. Instance takeover, abuse s3 access & perform ransomware using external KMS key", color="green"))
     print(colored("7. Container Escape & Cluster Takeover in EKS", color="green"))
-    print(colored("6. Exit", color="green"))
+    print(colored("8. Exit", color="green"))
     while True:
         try:
             choice = int(input(colored("Enter your choice: ", color="yellow")))
-            if choice not in [1, 2, 3, 4, 5, 6, 7]:
-                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 5, 6 or 7.", color="red"))
+            if choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
+                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 5, 7 or 8.", color="red"))
             return choice
         except ValueError as e:
             print(e)
@@ -85,9 +85,11 @@ def execute_scenario(x, manual):
             scenario_4_execute()
         elif x == 5:
             scenario_5_execute()
+        elif x == 6:
+            exit
         elif x == 7:
             scenario_7_execute()               
-        elif x == 6:
+        elif x == 8:
             exit
         else: 
             print("Invalid Scenario Selected")
@@ -102,6 +104,8 @@ def post_execute_scenario(x):
             scenario_1.ScenarioExecution().post_execution()
         elif x == 2:
             scenario_2.ScenarioExecution.post_execution("None")
+        elif x == 7:
+            scenario_7.ScenarioExecution.post_execution("None")
         else: 
             print("Invalid Scenario Selected")
         print(colored("Thank you for using COBRA!", color="green"))
@@ -136,6 +140,8 @@ def main(action, simulation, scenario, manual):
                 post_execute_scenario(1)
             elif scenario_choice == 2:
                 post_execute_scenario(2)
+            elif scenario_choice == 7:
+                post_execute_scenario(7)
     elif action == 'status' and scenario == "cobra-scenario-1":
         subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack ls", shell=True)
     elif action == 'status' and scenario == "cobra-scenario-2":
