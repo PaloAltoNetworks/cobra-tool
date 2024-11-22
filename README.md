@@ -46,6 +46,8 @@ It facilitates Proof of Concept (POC) evaluations, assesses security controls, m
   - Must have the region defined. 
 - Azure CLI
 - Google Cloud SDK
+- kubectl [https://kubernetes.io/docs/tasks/tools/](https://kubernetes.io/docs/tasks/tools/)
+
 
 
 ## Installation
@@ -93,25 +95,28 @@ python3 cobra.py -h
  \____\___/|____/|_| \_\/_/   \_\
 
 
-usage: cobra.py [-h] [--simulation] [--scenario {cobra-scenario-1,scenario-2}] {aws,azure,gcp} {launch,status,destroy}
+usage: cobra.py [-h] [--simulation]
+                [--scenario {cobra-scenario-1,cobra-scenario-2,cobra-scenario-3,cobra-scenario-4,cobra-scenario-5,cobra-scenario-7}]
+                [--manual]
+                {launch,status,destroy,post-launch}
 
 Terminal-based option tool
 
 positional arguments:
-  {aws,azure,gcp}       Cloud provider (aws, azure, gcp)
-  {launch,status,destroy}
+  {launch,status,destroy,post-launch}
                         Action to perform (launch, status, destroy)
 
 options:
   -h, --help            show this help message and exit
   --simulation          Enable simulation mode
-  --scenario {cobra-scenario-1,scenario-2}
+  --scenario {cobra-scenario-1,cobra-scenario-2,cobra-scenario-3,cobra-scenario-4,cobra-scenario-5,cobra-scenario-7}
                         Scenario selection
+  --manual              Perform attack manually through post-launch
 ```
 
 >>Note* ONLY RUN INTO SANDBOX ENVIRONMENT
 
-#### Simulate Cloud Attacks 
+#### Automated Simulate Cloud Attacks 
 
 ```
 python3 cobra.py launch --simulation
@@ -126,20 +131,54 @@ python3 cobra.py launch --simulation
  \____|  \___/  |____/  |_| \_\ /_/   \_\
 
 
-Select Attack Scenario of aws:
+Select Attack Scenario of:
 1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
-2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence
+2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilege escalation, rogue identity creation & persistence
 3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster
 4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access
 5. Instance takeover, abuse s3 access & perform ransomware using external KMS key
+7. Container Escape & Cluster Takeover in EKS
+8. Exit
 Enter your choice:
 
 ```
+
+#### Manual Attack simulation 
+
+```
+python3 cobra.py launch --simulation --manual
+```
+
+```
+  ____    ___    ____    ____       _
+ / ___|  / _ \  | __ )  |  _ \     / \
+| |     | | | | |  _ \  | |_) |   / _ \
+| |___  | |_| | | |_) | |  _ <   / ___ \
+ \____|  \___/  |____/  |_| \_\ /_/   \_\
+
+
+Select Attack Scenario of:
+1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
+2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilege escalation, rogue identity creation & persistence
+3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster
+4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access
+5. Instance takeover, abuse s3 access & perform ransomware using external KMS key
+7. Container Escape & Cluster Takeover in EKS
+8. Exit
+Enter your choice:
+
+```
+
+
 
 #### COBRA Post Launch Simulation 
 
 ```
 python3 cobra.py post-launch --simulation 
+
+```
+
+```
   ____    ___    ____    ____       _
  / ___|  / _ \  | __ )  |  _ \     / \
 | |     | | | | |  _ \  | |_) |   / _ \
@@ -202,9 +241,9 @@ python3 cobra.py destroy --scenario <cobra-scenario-1/cobra-scenario-2>
 3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster
 4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access
 5. Instance takeover, abuse s3 access & perform ransomware using external KMS key
+7. Container Escape & Cluster Takeover in EKS
 
 ### To Do / In Roadmap
-
 
 - Azure App exploit on a function, data exfiltration from Blob storage & abusing function misconfigs to escalate privileges & leaving a backdoor IAM entity. 
 - Exploiting an App on VM, exfiltration of data from Cosmos DB & possible takeover of a resource group. 
