@@ -3,6 +3,8 @@ import vpc
 import utils
 import pulumi
 from pulumi_aws import eks
+# adding missing import to fix runtime error
+import pulumi_aws as aws
 
 # Create an EKS cluster with the default configuration.
 current = aws.get_region()

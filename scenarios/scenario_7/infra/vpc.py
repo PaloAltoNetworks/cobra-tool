@@ -1,4 +1,4 @@
-from pulumi_aws import ec2, get_availability_zones
+from pulumi_aws import ec2, get_availability_zones, get_region
 
 ## VPC
 
@@ -36,8 +36,21 @@ eks_route_table = ec2.RouteTable(
 )
 
 ## Subnets, one for each AZ in a region
+# Need region to avoid using forbidden AZs
+# https://docs.aws.amazon.com/eks/latest/userguide/network-reqs.html#network-requirements-subnets
+current = get_region()
+region = current.name
+exclude_zone_ids = []
 
-zones = get_availability_zones()
+
+if (region == "us-east-1"):
+    exclude_zone_ids.append("use1-az3")
+elif (region == "us-west-1"):
+    exclude_zone_ids.append("usw1-az2")
+elif (region == "ca-central-1"):
+    exclude_zone_ids.append("cac1-az3")
+
+zones = get_availability_zones(state="available", exclude_zone_ids=exclude_zone_ids)
 subnet_ids = []
 
 for zone in zones.names:
