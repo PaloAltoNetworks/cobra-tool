@@ -253,6 +253,16 @@ python3 cobra.py destroy --scenario <cobra-scenario-1/cobra-scenario-2>
 1. Torghost - [https://github.com/SusmithKrishnan/torghost](https://github.com/SusmithKrishnan/torghost)
 2. Cloud Enumeration Tool - [https://github.com/NotSoSecure/cloud-service-enum](https://github.com/NotSoSecure/cloud-service-enum)
 
+### Project Manager
+
+[Vijay Upadhyaya](https://www.linkedin.com/in/vijayupadhyaya/)
+
+### Lead Developer's
+
+[Anand Tiwari](https://www.linkedin.com/in/anandsundartiwari/)
+
+[Harsha Koushik](https://www.linkedin.com/in/hkoushik/)
+
 
 ## License
 
