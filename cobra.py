@@ -5,7 +5,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Terminal-based option tool")
     parser.add_argument("action", choices=["launch", "status", "destroy", "post-launch"], help="Action to perform (launch, status, destroy)")
     parser.add_argument("--simulation", action="store_true", help="Enable simulation mode")
-    parser.add_argument("--scenario", choices=["cobra-scenario-1", "cobra-scenario-2", "cobra-scenario-3", "cobra-scenario-4", "cobra-scenario-5", "cobra-scenario-7"], default="cobra-scenario-1", help="Scenario selection")
+    parser.add_argument("--scenario", choices=["cobra-scenario-1", "cobra-scenario-2", "cobra-scenario-3", "cobra-scenario-4", "cobra-scenario-5", "cobra-scenario-6", "cobra-scenario-7"], default="cobra-scenario-1", help="Scenario selection")
     parser.add_argument("--manual", action="store_true", help="Perform attack manually through post-launch")
     return parser.parse_args()
 
