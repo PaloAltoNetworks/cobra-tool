@@ -126,7 +126,10 @@ sudo apt install jq -y
 cd /home/azureuser/ && wget -P /home/azureuser/ https://cloudlabsdemo99.s3.amazonaws.com/flask-rce.zip 
 cd /home/azureuser/ && unzip flask-rce.zip 
 cd /home/azureuser/ && sudo pip3 install -r requirements.txt
-cd /home/azureuser/ && sudo flask run --host=0.0.0.0
+cd /home/azureuser/ && sudo chown azureuser:azureuser Dockerfile app.py requirements.txt
+cd /home/azureuser/ && sudo chown -R azureuser:azureuser templates/
+cd /home/azureuser/ && export FLASK_APP="app.py"
+cd /home/azureuser/ && flask run --host=0.0.0.0 &
 EOT
   )
 
