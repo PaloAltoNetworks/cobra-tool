@@ -21,13 +21,13 @@ def scenario_6_execute():
     loading_animation()
     print("-"*30)
 
-    # file_path = "./core/cobra-scenario-6-output.json"
-    # if os.path.exists(file_path):
-    #     os.remove(file_path)
-    #     print("File '{}' found and deleted.".format(file_path))
+    file_path = "./core/cobra-scenario-6-output.json"
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print("File '{}' found and deleted.".format(file_path))
 
-    # subprocess.call("cd ./scenarios/scenario_6/infra/ && terraform init && terraform apply --auto-approve", shell=True)
-    # subprocess.call("cd ./scenarios/scenario_6/infra/ && terraform output -json >> ../../../core/cobra-scenario-6-output.json", shell=True)
+    subprocess.call("cd ./scenarios/scenario_6/infra/ && terraform init && terraform apply --auto-approve", shell=True)
+    subprocess.call("cd ./scenarios/scenario_6/infra/ && terraform output -json >> ../../../core/cobra-scenario-6-output.json", shell=True)
 
     with open("./core/cobra-scenario-6-output.json", "r") as file:
         data = json.load(file)
