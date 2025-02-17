@@ -131,6 +131,8 @@ def main(action, simulation, scenario, manual):
                 execute_scenario(4, manual)
             elif scenario_choice == 5:
                 execute_scenario(5, manual)
+            elif scenario_choice == 6:
+                execute_scenario(6, manual)                
             elif scenario_choice == 7:
                 execute_scenario(7, manual)  
                 #print(colored("Scenario coming soon!", color="yellow"))
