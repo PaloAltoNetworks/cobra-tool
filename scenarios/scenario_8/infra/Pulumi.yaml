@@ -1,0 +1,14 @@
+name: infra
+runtime:
+  name: python
+description: A minimal AWS Python Pulumi program
+config:
+  aws:region: us-east-1    # Or your desired region
+  infra:include_agent: False
+  infra:subnetId: subnet-00296c3ce08ebf532
+  infra:vpcId: vpc-0183f533f910aa121
+  infra:publicKeyPath: ../../../id_rsa.pub
+
+  pulumi:tags:
+    value:
+      pulumi:template: ""

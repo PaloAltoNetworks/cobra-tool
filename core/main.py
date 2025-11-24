@@ -11,10 +11,12 @@ from .report import gen_report_2
 from scenarios.scenario_1 import scenario_1
 from scenarios.scenario_2 import scenario_2
 from scenarios.scenario_7 import scenario_7
+from scenarios.scenario_8 import scenario_8
 from scenarios.scenario_3.scenario_3 import scenario_3_execute
 from scenarios.scenario_4.scenario_4 import scenario_4_execute
 from scenarios.scenario_5.scenario_5 import scenario_5_execute
 from scenarios.scenario_6.scenario_6 import scenario_6_execute
+
 
 def loading_animation():
     chars = "/—\\|"
@@ -28,19 +30,6 @@ def print_ascii_art(text):
     ascii_art = pyfiglet.figlet_format(text)
     print(colored(ascii_art, color="cyan"))
 
-def select_cloud_provider():
-    print(colored("Select Cloud Provider:", color="yellow"))
-    print(colored("1. AWS", color="green")) 
-    print(colored("2. Azure", color="green"))
-    print(colored("3. GCP", color="green"))
-    while True:
-        try:
-            choice = int(input(colored("Enter your choice (1/2/3/4): ", color="yellow")))
-            if choice not in [1, 2, 3, 4, 5]:
-                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4 or 5.", color="red"))
-            return choice
-        except ValueError as e:
-            print(e)
 
 def select_attack_scenario():
     print(colored("Select Attack Scenario of:", color="yellow"))
@@ -51,7 +40,8 @@ def select_attack_scenario():
     print(colored("5. Instance takeover, abuse s3 access & perform ransomware using external KMS key", color="green"))
     print(colored("6. Azure Web Exploit, Abuse Managed Identity, Extract Secrets from Key Vault", color="green"))
     print(colored("7. Container Escape & Cluster Takeover in EKS", color="green"))
-    print(colored("8. Exit", color="green"))
+    print(colored("8. Lambda takeover, AssumeRole spraying, Secrets Dump, and exfilteration", color="green"))
+    print(colored("9. Exit", color="green"))
     while True:
         try:
             choice = int(input(colored("Enter your choice: ", color="yellow")))
@@ -90,8 +80,10 @@ def execute_scenario(x, manual):
         elif x == 6:
             scenario_6_execute()
         elif x == 7:
-            scenario_7.ScenarioExecution().scenario_7_execute()           
+            scenario_7.ScenarioExecution().scenario_7_execute()
         elif x == 8:
+            scenario_8.ScenarioExecution().scenario_8_execute()           
+        elif x == 9:
             exit
         else: 
             print("Invalid Scenario Selected")
@@ -120,22 +112,9 @@ def main(action, simulation, scenario, manual):
     if action == 'launch':
         if simulation is True:
             scenario_choice = select_attack_scenario()
-            if scenario_choice == 1:
-                # Pass the selected scenario module to execute
-                execute_scenario(1, manual)
-            elif scenario_choice == 2:
-                execute_scenario(2, manual)
-            elif scenario_choice == 3:
-                execute_scenario(3, manual)
-            elif scenario_choice == 4:
-                execute_scenario(4, manual)
-            elif scenario_choice == 5:
-                execute_scenario(5, manual)
-            elif scenario_choice == 6:
-                execute_scenario(6, manual)                
-            elif scenario_choice == 7:
-                execute_scenario(7, manual)  
-                #print(colored("Scenario coming soon!", color="yellow"))
+            # Pass the selected scenario module to execute
+            execute_scenario(scenario_choice, manual)
+
     elif action == 'post-launch':
         if simulation is True:
             scenario_choice = select_attack_scenario()
@@ -150,6 +129,8 @@ def main(action, simulation, scenario, manual):
         subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack ls", shell=True)
     elif action == 'status' and scenario == "cobra-scenario-2":
         subprocess.call("cd ./scenarios/scenario_2/infra/ && pulumi stack ls", shell=True)
+    elif action == 'status' and scenario == "cobra-scenario-8":
+        subprocess.call("cd ./scenarios/scenario_8/infra/ && pulumi stack ls", shell=True)
     elif action == 'destroy' and scenario == "cobra-scenario-1":
         subprocess.call("cd ./scenarios/scenario_1/infra && pulumi destroy -s cobra-scenario-1 --yes ", shell=True)
     elif action == 'destroy' and scenario == "cobra-scenario-2":
@@ -164,6 +145,8 @@ def main(action, simulation, scenario, manual):
         subprocess.call("cd ./scenarios/scenario_6/infra && terraform destroy --auto-approve", shell=True)
     elif action == 'destroy' and scenario == "cobra-scenario-7":
         subprocess.call("cd ./scenarios/scenario_7/infra && pulumi destroy -s cobra-scenario-7 --yes", shell=True)
+    elif action == 'destroy' and scenario == "cobra-scenario-8":
+        subprocess.call("cd ./scenarios/scenario_8/infra && pulumi destroy -s cobra-scenario-8 --yes", shell=True)
 
     else:
         print('No options provided. --help to know more')
