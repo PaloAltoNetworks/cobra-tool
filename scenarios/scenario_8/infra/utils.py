@@ -14,6 +14,7 @@ def register_auto_tags(auto_tags):
 
 
 # auto_tag applies the given tags to the resource properties if applicable.
+# taggable resources list taken from: https://github.com/joeduffy/aws-tags-example/blob/master/autotag-py/taggable.py
 def auto_tag(args, auto_tags):
     if is_taggable(args.type_):
         args.props['tags'] = {**(args.props['tags'] or {}), **auto_tags}
