@@ -5,9 +5,17 @@ import iam
 from utils import *
 
 
-def include_agent_machine(vpc_id, subnet_id, public_key_path):
+def create_ec2_resources(ec2_role, dev_access_key, lambda_role, agent_bucket,
+                         agent_object):
     region = aws.get_region()
     pulumi.export("Region", region.region)
+
+    # --- Use Pulumi Config to get VPC and Subnet IDs ---
+    config = pulumi.Config()
+
+    vpc_id = config.require("vpcId")
+    subnet_id = config.require("subnetId")
+    public_key_path = config.require("publicKeyPath")
 
     key_pair = aws.ec2.KeyPair("my-key-pair",
                                key_name="cobra-scenario-8-ec2-key",
@@ -49,43 +57,64 @@ def include_agent_machine(vpc_id, subnet_id, public_key_path):
     instance_profile = aws.iam.InstanceProfile(
         "ec2-instance-profile",
         name="cobra-scenario-8-instance-profile",
-        role=iam.ec2_role.name)
+        role=ec2_role.name)
 
     user_data_script = pulumi.Output.format(
         """#!/bin/bash
-    # 1. Install AWS CLI via Snap
-    sudo snap install aws-cli --classic
+# 1. Install Dependencies
+sudo snap install aws-cli --classic
+sudo apt-get update
+sudo apt-get install -y unzip
 
-    # 2. Create the .aws directory
-    mkdir -p /home/ubuntu/.aws
+# 2. Download Agent
+# CRITICAL: We do this BEFORE writing the specific user credentials below.
+# This command uses the EC2 Instance Profile (which has S3 read access).
+echo "Downloading agent from S3..."
+aws s3 cp s3://{3}/{4} /home/ubuntu/agent_installer.zip
 
-    # 3. Write the credentials file
-    # This sets up the 'default' profile using the Dev User's keys
-    cat <<EOF > /home/ubuntu/.aws/credentials
-    [default]
-    aws_access_key_id = {0}
-    aws_secret_access_key = {1}
-    EOF
+# 3. Extract & Install Agent 
+echo "Extracting agent..."
+unzip /home/ubuntu/agent_installer.zip -d /home/ubuntu/agent
+chown -R ubuntu:ubuntu /home/ubuntu/agent
+sudo mkdir -p /etc/panw
+sudo cp  /home/ubuntu/agent/cortex.conf /etc/panw/
+chmod +x  /home/ubuntu/agent/cortex-*.sh
+sudo /home/ubuntu/agent/cortex-*.sh
 
-    # 4. Write the config file
-    # This defines the region and a profile to assume the Lambda Role
-    cat <<EOF > /home/ubuntu/.aws/config
-    [default]
-    region = {3}
+# 4. Configure 'Dev User' Credentials
+# Now we write the keys for the 'dev-user'. Future AWS commands run by the user
+# will use these keys (which have Lambda Admin access but NO S3 access).
+mkdir -p /home/ubuntu/.aws
 
-    [profile lambda-role]
-    role_arn = {2}
-    source_profile = default
-    EOF
+cat <<EOF > /home/ubuntu/.aws/credentials
+[default]
+aws_access_key_id = {0}
+aws_secret_access_key = {1}
+EOF
 
-    # 5. Update file permissions
-    chown -R ubuntu:ubuntu /home/ubuntu/.aws
-    chmod 600 /home/ubuntu/.aws/credentials
-    chmod 600 /home/ubuntu/.aws/config
+cat <<EOF > /home/ubuntu/.aws/config
+[default]
+region = {5}
 
-    echo "AWS CLI installed and credentials configured."
-    """, iam.dev_access_key.id, iam.dev_access_key.secret, iam.lambda_role.arn,
-        region.region)
+[profile lambda-role]
+role_arn = {2}
+source_profile = default
+EOF
+
+# 5. Fix permissions
+chown -R ubuntu:ubuntu /home/ubuntu/.aws
+chmod 600 /home/ubuntu/.aws/credentials
+chmod 600 /home/ubuntu/.aws/config
+
+echo "Setup complete."
+""",
+        dev_access_key.id,  # {0}
+        dev_access_key.secret,  # {1}
+        lambda_role.arn,  # {2}
+        agent_bucket.bucket,  # {3} Bucket Name
+        agent_object.key,  # {4} Object Key
+        region.region  # {5}
+    )
 
     # Create an EC2 instance with user data
     instance = aws.ec2.Instance(

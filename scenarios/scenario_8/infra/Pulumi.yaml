@@ -4,7 +4,8 @@ runtime:
 description: A minimal AWS Python Pulumi program
 config:
   aws:region: us-east-1    # Or your desired region
-  infra:include_agent: False
+  infra:includeAgent: True
+  infra:agentInstallerPath: ../../../aws-demo-ec2-agent_sh.tar.gz # Needs to be tar.gz of x86_64 SH Linux Installer
   infra:subnetId: subnet-00296c3ce08ebf532
   infra:vpcId: vpc-0183f533f910aa121
   infra:publicKeyPath: ../../../id_rsa.pub
