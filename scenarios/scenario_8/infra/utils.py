@@ -31,7 +31,7 @@ def read_public_key(pub_key_path):
         print(f"Error: Public key file not found at {pub_key_path}",
               file=sys.stderr)
         print(
-            "Please ensure the path '../../../id_rsa.pub' is correct relative to where you run 'pulumi up'.",
+            f"Please ensure the path '{pub_key_path}' is correct relative to where you run 'pulumi up'.",
             file=sys.stderr)
         sys.exit(1)
     except Exception as e:

@@ -3,7 +3,7 @@ import pulumi_aws as aws
 import json
 
 
-def create_iam_resources():
+def create_ec2_role():
     # Create an IAM role for EC2 instance
     ec2_role = aws.iam.Role("ec2-role",
                             name="cobra-scenario-8-ec2-role",
@@ -38,6 +38,10 @@ def create_iam_resources():
             ]
         }""")
 
+    return ec2_role
+
+
+def create_iam_resources():
     # Create 'dev' user
     dev_user = aws.iam.User("dev-user",
                             name="cobra-scenario-8-dev-user",
@@ -113,7 +117,6 @@ def create_iam_resources():
         policy_arn="arn:aws:iam::aws:policy/IAMFullAccess")
 
     return {
-        "ec2_role": ec2_role,
         "lambda_role": lambda_role,
         "iam_monitor_role": iam_monitor_role,
         "dev_access_key": dev_access_key

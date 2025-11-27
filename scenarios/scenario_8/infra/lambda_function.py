@@ -14,20 +14,20 @@ def create_lambda(lambda_role):
 
     # --- Lambda Scheduling Logic (Every 2 Hours) ---
 
-    # 1. Create the Event Rule
+    # Create the Event Rule
     lambda_cloudwatch_schedule = aws.cloudwatch.EventRule(
         "lambda_cloudwatch_schedule",
         name="cobra-scenario-8-lambda-schedule",
         description="Fires every 24 hours",
         schedule_expression="rate(24 hours)")
 
-    # 2. Target the Lambda Function
+    # Target the Lambda Function
     lambda_target = aws.cloudwatch.EventTarget(
         "lambda_event_target",
         rule=lambda_cloudwatch_schedule.name,
         arn=lambda_func.arn)
 
-    # 3. Give CloudWatch Permission to Invoke the Lambda
+    # Give CloudWatch Permission to Invoke the Lambda
     allow_cloudwatch = aws.lambda_.Permission(
         "allow_cloudwatch_lambda_invoke",
         action="lambda:InvokeFunction",
