@@ -33,14 +33,25 @@ def print_ascii_art(text):
 
 def select_attack_scenario():
     print(colored("Select Attack Scenario of:", color="yellow"))
-    print(colored("1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning", color="green"))
-    print(colored("2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilege escalation, rogue identity creation & persistence", color="green"))
-    print(colored("3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster", color="green"))
+    print(
+        colored(
+            "1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning",
+            color="green"))
+    print(
+        colored(
+            "2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilege escalation, rogue identity creation & persistence",
+            color="green"))
+    print(
+        colored(
+            "3. Compromising a web app living inside a GKE Pod, access pod secret, escalate privilege, take over the cluster",
+            color="green"))
     print(colored("4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access", color="green"))
     print(colored("5. Instance takeover, abuse s3 access & perform ransomware using external KMS key", color="green"))
     print(colored("6. Azure Web Exploit, Abuse Managed Identity, Extract Secrets from Key Vault", color="green"))
     print(colored("7. Container Escape & Cluster Takeover in EKS", color="green"))
-    print(colored("8. Lambda role takeover, AssumeRole spraying, Backdoor user, Secrets Dump, and exfilteration", color="green"))
+    print(
+        colored("8. Lambda role takeover, AssumeRole spraying, Backdoor user, Secrets Dump, and exfilteration",
+                color="green"))
     print(colored("9. Exit", color="green"))
     while True:
         try:
@@ -50,6 +61,7 @@ def select_attack_scenario():
             return choice
         except ValueError as e:
             print(e)
+
 
 def get_credentials():
     while True:
@@ -63,6 +75,7 @@ def get_credentials():
             return access_key, secret_key
         except ValueError as e:
             print(e)
+
 
 def execute_scenario(x, manual):
     try:
@@ -82,14 +95,15 @@ def execute_scenario(x, manual):
         elif x == 7:
             scenario_7.ScenarioExecution().scenario_7_execute()
         elif x == 8:
-            scenario_8.ScenarioExecution().scenario_8_execute()           
+            scenario_8.ScenarioExecution().scenario_8_execute()
         elif x == 9:
             exit
-        else: 
+        else:
             print("Invalid Scenario Selected")
         print(colored("Scenario executed successfully!", color="green"))
     except Exception as e:
         print(colored("Error executing scenario:", color="red"), str(e))
+
 
 def post_execute_scenario(x):
     try:
@@ -100,11 +114,12 @@ def post_execute_scenario(x):
             scenario_2.ScenarioExecution.post_execution("None")
         elif x == 7:
             scenario_7.ScenarioExecution.post_execution("None")
-        else: 
+        else:
             print("Invalid Scenario Selected")
         print(colored("Thank you for using COBRA!", color="green"))
     except Exception as e:
         print(colored("Error executing scenario:", color="red"), str(e))
+
 
 def main(action, simulation, scenario, manual):
     tool_name = "C O B R A"
@@ -146,10 +161,11 @@ def main(action, simulation, scenario, manual):
     elif action == 'destroy' and scenario == "cobra-scenario-7":
         subprocess.call("cd ./scenarios/scenario_7/infra && pulumi destroy -s cobra-scenario-7 --yes", shell=True)
     elif action == 'destroy' and scenario == "cobra-scenario-8":
-        subprocess.call("cd ./scenarios/scenario_8/infra && pulumi destroy -s cobra-scenario-8 --yes", shell=True)
+        scenario_8.ScenarioExecution().scenario_8_destroy()
 
     else:
         print('No options provided. --help to know more')
+
 
 if __name__ == "__main__":
     main()

