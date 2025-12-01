@@ -97,7 +97,7 @@ def execute_scenario(x, manual):
         elif x == 8:
             scenario_8.ScenarioExecution().scenario_8_execute(manual)
         elif x == 9:
-            exit
+            exit()
         else:
             print("Invalid Scenario Selected")
         print(colored("Scenario executed successfully!", color="green"))
