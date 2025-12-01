@@ -50,14 +50,14 @@ def select_attack_scenario():
     print(colored("6. Azure Web Exploit, Abuse Managed Identity, Extract Secrets from Key Vault", color="green"))
     print(colored("7. Container Escape & Cluster Takeover in EKS", color="green"))
     print(
-        colored("8. Lambda role takeover, AssumeRole spraying, Backdoor user, Secrets Dump, and exfilteration",
+        colored("8. Lambda role takeover, AssumeRole spraying, Backdoor user, Secrets Dump, and S3 exfilteration",
                 color="green"))
     print(colored("9. Exit", color="green"))
     while True:
         try:
             choice = int(input(colored("Enter your choice: ", color="yellow")))
-            if choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
-                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, 7 or 8.", color="red"))
+            if choice not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
+                raise ValueError(colored("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, 7, 8 or 9.", color="red"))
             return choice
         except ValueError as e:
             print(e)
@@ -95,7 +95,7 @@ def execute_scenario(x, manual):
         elif x == 7:
             scenario_7.ScenarioExecution().scenario_7_execute()
         elif x == 8:
-            scenario_8.ScenarioExecution().scenario_8_execute()
+            scenario_8.ScenarioExecution().scenario_8_execute(manual)
         elif x == 9:
             exit
         else:
@@ -114,6 +114,8 @@ def post_execute_scenario(x):
             scenario_2.ScenarioExecution.post_execution("None")
         elif x == 7:
             scenario_7.ScenarioExecution.post_execution("None")
+        elif x == 8:
+            scenario_8.ScenarioExecution().post_execution()
         else:
             print("Invalid Scenario Selected")
         print(colored("Thank you for using COBRA!", color="green"))
@@ -140,6 +142,8 @@ def main(action, simulation, scenario, manual):
                 post_execute_scenario(2)
             elif scenario_choice == 7:
                 post_execute_scenario(7)
+            elif scenario_choice == 8:
+                post_execute_scenario(8)
     elif action == 'status' and scenario == "cobra-scenario-1":
         subprocess.call("cd ./scenarios/scenario_1/infra/ && pulumi stack ls", shell=True)
     elif action == 'status' and scenario == "cobra-scenario-2":

