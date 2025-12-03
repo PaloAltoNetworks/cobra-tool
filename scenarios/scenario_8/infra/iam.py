@@ -105,7 +105,7 @@ def create_iam_resources():
                                     assume_role_policy=iam_monitor_trust_policy,
                                     name="cobra-scenario-8-iam-role")
 
-    iam_monitor_role_policy = aws.iam.RolePolicyAttachment("iam-monitor-full-acceass-policy-attachment",
+    iam_monitor_role_policy = aws.iam.RolePolicyAttachment("iam-monitor-full-access-policy-attachment",
                                                            role=iam_monitor_role.name,
                                                            policy_arn="arn:aws:iam::aws:policy/AdministratorAccess")
 

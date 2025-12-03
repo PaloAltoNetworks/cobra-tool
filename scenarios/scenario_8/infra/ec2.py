@@ -35,16 +35,13 @@ def create_ec2_attacker_machine():
                                key_name="cobra-scenario-8-attacker-ec2-key",
                                public_key=read_public_key(public_key_path))
 
-    user_data_script = open("./ec2_user_data_scripts/attacker_init_script.sh",
-                            "r").read()
+    user_data_script = open("./ec2_user_data_scripts/attacker_init_script.sh", "r").read()
 
     attacker_ubuntu_ami = aws.ec2.get_ami(
         filters=[
             aws.ec2.GetAmiFilterArgs(
                 name="name",
-                values=[
-                    "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
-                ],
+                values=["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"],
             ),
             aws.ec2.GetAmiFilterArgs(
                 name="virtualization-type",
@@ -67,37 +64,29 @@ def create_ec2_attacker_machine():
         key_name=key_pair.key_name,
         ebs_block_devices=[
             aws.ec2.InstanceEbsBlockDeviceArgs(
-                device_name=attacker_ubuntu_ami.
-                root_device_name,  # Finds the root device
+                device_name=attacker_ubuntu_ami.root_device_name,  # Finds the root device
                 encrypted=True,  # Forces encryption
                 volume_type="gp3"
                 # You can also specify volume_size, volume_type, etc. here
             )
         ],
-        tags={
-            **default_tags, "UC-OWNER": "Osher",
-            "Name": "Cobra Scenario 8 - Attacker Machine"
-        })
+        tags={"Name": "Cobra Scenario 8 - Attacker Machine"})
 
     pulumi.export("Attacker Server Public IP", instance.public_ip)
     pulumi.export("Attacker Server Instance ID", instance.id)
 
 
-def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role,
-                                   agent_bucket, agent_object):
+def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_bucket, agent_object):
     public_key_path = config.require("compromisedPublicKeyPath")
     key_pair = aws.ec2.KeyPair("compromised-machine-key-pair",
                                key_name="cobra-scenario-8-compromised-ec2-key",
                                public_key=read_public_key(public_key_path))
 
-    instance_profile = aws.iam.InstanceProfile(
-        "ec2-instance-profile",
-        name="cobra-scenario-8-instance-profile",
-        role=ec2_role.name)
+    instance_profile = aws.iam.InstanceProfile("ec2-instance-profile",
+                                               name="cobra-scenario-8-instance-profile",
+                                               role=ec2_role.name)
 
-    user_data_script_template = open(
-        "./ec2_user_data_scripts/compromised_init_script_template.sh",
-        "r").read()
+    user_data_script_template = open("./ec2_user_data_scripts/compromised_init_script_template.sh", "r").read()
 
     user_data_script = pulumi.Output.format(
         user_data_script_template,
@@ -114,11 +103,8 @@ def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role,
         # Canonical's AWS Account ID
         owners=["099720109477"],
         filters=[
-            aws.ec2.GetAmiFilterArgs(
-                name="name",
-                values=[
-                    "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20251022"
-                ]),
+            aws.ec2.GetAmiFilterArgs(name="name",
+                                     values=["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20251022"]),
             aws.ec2.GetAmiFilterArgs(
                 name="virtualization-type",
                 values=["hvm"],
@@ -140,17 +126,13 @@ def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role,
         user_data_replace_on_change=True,
         ebs_block_devices=[
             aws.ec2.InstanceEbsBlockDeviceArgs(
-                device_name=compromised_ubuntu_ami.
-                root_device_name,  # Finds the root device
+                device_name=compromised_ubuntu_ami.root_device_name,  # Finds the root device
                 encrypted=True,  # Forces encryption
                 volume_type="gp3"
                 # You can also specify volume_size, volume_type, etc. here
             )
         ],
-        tags={
-            **default_tags, "UC-OWNER": "Osher",
-            "Name": "Cobra Scenario 8 - Compromised Dev Machine"
-        })
+        tags={"Name": "Cobra Scenario 8 - Compromised Dev Machine"})
 
     pulumi.export("Compromised Server Public IP", instance.public_ip)
     pulumi.export("Compromised Server Instance ID", instance.id)

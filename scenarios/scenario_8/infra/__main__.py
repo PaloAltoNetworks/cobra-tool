@@ -9,10 +9,14 @@ import s3
 import ec2
 import secrets
 
-aws.Provider("default", default_tags=aws.ProviderDefaultTagsArgs(tags=default_tags))
-
 config = pulumi.Config()
 
+# Make sure resources will be tagged with our default configurable tags
+default_tags = config.require_object("tags")
+aws.Provider("default", default_tags=aws.ProviderDefaultTagsArgs(tags=default_tags))
+register_auto_tags(default_tags)
+
+# IAM Resources
 iam_resources = iam.create_iam_resources()
 dev_access_key = iam_resources['dev_access_key']
 lambda_role = iam_resources['lambda_role']
@@ -21,6 +25,8 @@ iam_monitor_role = iam_resources['iam_monitor_role']
 pulumi.export("Dev Access Key ID", dev_access_key.id)
 pulumi.export("Dev Access Key Secret", dev_access_key.secret)
 pulumi.export("IAM Monitor Role ARN", iam_monitor_role.arn)
+
+# Lambda
 lambda_function.create_lambda(iam_resources['lambda_role'])
 pulumi.export("Lambda Role ARN", iam_resources['lambda_role'].arn)
 
