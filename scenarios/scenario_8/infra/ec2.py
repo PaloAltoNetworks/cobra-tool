@@ -39,10 +39,8 @@ def create_ec2_attacker_machine():
 
     attacker_ubuntu_ami = aws.ec2.get_ami(
         filters=[
-            aws.ec2.GetAmiFilterArgs(
-                name="name",
-                values=["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"],
-            ),
+            aws.ec2.GetAmiFilterArgs(name="name",
+                                     values=["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]),
             aws.ec2.GetAmiFilterArgs(
                 name="virtualization-type",
                 values=["hvm"],

