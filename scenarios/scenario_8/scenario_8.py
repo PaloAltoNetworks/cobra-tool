@@ -160,9 +160,6 @@ class ScenarioExecution:
         for secret_name in self.discovered_secrets:
             cmdline = f'aws secretsmanager get-secret-value --secret-id "{secret_name}"'
             res = self.attacker_run(cmdline, check=True)
-            if res != 0:
-                print(colored(f"Secrets dump failed with error_code={res}, aborting...", "red"))
-                exit(1)
 
     def attacker_assume_role(self, role_arn, session_name="DebuggingSession", update_env=True, check=True):
         cmd = f"aws sts assume-role --role-arn {role_arn} --role-session-name {session_name} --output json 2>&1"
