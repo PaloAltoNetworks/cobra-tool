@@ -44,16 +44,19 @@ def generate_ssh_key(key_name="./id_rsa"):
 def upload_file_to_server(source_file, server_username, server_ip, server_directory, key_path='./id_rsa'):
     try:
         # Construct the scp command
-        scp_command = f'scp -o StrictHostKeyChecking=no -i {key_path} -r {source_file} {server_username}@{server_ip}:{server_directory}'
+        scp_command = f'scp -i {key_path} -r {source_file} {server_username}@{server_ip}:{server_directory}'
 
         # Execute the scp command
         subprocess.check_call(scp_command, shell=True)
 
         print(f"File '{source_file}' successfully uploaded to server '{server_ip}' in directory '{server_directory}'.")
         return True
+
     except subprocess.CalledProcessError as e:
         print(f"Error uploading file: {e}")
-        return False
+
+        # Re-raise the exception so the calling script knows it failed
+        raise (e)
 
 
 def run_subprocess(cmd, return_output=False, check=True, suppress_print=False):

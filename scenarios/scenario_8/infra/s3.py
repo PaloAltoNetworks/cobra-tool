@@ -8,23 +8,29 @@ def create_s3_resources():
 
     source_dir = "bucket_files"
 
-    strategy_doc = s3.BucketObject("strategy-doc",
-                                   bucket=bucket.id,
-                                   key="confidential/project_cobra_confidential.txt",
-                                   source=pulumi.FileAsset("./bucket_files/phase2_strategy.txt"),
-                                   content_type="text/markdown")
+    s3_objects = []
 
-    postmortem_doc = s3.BucketObject("postmortem-doc",
-                                     bucket=bucket.id,
-                                     key="incidents/2024/incident_postmortem_sev1.txt",
-                                     source=pulumi.FileAsset("./bucket_files/incident_report_2024.txt"),
-                                     content_type="text/markdown")
+    for i in range(6):
+        s3_objects.append(
+            s3.BucketObject(f"strategy-doc-{str(i)}",
+                            bucket=bucket.id,
+                            key="confidential/project_cobra_confidential.txt",
+                            source=pulumi.FileAsset("./bucket_files/phase2_strategy.txt"),
+                            content_type="text/markdown"))
 
-    chat_log = s3.BucketObject("chat-log",
-                               bucket=bucket.id,
-                               key="logs/slack_exports/chat_export_dev_ops.txt",
-                               source=pulumi.FileAsset("./bucket_files/chat_devops.txt"),
-                               content_type="text/markdown")
+        s3_objects.append(
+            s3.BucketObject(f"postmortem-doc-{str(i)}",
+                            bucket=bucket.id,
+                            key="incidents/2024/incident_postmortem_sev1.txt",
+                            source=pulumi.FileAsset("./bucket_files/incident_report_2024.txt"),
+                            content_type="text/markdown"))
+
+        s3_objects.append(
+            s3.BucketObject(f"chat-log-{str(i)}",
+                            bucket=bucket.id,
+                            key="logs/slack_exports/chat_export_dev_ops.txt",
+                            source=pulumi.FileAsset("./bucket_files/chat_devops.txt"),
+                            content_type="text/markdown"))
 
     pulumi.export('Bucket Name', bucket.id)
 
