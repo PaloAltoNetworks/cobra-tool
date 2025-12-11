@@ -12,22 +12,6 @@ subnet_id = config.require("subnetId")
 region = aws.get_region()
 pulumi.export("Region", region.region)
 
-sg = aws.ec2.SecurityGroup("ec2-security-group",
-                           name="cobra-scenario-8-sg",
-                           vpc_id=vpc_id,
-                           ingress=[{
-                               "protocol": "tcp",
-                               "fromPort": 22,
-                               "toPort": 22,
-                               "cidrBlocks": ["0.0.0.0/0"]
-                           }],
-                           egress=[{
-                               "protocol": "-1",
-                               "fromPort": 0,
-                               "toPort": 0,
-                               "cidrBlocks": ["0.0.0.0/0"]
-                           }])
-
 
 def create_ec2_attacker_machine():
     public_key_path = config.require("attackerPublicKeyPath")
@@ -50,11 +34,30 @@ def create_ec2_attacker_machine():
         most_recent=True,
     )
 
+    # Convert to /24 cidr block
+    sg_cidr = ".".join(fetch_public_ip().split(".")[:-1]) + ".0/24"
+
+    attacker_ec2_sg = aws.ec2.SecurityGroup("ec2-security-group-attacker",
+                                            name="cobra-scenario-8-sg-attacker",
+                                            vpc_id=vpc_id,
+                                            ingress=[{
+                                                "protocol": "tcp",
+                                                "fromPort": 22,
+                                                "toPort": 22,
+                                                "cidrBlocks": [sg_cidr]
+                                            }],
+                                            egress=[{
+                                                "protocol": "-1",
+                                                "fromPort": 0,
+                                                "toPort": 0,
+                                                "cidrBlocks": ["0.0.0.0/0"]
+                                            }])
+
     instance = aws.ec2.Instance(
         "ec2-attacker-dev-machine",
         instance_type="t2.small",
         ami=attacker_ubuntu_ami.id,
-        vpc_security_group_ids=[sg.id],
+        vpc_security_group_ids=[attacker_ec2_sg.id],
         subnet_id=subnet_id,
         associate_public_ip_address=True,
         user_data=user_data_script,
@@ -110,13 +113,29 @@ def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_
         ],
     )
 
+    compromised_ec2_sg = aws.ec2.SecurityGroup("ec2-security-group-compromised",
+                                               name="cobra-scenario-8-sg-comrpomised",
+                                               vpc_id=vpc_id,
+                                               ingress=[{
+                                                   "protocol": "tcp",
+                                                   "fromPort": 22,
+                                                   "toPort": 22,
+                                                   "cidrBlocks": ["0.0.0.0/0"]
+                                               }],
+                                               egress=[{
+                                                   "protocol": "-1",
+                                                   "fromPort": 0,
+                                                   "toPort": 0,
+                                                   "cidrBlocks": ["0.0.0.0/0"]
+                                               }])
+
     # Create an EC2 instance with user data
     instance = aws.ec2.Instance(
         "ec2-compromised-dev-machine",
         instance_type="t2.small",
         ami=compromised_ubuntu_ami.id,
         iam_instance_profile=instance_profile.name,
-        vpc_security_group_ids=[sg.id],
+        vpc_security_group_ids=[compromised_ec2_sg.id],
         subnet_id=subnet_id,
         associate_public_ip_address=True,
         key_name=key_pair.key_name,

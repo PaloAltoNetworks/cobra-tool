@@ -1,6 +1,8 @@
 import pulumi
-from taggable import is_taggable
 import sys
+import requests
+
+from taggable import is_taggable
 
 
 # registerAutoTags registers a global stack transformation that merges a set
@@ -31,6 +33,22 @@ def read_public_key(pub_key_path):
     except Exception as e:
         print(f"Error reading public key: {e}", file=sys.stderr)
         sys.exit(1)
+
+
+def fetch_public_ip():
+    try:
+        response = requests.get('https://api.ipify.org', verify=False)
+        response.raise_for_status()
+        ip = response.text
+
+        if not ip:
+            raise Exception("Could not fetch IP, got empty response.")
+
+        return ip
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching IP: {e}")
+        raise (e)
 
 
 # Make sure resources will be tagged with our default configurable tags
