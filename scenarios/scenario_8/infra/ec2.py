@@ -2,29 +2,33 @@ import pulumi
 import pulumi_aws as aws
 
 import iam
+from vpc import vpc_id, subnet_id
 from utils import *
 
-# --- Use Pulumi Config to get VPC and Subnet IDs ---
-config = pulumi.Config()
-vpc_id = config.require("vpcId")
-subnet_id = config.require("subnetId")
 
+config = pulumi.Config()
 region = aws.get_region()
 pulumi.export("Region", region.region)
 
 
 def create_ec2_attacker_machine():
     public_key_path = config.require("attackerPublicKeyPath")
-    key_pair = aws.ec2.KeyPair("attacker-machine-key-pair",
-                               key_name="cobra-scenario-8-attacker-ec2-key",
-                               public_key=read_public_key(public_key_path))
+    key_pair = aws.ec2.KeyPair(
+        "attacker-machine-key-pair",
+        key_name="cobra-scenario-8-attacker-ec2-key",
+        public_key=read_public_key(public_key_path),
+    )
 
-    user_data_script = open("./ec2_user_data_scripts/attacker_init_script.sh", "r").read()
+    user_data_script = open(
+        "./ec2_user_data_scripts/attacker_init_script.sh", "r"
+    ).read()
 
     attacker_ubuntu_ami = aws.ec2.get_ami(
         filters=[
-            aws.ec2.GetAmiFilterArgs(name="name",
-                                     values=["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]),
+            aws.ec2.GetAmiFilterArgs(
+                name="name",
+                values=["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"],
+            ),
             aws.ec2.GetAmiFilterArgs(
                 name="virtualization-type",
                 values=["hvm"],
@@ -34,24 +38,32 @@ def create_ec2_attacker_machine():
         most_recent=True,
     )
 
+    # Security group
+
     # Convert to /24 cidr block
     sg_cidr = ".".join(fetch_public_ip().split(".")[:-1]) + ".0/24"
 
-    attacker_ec2_sg = aws.ec2.SecurityGroup("ec2-security-group-attacker",
-                                            name="cobra-scenario-8-sg-attacker",
-                                            vpc_id=vpc_id,
-                                            ingress=[{
-                                                "protocol": "tcp",
-                                                "fromPort": 22,
-                                                "toPort": 22,
-                                                "cidrBlocks": [sg_cidr]
-                                            }],
-                                            egress=[{
-                                                "protocol": "-1",
-                                                "fromPort": 0,
-                                                "toPort": 0,
-                                                "cidrBlocks": ["0.0.0.0/0"]
-                                            }])
+    attacker_ec2_sg = aws.ec2.SecurityGroup(
+        "ec2-security-group-attacker",
+        name="cobra-scenario-8-sg-attacker",
+        vpc_id=vpc_id,
+        ingress=[
+            {
+                "protocol": "tcp",
+                "fromPort": 22,
+                "toPort": 22,
+                "cidrBlocks": [sg_cidr],
+            }
+        ],
+        egress=[
+            {
+                "protocol": "-1",
+                "fromPort": 0,
+                "toPort": 0,
+                "cidrBlocks": ["0.0.0.0/0"],
+            }
+        ],
+    )
 
     instance = aws.ec2.Instance(
         "ec2-attacker-dev-machine",
@@ -67,27 +79,36 @@ def create_ec2_attacker_machine():
             aws.ec2.InstanceEbsBlockDeviceArgs(
                 device_name=attacker_ubuntu_ami.root_device_name,  # Finds the root device
                 encrypted=True,  # Forces encryption
-                volume_type="gp3"
+                volume_type="gp3",
                 # You can also specify volume_size, volume_type, etc. here
             )
         ],
-        tags={"Name": "Cobra Scenario 8 - Attacker Machine"})
+        tags={"Name": "Cobra Scenario 8 - Attacker Machine"},
+    )
 
     pulumi.export("Attacker Server Public IP", instance.public_ip)
     pulumi.export("Attacker Server Instance ID", instance.id)
 
 
-def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_bucket, agent_object):
+def create_ec2_compromised_machine(
+    ec2_role, dev_access_key, lambda_role, agent_bucket, agent_object
+):
     public_key_path = config.require("compromisedPublicKeyPath")
-    key_pair = aws.ec2.KeyPair("compromised-machine-key-pair",
-                               key_name="cobra-scenario-8-compromised-ec2-key",
-                               public_key=read_public_key(public_key_path))
+    key_pair = aws.ec2.KeyPair(
+        "compromised-machine-key-pair",
+        key_name="cobra-scenario-8-compromised-ec2-key",
+        public_key=read_public_key(public_key_path),
+    )
 
-    instance_profile = aws.iam.InstanceProfile("ec2-instance-profile",
-                                               name="cobra-scenario-8-instance-profile",
-                                               role=ec2_role.name)
+    instance_profile = aws.iam.InstanceProfile(
+        "ec2-instance-profile",
+        name="cobra-scenario-8-instance-profile",
+        role=ec2_role.name,
+    )
 
-    user_data_script_template = open("./ec2_user_data_scripts/compromised_init_script_template.sh", "r").read()
+    user_data_script_template = open(
+        "./ec2_user_data_scripts/compromised_init_script_template.sh", "r"
+    ).read()
 
     user_data_script = pulumi.Output.format(
         user_data_script_template,
@@ -96,7 +117,7 @@ def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_
         lambda_role.arn,  # {2}
         agent_bucket.bucket,  # {3} Bucket Name
         agent_object.key,  # {4} Object Key
-        region.region  # {5}
+        region.region,  # {5}
     )
 
     compromised_ubuntu_ami = aws.ec2.get_ami(
@@ -104,8 +125,12 @@ def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_
         # Canonical's AWS Account ID
         owners=["099720109477"],
         filters=[
-            aws.ec2.GetAmiFilterArgs(name="name",
-                                     values=["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20251022"]),
+            aws.ec2.GetAmiFilterArgs(
+                name="name",
+                values=[
+                    "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20251022"
+                ],
+            ),
             aws.ec2.GetAmiFilterArgs(
                 name="virtualization-type",
                 values=["hvm"],
@@ -113,21 +138,28 @@ def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_
         ],
     )
 
-    compromised_ec2_sg = aws.ec2.SecurityGroup("ec2-security-group-compromised",
-                                               name="cobra-scenario-8-sg-comrpomised",
-                                               vpc_id=vpc_id,
-                                               ingress=[{
-                                                   "protocol": "tcp",
-                                                   "fromPort": 22,
-                                                   "toPort": 22,
-                                                   "cidrBlocks": ["0.0.0.0/0"]
-                                               }],
-                                               egress=[{
-                                                   "protocol": "-1",
-                                                   "fromPort": 0,
-                                                   "toPort": 0,
-                                                   "cidrBlocks": ["0.0.0.0/0"]
-                                               }])
+    # Security group
+    compromised_ec2_sg = aws.ec2.SecurityGroup(
+        "ec2-security-group-compromised",
+        name="cobra-scenario-8-sg-comrpomised",
+        vpc_id=vpc_id,
+        ingress=[
+            {
+                "protocol": "tcp",
+                "fromPort": 22,
+                "toPort": 22,
+                "cidrBlocks": ["0.0.0.0/0"],
+            }
+        ],
+        egress=[
+            {
+                "protocol": "-1",
+                "fromPort": 0,
+                "toPort": 0,
+                "cidrBlocks": ["0.0.0.0/0"],
+            }
+        ],
+    )
 
     # Create an EC2 instance with user data
     instance = aws.ec2.Instance(
@@ -145,11 +177,12 @@ def create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_
             aws.ec2.InstanceEbsBlockDeviceArgs(
                 device_name=compromised_ubuntu_ami.root_device_name,  # Finds the root device
                 encrypted=True,  # Forces encryption
-                volume_type="gp3"
+                volume_type="gp3",
                 # You can also specify volume_size, volume_type, etc. here
             )
         ],
-        tags={"Name": "Cobra Scenario 8 - Compromised Dev Machine"})
+        tags={"Name": "Cobra Scenario 8 - Compromised Dev Machine"},
+    )
 
     pulumi.export("Compromised Server Public IP", instance.public_ip)
     pulumi.export("Compromised Server Instance ID", instance.id)
