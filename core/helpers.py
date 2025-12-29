@@ -59,32 +59,49 @@ def upload_file_to_server(source_file, server_username, server_ip, server_direct
         raise (e)
 
 
-def run_subprocess(cmd, return_output=False, check=True, suppress_print=False):
-    # If we want to return output, we must capture it (PIPE), this also means that the terminal will not display it.
-    capture_target = subprocess.PIPE if (return_output or suppress_print) else None
+def run_command(cmd: str, check: bool = True) -> int:
+    """
+    Execute a shell command and return exit code.
+    Output is printed to terminal.
+    
+    Args:
+        cmd: Shell command to execute
+        check: If True, raise exception on non-zero exit code
+        
+    Returns:
+        Exit code (0 = success)
+        
+    Raises:
+        CalledProcessError: If check=True and command fails
+    """
+    result = subprocess.run(cmd, shell=True, check=check, text=True)
+    return result.returncode
 
-    try:
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            check=check,  # Automatically raises CalledProcessError if True and exit code != 0
-            stdout=capture_target,  # Controls capture vs print
-            stderr=capture_target,  # Keep stderr combined with stdout logic
-            text=True  # Auto-decodes bytes to string (utf-8)
-        )
 
-        # If we are here, the command succeeded (or check=False)
-        if return_output:
-            return result.stdout.strip()
-
-        return result.returncode
-
-    except subprocess.CalledProcessError as e:
-        # This block is only reached if check=True AND the command failed.
-        # The 'e' object contains e.returncode, e.stdout, and e.stderr
-        print(f"Command failed with error code: {e.returncode}")
-        if return_output and e.stdout:
-            print(f"Captured Output before failure: {e.stdout}")
-
-        # Re-raise the exception so the calling script knows it failed
-        raise e
+def run_command_capture(cmd: str, check: bool = True, include_stderr: bool = True) -> str:
+    """
+    Execute a shell command and capture output.
+    
+    Args:
+        cmd: Shell command to execute
+        check: If True, raise exception on non-zero exit code
+        include_stderr: If True, include stderr in output
+        
+    Returns:
+        Command output (stdout, optionally with stderr)
+        
+    Raises:
+        CalledProcessError: If check=True and command fails
+    """
+    stderr_target = subprocess.STDOUT if include_stderr else subprocess.PIPE
+    
+    result = subprocess.run(
+        cmd,
+        shell=True,
+        check=check,
+        stdout=subprocess.PIPE,
+        stderr=stderr_target,
+        text=True
+    )
+    
+    return result.stdout.strip() if result.stdout else ""

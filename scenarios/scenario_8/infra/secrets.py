@@ -5,6 +5,7 @@ import pulumi_aws as aws
 
 config = pulumi.Config()
 extra_region = config.require("extraRegion")
+pulumi.export("ExtraRegion", extra_region)
 
 
 def create_secrets():

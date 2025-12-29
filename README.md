@@ -234,7 +234,7 @@ cobra-scenario-3  5 minutes ago  4               https://app.pulumi.com/xxxxxxxx
 python3 cobra.py destroy --scenario <cobra-scenario-1/cobra-scenario-2> 
 ```
 
-### Current Scenarios 
+### Current Scenarios
 
 1. Exploit Vulnerable Application, EC2 takeover, Credential Exfiltration & Anomalous Compute Provisioning
 2. Rest API exploit - command injection, credential exfiltration from backend lambda and privilige escalation, rogue identity creation & persistence
@@ -242,6 +242,7 @@ python3 cobra.py destroy --scenario <cobra-scenario-1/cobra-scenario-2>
 4. Exfiltrate EC2 role credentials using IMDSv2 with least privileged access
 5. Instance takeover, abuse s3 access & perform ransomware using external KMS key
 7. Container Escape & Cluster Takeover in EKS
+8. AWS Privilege Escalation, Persistence & Data Exfiltration
 
 ### To Do / In Roadmap
 

@@ -50,7 +50,7 @@ def select_attack_scenario():
     print(colored("6. Azure Web Exploit, Abuse Managed Identity, Extract Secrets from Key Vault", color="green"))
     print(colored("7. Container Escape & Cluster Takeover in EKS", color="green"))
     print(
-        colored("8. Lambda role takeover, AssumeRole spraying, Backdoor user, Secrets Dump, and S3 exfilteration",
+        colored("8. AWS Privilege Escalation, Persistence & Data Exfiltration",
                 color="green"))
     print(colored("9. Exit", color="green"))
     while True:
