@@ -45,8 +45,8 @@ def create_s3_resources():
             s3.BucketObject(
                 f"transactions-snippet-{str(i)}",
                 bucket=bucket.id,
-                key=f"logs/slack_exports/transactions_snippet_{str(i)}.csv",
-                source=pulumi.FileAsset("./bucket_files/transactions_snippet.csv"),
+                key=f"logs/slack_exports/sensitive_info_{str(i)}.txt",
+                source=pulumi.FileAsset("./bucket_files/sensitive_info.txt"),
                 content_type="text/csv",
             )
         )

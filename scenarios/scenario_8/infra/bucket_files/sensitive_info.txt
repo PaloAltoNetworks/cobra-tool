@@ -1,0 +1,50 @@
+================================================================================
+INTERNAL DEVOPS DEBUG LOG - DO NOT DISTRIBUTE - PROPERTY OF COBRA-LABS
+================================================================================
+Generated: 2025-12-30T14:05:52Z
+Node: prod-db-sync-01.internal
+
+--- HARDCODED CREDENTIALS (SECRET_SCANNER_TRIGGER) ---
+The following temporary keys were used for the S3 migration script. 
+
+TODO: Rotate these before EOD ;)
+
+AWS_ACCESS_KEY_ID=AKIA52EXAMPLE7QJ4K8L
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K9MDENG/bPxRfiCYEXAMPLEKEY
+GITHUB_TOKEN=ghp_vN19N82KkL82Z3mN4oP5qR6sT7uV6wX9yZ01
+STRIPE_LIVE_KEY=sk_live_51GwaX2Lkd32kLp01M92jK29S00L2kP18v
+DB_CONNECTION_STRING=postgresql://admin:P@ssw0rd123!@10.0.42.5:5432/customer_pci_db
+
+--- CUSTOMER PII DATA (GDPR/CCPA_PII_TRIGGER) ---
+Sample records for identity verification service testing.
+
+[Row_ID, Full_Name, SSN_US, National_ID_UK, Date_of_Birth, Personal_Email]
+1001, "Johnathan Miller", 982-00-1234, ID-9982310-EU, 12/05/1984, j.miller@protonmail.com
+1002, "Samantha V. Vance", 102-88-9921, ID-8827103-GB, 05/22/1991, svance@gmail.com
+1003, "Dr. Robert Aris", 443-11-0029, ID-1120039-UK, 11/14/1972, rarishod@clinic.org
+1004, "Elena Rodriguez", 552-12-8832, ID-0029311-ES, 09/30/1988, elena.rod@yahoo.com
+
+--- CARDHOLDER DATA (PCI-DSS_TRIGGER) ---
+Transaction validation payload - Raw info for Luhn-algorithm testing.
+
+- PRIMARY_ACCOUNT_NUMBER: 4111 1111 1111 1111 (VISA)
+- PRIMARY_ACCOUNT_NUMBER: 5412 7512 3412 3456 (MASTERCARD)
+- PRIMARY_ACCOUNT_NUMBER: 3782 910283 41002 (AMEX)
+- CVV_CODES: 442, 109, 8821, 312
+- TRACK_2_DATA: 4111111111111111=251210100000000000000
+
+--- PATIENT HEALTH RECORDS (HIPAA_PHI_TRIGGER) ---
+Medical billing samples for internal insurance reconciliation.
+
+Patient_Name: Miller, Johnathan
+Residential_Address: 742 Evergreen Terrace, Springfield, OR 97477
+Insurance_ID: BCBS-998231002
+Diagnostic_ICD10: E11.9 (Type 2 diabetes mellitus)
+Physician_Notes: Patient exhibits symptoms of chronic fatigue. 
+Prescription: Metformin 500mg, twice daily.
+
+--- SYSTEM METADATA ---
+Last Sync Status: FAIL
+Error: Unauthorized access detected from TOR exit node. 
+Remediation: Manual override initiated by admin-temp.
+================================================================================
