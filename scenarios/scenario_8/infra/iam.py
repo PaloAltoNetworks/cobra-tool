@@ -47,7 +47,10 @@ def create_ec2_role():
 
 def create_iam_resources():
     # Create 'dev' user
-    dev_user = aws.iam.User("dev-user", name="cobra-scenario-8-developer-user")
+    dev_user = aws.iam.User(
+        "dev-user",
+        name=f"cobra-scenario-8-developer-user--{str(random.randint(0, 1000))}",
+    )
     dev_user_arn = dev_user.arn
 
     # Create access key for dev
