@@ -1,7 +1,7 @@
 import pulumi
 import pulumi_aws as aws
+import pulumi_random
 import json
-import random
 
 
 def create_ec2_role():
@@ -46,10 +46,17 @@ def create_ec2_role():
 
 
 def create_iam_resources():
+    # Create RandomInteger for dev user suffix
+    dev_user_suffix = pulumi_random.RandomInteger(
+        "dev-user-suffix",
+        min=0,
+        max=1000
+    )
+
     # Create 'dev' user
     dev_user = aws.iam.User(
         "dev-user",
-        name=f"cobra-scenario-8-developer-user--{str(random.randint(0, 1000))}",
+        name=dev_user_suffix.result.apply(lambda n: f"cobra-scenario-8-developer-user--{n}"),
     )
     dev_user_arn = dev_user.arn
 
@@ -121,10 +128,17 @@ def create_iam_resources():
         }
     )
 
+    # Create RandomInteger for IAM monitor role suffix
+    iam_monitor_suffix = pulumi_random.RandomInteger(
+        "iam-monitor-suffix",
+        min=0,
+        max=1000
+    )
+
     iam_monitor_role = aws.iam.Role(
         "iam-monitor-role",
         assume_role_policy=iam_monitor_trust_policy,
-        name=f"cobra-scenario-8-iam-monitoring-{str(random.randint(0, 1000))}-role",  # Randomized to avoid skewing the analytics baselines with recurrent executions
+        name=iam_monitor_suffix.result.apply(lambda n: f"cobra-scenario-8-iam-monitoring-{n}-role"),  # Randomized to avoid skewing the analytics baselines with recurrent executions
     )
 
     iam_monitor_role_policy = aws.iam.RolePolicyAttachment(
