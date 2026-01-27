@@ -39,4 +39,5 @@ eks_node_group = eks.NodeGroup(
     ),
 )
 pulumi.export("Region", region)
+pulumi.export("ClusterName", eks_cluster.name)
 pulumi.export("ClusterData", utils.generate_kube_config(eks_cluster))
