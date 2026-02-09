@@ -12,6 +12,9 @@ config:
   infra:includeAgent: False
   infra:agentInstallerPath: ../../../osher-cobra-agent_sh.tar.gz # Needs to be tar.gz of x86_64 SH Linux Installer
 
+  # Number of S3 buckets to create for exfiltration (default: 20)
+  # infra:exfilBucketCount: 20
+
   # Set the appropriate vpc & subnet if needed
   # infra:subnetId: subnet-00296c3ce08ebf532
   # infra:vpcId: vpc-0183f533f910aa121

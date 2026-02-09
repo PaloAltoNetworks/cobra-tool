@@ -2,18 +2,22 @@ import os
 import pulumi
 from pulumi_aws import s3
 
+DEFAULT_EXFIL_BUCKET_COUNT = 20
 
-def create_s3_resources():
-    bucket = s3.Bucket("cobra-scenario-8-sensitive-bucket")
 
-    source_dir = "bucket_files"
+def _populate_bucket(bucket, bucket_index):
+    """Populate a single bucket with sensitive files.
 
+    Args:
+        bucket: The S3 bucket resource to populate.
+        bucket_index: Index of the bucket, used to create unique resource names.
+    """
     s3_objects = []
 
     for i in range(6):
         s3_objects.append(
             s3.BucketObject(
-                f"strategy-doc-{str(i)}",
+                f"strategy-doc-b{bucket_index}-{str(i)}",
                 bucket=bucket.id,
                 key=f"confidential/project_cobra_confidential_{str(i)}.txt",
                 source=pulumi.FileAsset("./bucket_files/phase2_strategy.txt"),
@@ -23,7 +27,7 @@ def create_s3_resources():
 
         s3_objects.append(
             s3.BucketObject(
-                f"postmortem-doc-{str(i)}",
+                f"postmortem-doc-b{bucket_index}-{str(i)}",
                 bucket=bucket.id,
                 key=f"incidents/2024/incident_postmortem_sev1_{str(i)}.txt",
                 source=pulumi.FileAsset("./bucket_files/incident_report_2024.txt"),
@@ -33,7 +37,7 @@ def create_s3_resources():
 
         s3_objects.append(
             s3.BucketObject(
-                f"chat-log-{str(i)}",
+                f"chat-log-b{bucket_index}-{str(i)}",
                 bucket=bucket.id,
                 key=f"logs/slack_exports/chat_export_dev_ops_{str(i)}.txt",
                 source=pulumi.FileAsset("./bucket_files/chat_devops.txt"),
@@ -43,15 +47,29 @@ def create_s3_resources():
 
         s3_objects.append(
             s3.BucketObject(
-                f"transactions-snippet-{str(i)}",
+                f"transactions-snippet-b{bucket_index}-{str(i)}",
                 bucket=bucket.id,
                 key=f"logs/slack_exports/sensitive_info_{str(i)}.txt",
                 source=pulumi.FileAsset("./bucket_files/sensitive_info.txt"),
-                content_type="text/csv",
+                content_type="text/plain",
             )
         )
 
-    pulumi.export("Bucket Name", bucket.id)
+    return s3_objects
+
+
+def create_s3_resources():
+    config = pulumi.Config()
+    bucket_count = config.get_int("exfilBucketCount") or DEFAULT_EXFIL_BUCKET_COUNT
+
+    buckets = []
+    for idx in range(bucket_count):
+        bucket = s3.Bucket(f"cobra-scenario-8-sensitive-bucket-{idx}")
+        _populate_bucket(bucket, idx)
+        buckets.append(bucket)
+
+    bucket_names = [b.id for b in buckets]
+    pulumi.export("Exfil Bucket Names", pulumi.Output.all(*bucket_names))
 
 
 def create_agent_installation():
@@ -64,7 +82,7 @@ def create_agent_installation():
     installer_object = s3.BucketObject(
         "agent-installer-obj",
         bucket=bucket.id,
-        key="agent_installer.zip",  # <--- The EC2 will download this key
+        key="agent_installer.zip",
         source=pulumi.FileArchive(agent_installer_path),
     )
 

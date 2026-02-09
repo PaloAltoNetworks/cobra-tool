@@ -5,3 +5,5 @@ CYTOOL_STATUS_CMD = "/opt/traps/bin/cytool status"
 
 DEFAULT_BACKDOOR_USERNAME = "cobra-prod-system-backup-user"
 BACKDOOR_ADMIN_POLICY_ARN = "arn:aws:iam::aws:policy/AdministratorAccess"
+
+DEFAULT_EXFIL_BUCKET_COUNT = 20
