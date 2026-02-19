@@ -21,10 +21,12 @@ iam_resources = iam.create_iam_resources()
 dev_access_key = iam_resources['dev_access_key']
 lambda_role = iam_resources['lambda_role']
 iam_monitor_role = iam_resources['iam_monitor_role']
+user_prefix = iam_resources['user_prefix']
 
 pulumi.export("Dev Access Key ID", dev_access_key.id)
 pulumi.export("Dev Access Key Secret", dev_access_key.secret)
 pulumi.export("IAM Monitor Role ARN", iam_monitor_role.arn)
+pulumi.export("User Prefix", user_prefix)
 
 # Lambda
 lambda_function.create_lambda(iam_resources['lambda_role'])

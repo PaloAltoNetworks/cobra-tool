@@ -46,6 +46,9 @@ def create_ec2_role():
 
 
 def create_iam_resources():
+    config = pulumi.Config()
+    user_prefix = config.get("userPrefix") or ""
+
     # Create RandomInteger for dev user suffix
     dev_user_suffix = pulumi_random.RandomInteger(
         "dev-user-suffix",
@@ -56,7 +59,9 @@ def create_iam_resources():
     # Create 'dev' user
     dev_user = aws.iam.User(
         "dev-user",
-        name=dev_user_suffix.result.apply(lambda n: f"cobra-scenario-8-developer-user--{n}"),
+        name=dev_user_suffix.result.apply(
+            lambda n: f"{user_prefix}-cobra-scenario-8-developer-user--{n}" if user_prefix else f"cobra-scenario-8-developer-user--{n}"
+        ),
     )
     dev_user_arn = dev_user.arn
 
@@ -151,6 +156,7 @@ def create_iam_resources():
         "lambda_role": lambda_role,
         "iam_monitor_role": iam_monitor_role,
         "dev_access_key": dev_access_key,
+        "user_prefix": user_prefix,
     }
 
 

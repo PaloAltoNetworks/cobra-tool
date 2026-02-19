@@ -2,7 +2,7 @@ import os
 import pulumi
 from pulumi_aws import s3
 
-DEFAULT_EXFIL_BUCKET_COUNT = 20
+DEFAULT_EXFIL_BUCKET_COUNT = 16
 
 
 def _populate_bucket(bucket, bucket_index):
@@ -14,46 +14,46 @@ def _populate_bucket(bucket, bucket_index):
     """
     s3_objects = []
 
-    for i in range(6):
-        s3_objects.append(
-            s3.BucketObject(
-                f"strategy-doc-b{bucket_index}-{str(i)}",
-                bucket=bucket.id,
-                key=f"confidential/project_cobra_confidential_{str(i)}.txt",
-                source=pulumi.FileAsset("./bucket_files/phase2_strategy.txt"),
-                content_type="text/plain",
-            )
-        )
 
-        s3_objects.append(
-            s3.BucketObject(
-                f"postmortem-doc-b{bucket_index}-{str(i)}",
-                bucket=bucket.id,
-                key=f"incidents/2024/incident_postmortem_sev1_{str(i)}.txt",
-                source=pulumi.FileAsset("./bucket_files/incident_report_2024.txt"),
-                content_type="text/plain",
-            )
+    s3_objects.append(
+        s3.BucketObject(
+            f"strategy-doc-b{bucket_index}",
+            bucket=bucket.id,
+            key=f"confidential/project_cobra_confidential-b{bucket_index}.txt",
+            source=pulumi.FileAsset("./bucket_files/phase2_strategy.txt"),
+            content_type="text/plain",
         )
+    )
 
-        s3_objects.append(
-            s3.BucketObject(
-                f"chat-log-b{bucket_index}-{str(i)}",
-                bucket=bucket.id,
-                key=f"logs/slack_exports/chat_export_dev_ops_{str(i)}.txt",
-                source=pulumi.FileAsset("./bucket_files/chat_devops.txt"),
-                content_type="text/plain",
-            )
+    s3_objects.append(
+        s3.BucketObject(
+            f"postmortem-doc-b{bucket_index}",
+            bucket=bucket.id,
+            key=f"incidents/2024/incident_postmortem_sev1-b{bucket_index}.txt",
+            source=pulumi.FileAsset("./bucket_files/incident_report_2024.txt"),
+            content_type="text/plain",
         )
+    )
 
-        s3_objects.append(
-            s3.BucketObject(
-                f"transactions-snippet-b{bucket_index}-{str(i)}",
-                bucket=bucket.id,
-                key=f"logs/slack_exports/sensitive_info_{str(i)}.txt",
-                source=pulumi.FileAsset("./bucket_files/sensitive_info.txt"),
-                content_type="text/plain",
-            )
+    s3_objects.append(
+        s3.BucketObject(
+            f"chat-log-b{bucket_index}",
+            bucket=bucket.id,
+            key=f"logs/slack_exports/chat_export_dev_ops-b{bucket_index}.txt",
+            source=pulumi.FileAsset("./bucket_files/chat_devops.txt"),
+            content_type="text/plain",
         )
+    )
+
+    s3_objects.append(
+        s3.BucketObject(
+            f"transactions-snippet-b{bucket_index}",
+            bucket=bucket.id,
+            key=f"logs/slack_exports/sensitive_info-b{bucket_index}.txt",
+            source=pulumi.FileAsset("./bucket_files/sensitive_info.txt"),
+            content_type="text/plain",
+        )
+    )
 
     return s3_objects
 

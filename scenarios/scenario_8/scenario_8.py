@@ -53,6 +53,11 @@ class ScenarioExecution:
         self.iam_monitor_role_arn = data["IAM Monitor Role ARN"]
         self.exfil_bucket_names = data["Exfil Bucket Names"]
 
+        # Apply user prefix to the backdoor username if configured
+        user_prefix = data.get("User Prefix", "")
+        if user_prefix:
+            self.backdoor_username = f"{user_prefix}-{DEFAULT_BACKDOOR_USERNAME}"
+
         if self.agent_included:
             self.compromised_ec2_external_ip = data["Compromised Server Public IP"]
         else:
@@ -120,8 +125,8 @@ class ScenarioExecution:
     def wait_for_agent(self):
         self._wait_for_condition(
             check_func=self.check_agent_connected,
-            success_msg="Agent connected!",
-            timeout_msg="Agent did not connect for too long (timed out), aborting...",
+            success_msg="Agent EDR enabled!",
+            timeout_msg="Agent EDR did not start for too long (timed out), aborting...",
         )
 
     def attacker_run(self, cmdline, return_errcode=False, check=False, use_tor=True):
@@ -593,6 +598,14 @@ class ScenarioExecution:
         self.s3_exfiltration()
 
     def scenario_8_destroy(self):
+        # Read the user prefix from Pulumi output to construct the correct backdoor username
+        if os.path.exists(PULUMI_OUTPUT_JSON_PATH):
+            with open(PULUMI_OUTPUT_JSON_PATH, "r") as file:
+                data = json.load(file)
+            user_prefix = data.get("User Prefix", "")
+            if user_prefix:
+                self.backdoor_username = f"{user_prefix}-{DEFAULT_BACKDOOR_USERNAME}"
+
         print(colored("Cleaning up: Removing backdoor user...", "yellow"))
         run_command(
             f"aws iam delete-login-profile --user-name {self.backdoor_username}",

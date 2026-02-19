@@ -9,11 +9,14 @@ config:
   infra:extraRegion: us-west-1
 
   # Whether to include the agent machine in the scenario
-  infra:includeAgent: False
-  infra:agentInstallerPath: ../../../osher-cobra-agent_sh.tar.gz # Needs to be tar.gz of x86_64 SH Linux Installer
+  infra:includeAgent: True
+  infra:agentInstallerPath: ../../../cobra-8-agent-ec2_sh.tar.gz # Needs to be tar.gz of x86_64 SH Linux Installer
 
-  # Number of S3 buckets to create for exfiltration (default: 20)
-  # infra:exfilBucketCount: 20
+  # Prefix for created IAM user names (dev user, backdoor user, etc.)
+  infra:userPrefix: "TEST"
+
+  # Number of S3 buckets to create for exfiltration
+  # infra:exfilBucketCount: 16
 
   # Set the appropriate vpc & subnet if needed
   # infra:subnetId: subnet-00296c3ce08ebf532
