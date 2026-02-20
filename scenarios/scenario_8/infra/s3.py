@@ -55,6 +55,16 @@ def _populate_bucket(bucket, bucket_index):
         )
     )
 
+    s3_objects.append(
+        s3.BucketObject(
+            f"users-b{bucket_index}",
+            bucket=bucket.id,
+            key=f"data/users-b{bucket_index}.csv",
+            source=pulumi.FileAsset("./bucket_files/users.csv"),
+            content_type="text/csv",
+        )
+    )
+
     return s3_objects
 
 

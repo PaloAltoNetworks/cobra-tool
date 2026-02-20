@@ -12,6 +12,18 @@ config:
   infra:includeAgent: True
   infra:agentInstallerPath: ../../../cobra-8-agent-ec2_sh.tar.gz # Needs to be tar.gz of x86_64 SH Linux Installer
 
+  # Pin the Ubuntu AMI to a specific ID to lock the kernel version.
+  # The ID is region-specific – make sure it matches aws:region above.
+  # When includeAgent is True, make sure the AMI's kernel version is
+  # supported by the agent; otherwise the agent installation may fail.
+  # https://docs-cortex.paloaltonetworks.com/r/Cortex-XDR/Linux-Kernel-Versions/Ubuntu-24-x86_64
+  # Find available AMIs with:
+  #   aws ec2 describe-images --owners 099720109477 \
+  #     --filters "Name=name,Values=ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*" \
+  #     --query 'Images | sort_by(@, &CreationDate) | [-5:].{Name:Name,ImageId:ImageId,CreationDate:CreationDate}' \
+  #     --output table --region us-east-1
+  infra:ubuntuAmiId: ami-0b6c6ebed2801a5cb
+
   # Prefix for created IAM user names (dev user, backdoor user, etc.)
   infra:userPrefix: "TEST"
 
