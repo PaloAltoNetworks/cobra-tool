@@ -9,7 +9,7 @@ config:
   infra:extraRegion: us-west-1
 
   # Whether to include the agent machine in the scenario
-  infra:includeAgent: True
+  infra:includeAgent: False
   infra:agentInstallerPath: ../../../cobra-8-agent-ec2_sh.tar.gz # Needs to be tar.gz of x86_64 SH Linux Installer
 
   # Pin the Ubuntu AMI to a specific ID to lock the kernel version.
@@ -42,9 +42,9 @@ config:
   infra:tags:
     value: |
       {
-        "Owner": "Osher",
-        "UC-OWNER": "Osher",
-        "Team": "Sparrow",
+        "Owner": "cobra",
+        "UC-OWNER": "cobra",
+        "Team": "cobra",
         "Project": "Cobra"
       }
 

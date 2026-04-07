@@ -3,6 +3,7 @@ import string
 import random
 import shlex
 import re
+import subprocess
 import time
 import json
 from tqdm import tqdm
@@ -52,15 +53,14 @@ class ScenarioExecution:
         self.lambda_role_arn = data["Lambda Role ARN"]
         self.iam_monitor_role_arn = data["IAM Monitor Role ARN"]
         self.exfil_bucket_names = data["Exfil Bucket Names"]
+        self.compromised_ec2_external_ip = data.get("Compromised Server Public IP")
 
         # Apply user prefix to the backdoor username if configured
         user_prefix = data.get("User Prefix", "")
         if user_prefix:
             self.backdoor_username = f"{user_prefix}-{DEFAULT_BACKDOOR_USERNAME}"
 
-        if self.agent_included:
-            self.compromised_ec2_external_ip = data["Compromised Server Public IP"]
-        else:
+        if not self.agent_included:
             self.attacker_env_vars["AWS_ACCESS_KEY_ID"] = data["Dev Access Key ID"]
             self.attacker_env_vars["AWS_SECRET_ACCESS_KEY"] = data[
                 "Dev Access Key Secret"
@@ -443,11 +443,12 @@ class ScenarioExecution:
             )
 
         else:
-            self.post_execution()
+            self.read_pulumi_config()
+            self._run_attack_simulation()
 
-    def post_execution(self):
+    def _run_attack_simulation(self):
+        """Run the full attack simulation (privilege escalation, persistence & data exfiltration)."""
         print(colored("Starting attack simulation...", "cyan"))
-        self.read_pulumi_config()
 
         print(colored("Waiting for attacker machine to initialize...", "yellow"))
         loading_animation()
@@ -596,6 +597,92 @@ class ScenarioExecution:
 
         print(colored("[ATTACKER] Exfiltrating S3 data...", "red"))
         self.s3_exfiltration()
+
+    def post_execution(self):
+        self.read_pulumi_config()
+        print(colored("Select Post Simulation Task:", color="yellow"))
+        print(colored("1. Upload file in Compromised Dev Machine", color="green"))
+        print(colored("2. Upload file in Attacker Server", color="green"))
+        print(colored("3. SSH inside Compromised Dev Machine", color="green"))
+        print(colored("4. SSH inside Attacker Server", color="green"))
+        print(
+            colored(
+                "5. Perform AWS Privilege Escalation, Persistence & Data Exfiltration Attack",
+                color="green",
+            )
+        )
+        print(colored("6. Exit", color="green"))
+        while True:
+            try:
+                choice = int(input(colored("Enter your choice: ", color="yellow")))
+                if choice not in [1, 2, 3, 4, 5, 6]:
+                    raise ValueError(
+                        colored(
+                            "Invalid choice. Please enter 1, 2, 3, 4, 5 or 6.",
+                            color="red",
+                        )
+                    )
+                if choice == 1:
+                    if not self.compromised_ec2_external_ip:
+                        print(
+                            colored(
+                                "Compromised Dev Machine IP is not available. Make sure the machine was deployed.",
+                                color="red",
+                            )
+                        )
+                        continue
+                    source_file = input(
+                        colored("Enter file path: ", color="yellow")
+                    )
+                    upload_file_to_server(
+                        source_file,
+                        server_username="ubuntu",
+                        server_ip=self.compromised_ec2_external_ip,
+                        server_directory="/home/ubuntu/",
+                        key_path=self.compromised_ec2_key,
+                    )
+                    print("Uploaded Successfully!!")
+                    return
+                elif choice == 2:
+                    source_file = input(
+                        colored("Enter file path: ", color="yellow")
+                    )
+                    upload_file_to_server(
+                        source_file,
+                        server_username="ubuntu",
+                        server_ip=self.attacker_ec2_external_ip,
+                        server_directory="/home/ubuntu/",
+                        key_path=self.attacker_ec2_key,
+                    )
+                    print("Uploaded Successfully!!")
+                    return
+                elif choice == 3:
+                    if not self.compromised_ec2_external_ip:
+                        print(
+                            colored(
+                                "Compromised Dev Machine IP is not available. Make sure the machine was deployed.",
+                                color="red",
+                            )
+                        )
+                        continue
+                    subprocess.call(
+                        f"ssh -o 'StrictHostKeyChecking accept-new' -i {self.compromised_ec2_key} ubuntu@{self.compromised_ec2_external_ip}",
+                        shell=True,
+                    )
+                    return
+                elif choice == 4:
+                    subprocess.call(
+                        f"ssh -o 'StrictHostKeyChecking accept-new' -i {self.attacker_ec2_key} ubuntu@{self.attacker_ec2_external_ip}",
+                        shell=True,
+                    )
+                    return
+                elif choice == 5:
+                    self._run_attack_simulation()
+                    return
+                elif choice == 6:
+                    return
+            except ValueError as e:
+                print(e)
 
     def scenario_8_destroy(self):
         # Read the user prefix from Pulumi output to construct the correct backdoor username

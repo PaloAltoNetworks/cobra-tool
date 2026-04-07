@@ -36,7 +36,7 @@ else:
         "cobra-subnet",
         vpc_id=vpc.id,
         cidr_block="10.0.1.0/24",
-        availability_zone=f"{region.region}a",
+        availability_zone=f"{region.name}a",
         tags={"Name": "Cobra Scenario 8 Subnet"},
     )
 

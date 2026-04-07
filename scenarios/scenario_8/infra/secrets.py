@@ -36,16 +36,21 @@ def create_secrets():
     )
 
     # This secret will be created in another region
+    extra_region_provider = aws.Provider(
+        "extra-region-provider",
+        region=extra_region,
+    )
+
     demo_secret_map = aws.secretsmanager.Secret(
         "secret-map",
-        region=extra_region,
         name="Cobra-8-Secret-Map",
         recovery_window_in_days=0,
         description="Another well kept secret.",
+        opts=pulumi.ResourceOptions(provider=extra_region_provider),
     )
     aws.secretsmanager.SecretVersion(
         "secret-map-version",
-        region=extra_region,
         secret_id=demo_secret_map.id,
         secret_string=json.dumps({"username": "root", "password": "r00t9001!"}),
+        opts=pulumi.ResourceOptions(provider=extra_region_provider),
     )

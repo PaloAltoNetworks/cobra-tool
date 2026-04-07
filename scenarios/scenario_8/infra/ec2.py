@@ -8,7 +8,7 @@ from utils import *
 
 config = pulumi.Config()
 region = aws.get_region()
-pulumi.export("Region", region.region)
+pulumi.export("Region", region.name)
 
 # ---------------------------------------------------------------------------
 # Ubuntu AMI resolution
@@ -134,7 +134,7 @@ def create_ec2_attacker_machine():
 
 
 def create_ec2_compromised_machine(
-    ec2_role, dev_access_key, lambda_role, agent_bucket, agent_object
+    dev_access_key, lambda_role, ec2_role=None, agent_bucket=None, agent_object=None
 ):
     public_key_path = config.require("compromisedPublicKeyPath")
     key_pair = aws.ec2.KeyPair(
@@ -143,25 +143,67 @@ def create_ec2_compromised_machine(
         public_key=read_public_key(public_key_path),
     )
 
-    instance_profile = aws.iam.InstanceProfile(
-        "ec2-instance-profile",
-        name="cobra-scenario-8-instance-profile",
-        role=ec2_role.name,
-    )
+    instance_profile = None
+    if ec2_role:
+        instance_profile = aws.iam.InstanceProfile(
+            "ec2-instance-profile",
+            name="cobra-scenario-8-instance-profile",
+            role=ec2_role.name,
+        )
 
-    user_data_script_template = open(
-        "./ec2_user_data_scripts/compromised_init_script_template.sh", "r"
-    ).read()
+    if agent_bucket and agent_object:
+        user_data_script_template = open(
+            "./ec2_user_data_scripts/compromised_init_script_template.sh", "r"
+        ).read()
 
-    user_data_script = pulumi.Output.format(
-        user_data_script_template,
-        dev_access_key.id,  # {0}
-        dev_access_key.secret,  # {1}
-        lambda_role.arn,  # {2}
-        agent_bucket.bucket,  # {3} Bucket Name
-        agent_object.key,  # {4} Object Key
-        region.region,  # {5}
-    )
+        user_data_script = pulumi.Output.format(
+            user_data_script_template,
+            dev_access_key.id,  # {0}
+            dev_access_key.secret,  # {1}
+            lambda_role.arn,  # {2}
+            agent_bucket.bucket,  # {3} Bucket Name
+            agent_object.key,  # {4} Object Key
+            region.name,  # {5}
+        )
+    else:
+        # No agent - just configure AWS credentials
+        user_data_script_no_agent = """#!/bin/bash
+# 1. Install Dependencies
+sudo snap install aws-cli --classic
+sudo apt-get update
+
+# 2. Configure 'Dev User' Credentials
+mkdir -p /home/ubuntu/.aws
+
+cat <<EOF > /home/ubuntu/.aws/credentials
+[default]
+aws_access_key_id = {0}
+aws_secret_access_key = {1}
+EOF
+
+cat <<EOF > /home/ubuntu/.aws/config
+[default]
+region = {2}
+
+[profile lambda-role]
+role_arn = {3}
+source_profile = default
+EOF
+
+# 3. Fix permissions
+chown -R ubuntu:ubuntu /home/ubuntu/.aws
+chmod 600 /home/ubuntu/.aws/credentials
+chmod 600 /home/ubuntu/.aws/config
+
+echo "Setup complete."
+"""
+        user_data_script = pulumi.Output.format(
+            user_data_script_no_agent,
+            dev_access_key.id,  # {0}
+            dev_access_key.secret,  # {1}
+            region.name,  # {2}
+            lambda_role.arn,  # {3}
+        )
 
     # Security group
     compromised_ec2_sg = aws.ec2.SecurityGroup(
@@ -187,11 +229,9 @@ def create_ec2_compromised_machine(
     )
 
     # Create an EC2 instance with user data
-    instance = aws.ec2.Instance(
-        "ec2-compromised-dev-machine",
+    instance_kwargs = dict(
         instance_type="t2.small",
         ami=ubuntu_ami.id,
-        iam_instance_profile=instance_profile.name,
         vpc_security_group_ids=[compromised_ec2_sg.id],
         subnet_id=subnet_id,
         associate_public_ip_address=True,
@@ -207,6 +247,13 @@ def create_ec2_compromised_machine(
             )
         ],
         tags={"Name": "Cobra Scenario 8 - Compromised Dev Machine"},
+    )
+    if instance_profile:
+        instance_kwargs["iam_instance_profile"] = instance_profile.name
+
+    instance = aws.ec2.Instance(
+        "ec2-compromised-dev-machine",
+        **instance_kwargs,
     )
 
     pulumi.export("Compromised Server Public IP", instance.public_ip)

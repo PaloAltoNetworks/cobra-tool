@@ -33,10 +33,10 @@ lambda_function.create_lambda(iam_resources['lambda_role'])
 pulumi.export("Lambda Role ARN", iam_resources['lambda_role'].arn)
 
 # Track when scenario includes agent, and add agent machine if it does
-agent_included = config.require_bool("includeAgent")
+agent_included = config.get_bool("includeAgent") or False
 pulumi.export("Agent Included", agent_included)
 
-if agent_included == True:
+if agent_included:
     # Assets required for agent installation
     s3_agent_assets = s3.create_agent_installation()
     agent_bucket = s3_agent_assets['agent_bucket']
@@ -45,7 +45,10 @@ if agent_included == True:
     # Assets for the EC2 machine with the agent
     ec2_role = iam.create_ec2_role()
     iam.add_agent_bucket_permission(ec2_role, agent_bucket)
-    ec2.create_ec2_compromised_machine(ec2_role, dev_access_key, lambda_role, agent_bucket, agent_installer_object)
+    ec2.create_ec2_compromised_machine(dev_access_key, lambda_role, ec2_role=ec2_role, agent_bucket=agent_bucket, agent_object=agent_installer_object)
+else:
+    # Create compromised machine without agent
+    ec2.create_ec2_compromised_machine(dev_access_key, lambda_role)
 
 # Secrets and S3 for impact stage
 secrets.create_secrets()
