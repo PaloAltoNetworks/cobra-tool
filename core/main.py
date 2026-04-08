@@ -11,7 +11,7 @@ from .report import gen_report_2
 from scenarios.scenario_1 import scenario_1
 from scenarios.scenario_2 import scenario_2
 from scenarios.scenario_7 import scenario_7
-from scenarios.scenario_3.scenario_3 import scenario_3_execute
+from scenarios.scenario_3 import scenario_3
 from scenarios.scenario_4.scenario_4 import scenario_4_execute
 from scenarios.scenario_5.scenario_5 import scenario_5_execute
 from scenarios.scenario_6.scenario_6 import scenario_6_execute
@@ -82,7 +82,7 @@ def execute_scenario(x, manual):
         elif x == 2:
             scenario_2.ScenarioExecution().scenario_2_execute()
         elif x == 3:
-            scenario_3_execute()
+            scenario_3.ScenarioExecution().execute(manual)
         elif x == 4:
             scenario_4_execute()
         elif x == 5:
@@ -106,9 +106,11 @@ def post_execute_scenario(x):
             scenario_1.ScenarioExecution().post_execution()
         elif x == 2:
             scenario_2.ScenarioExecution.post_execution("None")
+        elif x == 3:
+            scenario_3.ScenarioExecution().post_execution()
         elif x == 7:
             scenario_7.ScenarioExecution.post_execution("None")
-        else: 
+        else:
             print("Invalid Scenario Selected")
         print(colored("Thank you for using COBRA!", color="green"))
     except Exception as e:
@@ -144,6 +146,8 @@ def main(action, simulation, scenario, manual):
                 post_execute_scenario(1)
             elif scenario_choice == 2:
                 post_execute_scenario(2)
+            elif scenario_choice == 3:
+                post_execute_scenario(3)
             elif scenario_choice == 7:
                 post_execute_scenario(7)
     elif action == 'status' and scenario == "cobra-scenario-1":
