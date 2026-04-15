@@ -41,7 +41,7 @@ class ScenarioExecution:
             data = json.load(file)
         
         REGION = data["Region"] 
-        CLUSTER_NAME = data["ClusterData"]["cluster"]["name"]
+        CLUSTER_NAME = data["ClusterName"]
         
 
         subprocess.call(f"aws eks update-kubeconfig --name {CLUSTER_NAME} --region {REGION}", shell=True)

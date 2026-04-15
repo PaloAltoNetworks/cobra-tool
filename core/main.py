@@ -85,7 +85,7 @@ def execute_scenario(x, manual):
         elif x == 2:
             scenario_2.ScenarioExecution().scenario_2_execute()
         elif x == 3:
-            scenario_3_execute()
+            scenario_3.ScenarioExecution().execute(manual)
         elif x == 4:
             scenario_4_execute()
         elif x == 5:
@@ -112,6 +112,8 @@ def post_execute_scenario(x):
             scenario_1.ScenarioExecution().post_execution()
         elif x == 2:
             scenario_2.ScenarioExecution.post_execution("None")
+        elif x == 3:
+            scenario_3.ScenarioExecution().post_execution()
         elif x == 7:
             scenario_7.ScenarioExecution.post_execution("None")
         elif x == 8:
@@ -140,6 +142,8 @@ def main(action, simulation, scenario, manual):
                 post_execute_scenario(1)
             elif scenario_choice == 2:
                 post_execute_scenario(2)
+            elif scenario_choice == 3:
+                post_execute_scenario(3)
             elif scenario_choice == 7:
                 post_execute_scenario(7)
             elif scenario_choice == 8:
