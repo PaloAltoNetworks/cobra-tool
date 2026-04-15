@@ -1,0 +1,54 @@
+Slack Export - Channel: #dev-ops-emergency
+
+Date: 2024-11-01
+Topic: SEV-1 Production Outage
+
+[08:58 AM] Sarah (Dev):
+@channel The Lambda function cobra-scenario-8-lambda is failing hard. 100% error rate. Customers are getting 500s on the payment screen.
+
+[09:01 AM] Mike (Ops Lead):
+On it. Looking at CloudWatch. It's an IAM permission error.
+ClientError: An error occurred (AccessDenied) when calling the AssumeRole operation
+
+[09:05 AM] Sarah (Dev):
+I thought we fixed the trust policy yesterday?
+
+[09:06 AM] Mike (Ops Lead):
+We did, but it looks like the ExternalId condition is failing for the partner account. I can't debug this without redeploying, but the CI/CD pipeline is stuck because the build agent keys expired this morning. Perfect timing. 😤
+
+[09:10 AM] J. Doe (Director):
+@Mike @Sarah Updates? The CISO is breathing down my neck. We are losing $10k a minute here. Fix it. NOW.
+
+[09:12 AM] Mike (Ops Lead):
+I can't redeploy through the pipeline. I need to manually update the stack from the jump box (ec2-compromised-dev-machine), but I need fresh keys.
+
+[09:13 AM] J. Doe (Director):
+Just generate them. Bypass the approval workflow. I'll sign off on it later.
+
+[09:15 AM] Mike (Ops Lead):
+Done. I've generated permanent keys for dev-user. I'm baking them directly into the EC2 User Data so they stick if the instance reboots.
+Path: /home/ubuntu/.aws/credentials
+Profile: default
+
+[09:20 AM] Sarah (Dev):
+Okay, I can access the box now. But the Lambda is still failing AssumeRole. We don't have time to figure out which specific role ARN is wrong.
+
+[09:22 AM] Mike (Ops Lead):
+Screw it. I'm updating the Lambda execution role policy to Resource: * for sts:AssumeRole. That will let it assume ANY role it wants. It's a hammer, but it will stop the bleeding.
+
+[09:25 AM] Sarah (Dev):
+Is that safe? That means the Lambda can essentially become Admin if it guesses the right role name.
+
+[09:26 AM] J. Doe (Director):
+Does it work?
+
+[09:28 AM] Sarah (Dev):
+...Yes. Transactions are flowing again.
+
+[09:30 AM] Mike (Ops Lead):
+Crisis averted. I'll add a ticket to revert this later. Let's just... not mention the "Resource: *" part in the official RCA report, okay? Just say "permissions were adjusted."
+
+[09:31 AM] Sarah (Dev):
+Copy that.
+
+End of Export

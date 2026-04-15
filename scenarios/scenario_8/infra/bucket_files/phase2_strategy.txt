@@ -1,0 +1,88 @@
+TOP SECRET // NOFORN // INTERNAL USE ONLY
+
+PROJECT COBRA - PHASE 2 STRATEGY DOCUMENT
+
+DATE: 2024-11-15
+
+AUTHOR: Director J. Doe
+
+1. EXECUTIVE SUMMARY
+
+Project Cobra represents the organization's pivot to a fully serverless architecture for our next-generation financial transaction engine. This document outlines the confidential architectural decisions, budget allocations, and known vulnerability assessments for the Q4 rollout.
+
+WARNING: Unauthorized access to this document constitutes a Level 4 security violation.
+
+2. ARCHITECTURE OVERVIEW (CONFIDENTIAL)
+
+2.1 The "Lambda-First" Approach
+
+We are migrating all legacy EC2 workloads to AWS Lambda to reduce operational overhead.
+
+Target: 100% serverless by Q2 2025.
+
+Current Status: The cobra-scenario-8-lambda function is currently deployed in the us-east-1 region handling pilot transactions.
+
+2.2 Critical Infrastructure
+
+Identity Management: We are currently auditing our IAM roles. Note that the dev-user accounts have been granted temporary elevated privileges to speed up the migration. This is a known risk accepted by the CISO until the migration completes.
+
+Data Storage: All transaction logs are stored in the S3 bucket cobra-financial-records-v2-private.
+
+Network: All traffic is routed through the isolated VPC vpc-0a1b2c3d.
+
+3. BUDGET ALLOCATION (EYES ONLY)
+
+Item
+
+Allocation (USD)
+
+Notes
+
+AWS Compute (Lambda)
+
+$1.2M
+
+Projected scale for Q4
+
+Security Audits
+
+$150k
+
+Delayed due to budget cuts
+
+R&D Personnel
+
+$4.5M
+
+Cobra Team Alpha
+
+"Slush Fund"
+
+$500k
+
+Discretionary funds for rapid prototyping
+
+NOTE: The reduction in the Security Audit budget is strictly confidential. Do not discuss with external auditors.
+
+4. KNOWN RISKS & MITIGATIONS
+
+Risk 4.1: Over-Permissive Roles
+
+During the transition, several Lambda execution roles have been granted AdministratorAccess or broad sts:AssumeRole capabilities to debug cross-account connectivity issues.
+
+Mitigation: These policies are scheduled to be scoped down in Sprint 42.
+
+Current Exposure: HIGH. If a developer account is compromised, lateral movement is trivial.
+
+Risk 4.2: Supply Chain
+
+We are using several unvetted Python libraries in the Lambda layer for the prototype.
+
+5. CONTACTS
+
+Project Lead: admin@cobra-corp.internal
+
+Security Ops: sec-ops@cobra-corp.internal (On-call pager: 555-0199)
+
+END OF DOCUMENT
+DO NOT DISTRIBUTE
