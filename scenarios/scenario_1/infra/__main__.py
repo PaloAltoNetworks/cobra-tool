@@ -20,6 +20,43 @@ def read_public_key(pub_key_path):
 
 current = aws.get_region()
 
+# --- VPC & Networking ---
+vpc = aws.ec2.Vpc("cobra-vpc",
+    cidr_block="10.0.0.0/16",
+    enable_dns_hostnames=True,
+    enable_dns_support=True,
+    tags={**GLOBAL_TAGS, "Name": "Cobra Scenario 1 VPC"},
+)
+
+igw = aws.ec2.InternetGateway("cobra-igw",
+    vpc_id=vpc.id,
+    tags={**GLOBAL_TAGS, "Name": "Cobra Scenario 1 IGW"},
+)
+
+subnet = aws.ec2.Subnet("cobra-subnet",
+    vpc_id=vpc.id,
+    cidr_block="10.0.1.0/24",
+    availability_zone=f"{current.name}a",
+    map_public_ip_on_launch=True,
+    tags={**GLOBAL_TAGS, "Name": "Cobra Scenario 1 Subnet"},
+)
+
+route_table = aws.ec2.RouteTable("cobra-rt",
+    vpc_id=vpc.id,
+    routes=[
+        aws.ec2.RouteTableRouteArgs(
+            cidr_block="0.0.0.0/0",
+            gateway_id=igw.id,
+        )
+    ],
+    tags={**GLOBAL_TAGS, "Name": "Cobra Scenario 1 RT"},
+)
+
+aws.ec2.RouteTableAssociation("cobra-rta",
+    route_table_id=route_table.id,
+    subnet_id=subnet.id,
+)
+
 key_pair = aws.ec2.KeyPair("my-key-pair", public_key=read_public_key("../../../id_rsa.pub"))
 
 ubuntu_ami = aws.ec2.get_ami(
@@ -93,6 +130,7 @@ policy = aws.iam.RolePolicy("ec2-role-policy",
 )
 
 sg = aws.ec2.SecurityGroup("web-sg",
+    vpc_id=vpc.id,
     ingress=[
         {
             "protocol": "tcp",
@@ -133,14 +171,63 @@ sg = aws.ec2.SecurityGroup("web-sg",
     }]
 )
 
-# User data script to be executed when the instance starts
-user_data_script = """
-IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgZG9ja2VyLmlvIC15CnN1ZG8gYXB0IGluc3RhbGwgcHl0aG9uMy1waXAgLXkKc3VkbyBwaXAzIGluc3RhbGwgYXdzLWV4cG9ydC1jcmVkZW50aWFscwpzdWRvIHBpcDMgaW5zdGFsbCBhd3NjbGkKc3VkbyBzeXN0ZW1jdGwgc3RhcnQgZG9ja2VyCnN1ZG8gc3lzdGVtY3RsIGVuYWJsZSBkb2NrZXIKc3VkbyBhcHQgaW5zdGFsbCB1bnppcApzdWRvIHN5c3RlbWN0bCBzdGFydCBkb2NrZXIKc3VkbyBzeXN0ZW1jdGwgZW5hYmxlIGRvY2tlcgpzdWRvIHN5c3RlbWN0bCBzdG9wIHRvbWNhdDkuc2VydmljZQpzdWRvIGFwdCAgaW5zdGFsbCBkb2NrZXItY29tcG9zZSAteQp3Z2V0IGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9QYWxvQWx0b05ldHdvcmtzL2NvYnJhLXRvb2wvcmVmcy9oZWFkcy9tYWluL3NjZW5hcmlvcy9zY2VuYXJpb18xL2luZnJhL3ZpY3RpbS1sYWItZmlsZXMvYXBwLnppcCAtUCAvaG9tZS91YnVudHUvCmNkIC9ob21lL3VidW50dS8gJiYgdW56aXAgL2hvbWUvdWJ1bnR1L2FwcC56aXAKc3VkbyBkb2NrZXItY29tcG9zZSAtZiAvaG9tZS91YnVudHUvYXBwL2RvY2tlci1jb21wb3NlLnltbCB1cCAtLWJ1aWxkIC1kCnN1ZG8gZG9ja2VyIHJ1biAtZCAtcCA4MDgxOjgwODAgYW5hbmRkb2NrZXJodWIvc3ByaW5nNHNoZWxsOmxhdGVzdA
+# Victim Web Server user data script (plain text - Pulumi handles base64 encoding)
+user_data_script = """#!/bin/bash
+sudo apt update -y
+sudo apt install docker.io -y
+sudo apt install python3-pip -y
+sudo pip3 install aws-export-credentials
+sudo pip3 install awscli
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo apt install unzip -y
+sudo systemctl stop tomcat9.service
+
+# Install Docker Compose v2 plugin
+sudo mkdir -p /usr/local/lib/docker/cli-plugins
+sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+wget https://raw.githubusercontent.com/PaloAltoNetworks/cobra-tool/refs/heads/main/scenarios/scenario_1/infra/victim-lab-files/app.zip -P /home/ubuntu/
+cd /home/ubuntu/ && unzip /home/ubuntu/app.zip
+sudo docker compose -f /home/ubuntu/app/docker-compose.yml up --build -d
+sudo docker run -d -p 8081:8080 ananddockerhub/spring4shell:latest
 """
 
-#Attacker Machine User Script
-user_data_script_1 = """
-IyEvYmluL2Jhc2gKc3VkbyBhcHQgdXBkYXRlIC15CnN1ZG8gYXB0IGluc3RhbGwgcHl0aG9uMy1waXAgLXkKc3VkbyBhcHQgaW5zdGFsbCB1bnppcCAgLXkKc3VkbyBhcHQgIGluc3RhbGwgYXdzY2xpIC15CnN1ZG8gYXB0IGluc3RhbGwgZ2l0IC15CnN1ZG8gcGlwMyBpbnN0YWxsIGJzNCAKc3VkbyBhcHQgaW5zdGFsbCBqcSAteQpzdWRvIHBpcDMgaW5zdGFsbCBwYWNrYWdpbmcKCndnZXQgaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL1BhbG9BbHRvTmV0d29ya3MvY29icmEtdG9vbC9yZWZzL2hlYWRzL21haW4vc2NlbmFyaW9zL3NjZW5hcmlvXzEvaW5mcmEvYXR0YWNrZXItbGFiLWZpbGVzL2V4cGxvaXQucHkgLVAgL2hvbWUvdWJ1bnR1CmNobW9kICt4IC9ob21lL3VidW50dS9leHBsb2l0LnB5CmNob3duIHVidW50dTp1YnVudHUgL2hvbWUvdWJ1bnR1L2V4cGxvaXQucHkKCndnZXQgaHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL1BhbG9BbHRvTmV0d29ya3MvY29icmEtdG9vbC9yZWZzL2hlYWRzL21haW4vc2NlbmFyaW9zL3NjZW5hcmlvXzEvaW5mcmEvYXR0YWNrZXItbGFiLWZpbGVzL2V4cGxvaXQuc2ggLVAgL2hvbWUvdWJ1bnR1CmNobW9kICt4IC9ob21lL3VidW50dS9leHBsb2l0LnNoCmNob3duIHVidW50dTp1YnVudHUgL2hvbWUvdWJ1bnR1L2V4cGxvaXQuc2gKCndnZXQgaHR0cHM6Ly9naXRodWIuY29tL05vdFNvU2VjdXJlL2Nsb3VkLXNlcnZpY2UtZW51bS9hcmNoaXZlL3JlZnMvaGVhZHMvbWFzdGVyLnppcAp1bnppcCBtYXN0ZXIuemlwCnBpcDMgaW5zdGFsbCBjbG91ZC1zZXJ2aWNlLWVudW0tbWFzdGVyL2F3c19zZXJ2aWNlX2VudW0vcmVxdWlyZW1lbnRzLnR4dAoKY2QgL2hvbWUvdWJ1bnR1LwpnaXQgY2xvbmUgaHR0cHM6Ly9naXRodWIuY29tL1N1c21pdGhLcmlzaG5hbi90b3JnaG9zdC5naXQKbWtkaXIgL2hvbWUvdWJ1bnR1Ly5hd3MvCnRvdWNoIC9ob21lL3VidW50dS8uYXdzL2NyZWRlbnRpYWxzCmNob3duIC1SIHVidW50dTp1YnVudHUgL2hvbWUvdWJ1bnR1Ly5hd3MvCgpjZCAvaG9tZS91YnVudHUvdG9yZ2hvc3QvCmJhc2ggYnVpbGQuc2gKc3VkbyBweXRob24zIHRvcmdob3N0LnB5IC1zCnNsZWVwIDMwCnN1ZG8gcHl0aG9uMyB0b3JnaG9zdC5weSAtcw
+# Attacker Machine user data script (plain text - Pulumi handles base64 encoding)
+user_data_script_1 = """#!/bin/bash
+sudo apt update -y
+sudo apt install python3-pip -y
+sudo apt install unzip -y
+sudo apt install awscli -y
+sudo apt install git -y
+sudo pip3 install bs4
+sudo apt install jq -y
+sudo pip3 install packaging
+
+wget https://raw.githubusercontent.com/PaloAltoNetworks/cobra-tool/refs/heads/main/scenarios/scenario_1/infra/attacker-lab-files/exploit.py -P /home/ubuntu
+chmod +x /home/ubuntu/exploit.py
+chown ubuntu:ubuntu /home/ubuntu/exploit.py
+
+wget https://raw.githubusercontent.com/PaloAltoNetworks/cobra-tool/refs/heads/main/scenarios/scenario_1/infra/attacker-lab-files/exploit.sh -P /home/ubuntu
+chmod +x /home/ubuntu/exploit.sh
+chown ubuntu:ubuntu /home/ubuntu/exploit.sh
+
+wget https://github.com/NotSoSecure/cloud-service-enum/archive/refs/heads/master.zip
+unzip master.zip
+pip3 install cloud-service-enum-master/aws_service_enum/requirements.txt
+
+cd /home/ubuntu/
+git clone https://github.com/SusmithKrishnan/torghost.git
+mkdir /home/ubuntu/.aws/
+touch /home/ubuntu/.aws/credentials
+chown -R ubuntu:ubuntu /home/ubuntu/.aws/
+
+cd /home/ubuntu/torghost/
+bash build.sh
+sudo python3 torghost.py -s
+sleep 30
+sudo python3 torghost.py -s
 """
 
 instance_profile = aws.iam.InstanceProfile("my-instance-profile",
@@ -150,21 +237,25 @@ instance_profile = aws.iam.InstanceProfile("my-instance-profile",
 # Create an EC2 instance with user data
 instance = aws.ec2.Instance("web-server",
     instance_type="t2.medium",
-    ami=ubuntu_ami.id,  
+    ami=ubuntu_ami.id,
     iam_instance_profile=instance_profile.name,
-    security_groups=[sg.name],
+    vpc_security_group_ids=[sg.id],
+    subnet_id=subnet.id,
+    associate_public_ip_address=True,
     user_data=user_data_script,
     key_name=key_pair.key_name,
-    tags={**GLOBAL_TAGS, "Name": "Cobra-Webserver"}
+    tags={**GLOBAL_TAGS, "Name": "Cobra-Webserver"},
 )
 
 instance1 = aws.ec2.Instance("attacker-server",
     instance_type="t2.micro",
-    ami=ubuntu_ami.id, 
-    security_groups=[sg.name],
+    ami=ubuntu_ami.id,
+    vpc_security_group_ids=[sg.id],
+    subnet_id=subnet.id,
+    associate_public_ip_address=True,
     user_data=user_data_script_1,
     key_name=key_pair.key_name,
-    tags={**GLOBAL_TAGS, "Name": "Cobra-Attacker"}
+    tags={**GLOBAL_TAGS, "Name": "Cobra-Attacker"},
 )
 # Export the public IP of the EC2 instance
 print("Web Server Public IP")
