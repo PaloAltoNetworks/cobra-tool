@@ -1,0 +1,11 @@
+# =============================================================================
+# Global Resource Tags Configuration
+# =============================================================================
+# These tags will be applied to ALL resources across ALL scenarios.
+# Update the values below before launching any scenario.
+#
+# =============================================================================
+
+UC-OWNER: "xxxxxx"
+UC-ID: "xxxxxxx"
+UC-TTL: "xxxx"
