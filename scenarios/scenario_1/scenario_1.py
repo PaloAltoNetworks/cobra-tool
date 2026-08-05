@@ -126,7 +126,7 @@ class ScenarioExecution:
         print("-"*30)
         print(colored("Enumerating AWS Cloud environment", color="red"))
         self.loading_animation()
-        subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'pip3 install -r /cloud-service-enum-master/aws_service_enum/requirements.txt && pip3 install awsebcli --upgrade && pip3 install --upgrade awscli && python3 /cloud-service-enum-master/aws_service_enum/aws_enum_services.py'", shell=True)
+        subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'pip3 install -r cloud-service-enum-master/aws_service_enum/requirements.txt && pip3 install awsebcli --upgrade && pip3 install --upgrade awscli && python3 cloud-service-enum-master/aws_service_enum/aws_enum_services.py'", shell=True)
 
     def anomalous_infra_rollout(self):
         print("-"*30)

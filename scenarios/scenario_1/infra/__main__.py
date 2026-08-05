@@ -215,7 +215,7 @@ chown ubuntu:ubuntu /home/ubuntu/exploit.sh
 
 wget https://github.com/NotSoSecure/cloud-service-enum/archive/refs/heads/master.zip
 unzip master.zip
-pip3 install cloud-service-enum-master/aws_service_enum/requirements.txt
+pip3 install -r cloud-service-enum-master/aws_service_enum/requirements.txt
 
 cd /home/ubuntu/
 git clone https://github.com/SusmithKrishnan/torghost.git
