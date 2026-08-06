@@ -199,12 +199,20 @@ user_data_script_1 = """#!/bin/bash
 sudo apt update -y
 sudo apt install python3-pip -y
 sudo apt install unzip -y
-sudo apt install awscli -y
 sudo apt install git -y
-sudo pip3 install bs4
 sudo apt install jq -y
-sudo pip3 install packaging
+sudo apt install curl -y
 
+# Install AWS CLI v2 (avoids botocore version conflicts with apt awscli)
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+unzip -q /tmp/awscliv2.zip -d /tmp
+sudo /tmp/aws/install
+rm -rf /tmp/aws /tmp/awscliv2.zip
+
+# Python dependencies
+sudo pip3 install bs4 packaging requests
+
+# Download exploit scripts
 wget https://raw.githubusercontent.com/PaloAltoNetworks/cobra-tool/refs/heads/main/scenarios/scenario_1/infra/attacker-lab-files/exploit.py -P /home/ubuntu
 chmod +x /home/ubuntu/exploit.py
 chown ubuntu:ubuntu /home/ubuntu/exploit.py
@@ -213,13 +221,16 @@ wget https://raw.githubusercontent.com/PaloAltoNetworks/cobra-tool/refs/heads/ma
 chmod +x /home/ubuntu/exploit.sh
 chown ubuntu:ubuntu /home/ubuntu/exploit.sh
 
+# Cloud service enumeration tool
+cd /home/ubuntu/
 wget https://github.com/NotSoSecure/cloud-service-enum/archive/refs/heads/master.zip
 unzip master.zip
 pip3 install -r cloud-service-enum-master/aws_service_enum/requirements.txt
+chown -R ubuntu:ubuntu /home/ubuntu/cloud-service-enum-master
 
-cd /home/ubuntu/
+# Torghost for anonymization
 git clone https://github.com/SusmithKrishnan/torghost.git
-mkdir /home/ubuntu/.aws/
+mkdir -p /home/ubuntu/.aws/
 touch /home/ubuntu/.aws/credentials
 chown -R ubuntu:ubuntu /home/ubuntu/.aws/
 
